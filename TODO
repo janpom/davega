@@ -1,0 +1,11 @@
+- convert this into GitHub issues :)
+- increase delay if multiple consecutive VESC read failures
+- refresh full display every X secs (in case display gets reset)
+- warnings
+  - VESC error code
+  - EEPROM read error (use different storage area)
+- imperial units
+- PROGMEM for fonts & discharge ticks
+
+- update display exactly each X millis; measure time elapsed since the last update
+- enable SD card on the display
