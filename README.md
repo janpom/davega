@@ -1,6 +1,6 @@
 VeGa (Vesc Gauge, or Vesc Gadget) is a device for displaying data read from a [VESC](https://www.vesc-project.com/) based controller, such as speed, remaining battery capacity, and travelled distance. The device is also known (or, rather, incorrectly referred to) as [Dave](https://www.electric-skateboard.builders/t/vega-battery-monitor-odometer-speedometer/71509/8?u=janpom) by [some people](https://www.electric-skateboard.builders/t/vega-battery-monitor-odometer-speedometer/71509/130?u=janpom), which is pretty annoying, especially since it seems to [begin to catch](https://www.electric-skateboard.builders/t/vega-battery-monitor-odometer-speedometer/71509/145?u=janpom) and having to rebrand is no fun!
 
-![VeGa prototype](img/vega_prototype.jpg ! width=300)
+![VeGa prototype](img/vega_prototype.jpg | width=300)
 
 This repository contains the VeGa firmware. The schematics and gerber files can be obtained from [EasyEDA](https://easyeda.com/honza.pomikalek/VESC-Gauge).
 
