@@ -259,7 +259,7 @@ void display_update_battery_indicator(float battery_percent, bool redraw = false
     int cells_to_fill = round(battery_percent * LEN(BATTERY_INDICATOR_CELLS));
     if (redraw) {
         for (int i = 0; i < LEN(BATTERY_INDICATOR_CELLS); i++)
-            draw_battery_cell(i, i >= cells_to_fill - 1, true);
+            draw_battery_cell(i, i < cells_to_fill, true);
     }
     else {
         if (cells_to_fill > battery_cells_filled) {
@@ -297,7 +297,7 @@ void display_update_speed_indicator(float speed_percent, bool redraw = false) {
     int cells_to_fill = round(speed_percent * LEN(SPEED_INDICATOR_CELLS));
     if (redraw) {
         for (int i = 0; i < LEN(SPEED_INDICATOR_CELLS); i++)
-            draw_speed_cell(i, i >= cells_to_fill - 1, true);
+            draw_speed_cell(i, i < cells_to_fill, true);
     }
     else {
         if (cells_to_fill > speed_cells_filled) {
