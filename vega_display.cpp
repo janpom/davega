@@ -281,7 +281,7 @@ bool draw_speed_cell(int index, bool filled, bool redraw = false) {
         tft.fillRectangle(
                 p->x, p->y,
                 p->x + SPEED_INDICATOR_CELL_WIDTH, p->y + SPEED_INDICATOR_CELL_HEIGHT,
-                tft.setColor(100, 100, 255)
+                tft.setColor(150, 150, 255)
         );
     }
     if (!filled) {
