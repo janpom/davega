@@ -60,20 +60,20 @@ const Point PROGMEM BATTERY_INDICATOR_CELLS[] = {
 
 const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
     // bottom-left row
-    {57, 145},  {41, 145}, {25, 145},
+    {57, 151},  {41, 151}, {25, 151},
     // left column
-    {25, 128}, {25, 111}, {25, 94}, {25, 77},
+    {25, 134}, {25, 117}, {25, 100}, {25, 84},
     // top row
-    {25, 60}, {41, 60}, {57, 60}, {73, 60}, {90, 60},
-    {106, 60}, {122, 60}, {138, 60},
+    {25, 66}, {41, 66}, {57, 66}, {73, 66}, {90, 66},
+    {106, 66}, {122, 66}, {138, 66},
     // right column
-    {138, 77}, {138, 94}, {138, 111}, {138, 128},
+    {138, 83}, {138, 100}, {138, 117}, {138, 134},
     // bottom-right row
-    {138, 145}, {122, 145}, {106, 145},
+    {138, 151}, {122, 151}, {106, 151},
 };
 
 // TODO: PROGMEM
-const bool FONT_3x5[10][5][3] = {
+const bool FONT_DIGITS_3x5[10][5][3] = {
     {
         {1, 1, 1},
         {1, 0, 1},
@@ -162,13 +162,33 @@ void display_init() {
 }
 
 void
-display_draw_number(uint8_t number, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t magnify = 1) {
+display_draw_digit(uint8_t digit, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t magnify = 1) {
     for (int xx = 0; xx < 3; xx++) {
         for (int yy = 0; yy < 5; yy++) {
-            uint16_t color = FONT_3x5[number][yy][xx] ? fg_color : bg_color;
+            uint16_t color = FONT_DIGITS_3x5[digit][yy][xx] ? fg_color : bg_color;
             int x1 = x + xx * magnify;
             int y1 = y + yy * magnify;
-            tft.fillRectangle(x1, y1, x1 + magnify, y1 + magnify, color);
+            tft.fillRectangle(x1, y1, x1 + magnify - 1, y1 + magnify - 1, color);
+        }
+    }
+}
+
+void
+display_draw_number(char *number, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify = 1) {
+    int cursor_x = x;
+    int number_len = strlen(number);
+    for (int i=0; i < number_len; i++) {
+        char ch = number[i];
+        if (ch >= '0' and ch <= '9') {
+            display_draw_digit(ch - '0', cursor_x, y, fg_color, bg_color, magnify);
+            cursor_x += 3 * magnify + spacing;
+        } else if (ch == '.') {
+            tft.fillRectangle(cursor_x, y, cursor_x + magnify - 1, y + 5 * magnify - 1, bg_color);
+            tft.fillRectangle(cursor_x, y + 4 * magnify, cursor_x + magnify - 1, y + 5 * magnify - 1, fg_color);
+            cursor_x += magnify + spacing;
+        } else if (ch == ' ') {
+            tft.fillRectangle(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
+            cursor_x += 3 * magnify + spacing;
         }
     }
 }
@@ -176,60 +196,47 @@ display_draw_number(uint8_t number, uint8_t x, uint8_t y, uint16_t fg_color, uin
 void display_draw_labels() {
     tft.setFont(Terminal6x8);
 
-    tft.drawText(35, 42, "VOLTS", COLOR_WHITE);
-    tft.drawText(131, 42, "MAH", COLOR_WHITE);
+    tft.drawText(36, 48, "VOLTS", COLOR_WHITE);
+    tft.drawText(132, 48, "MAH", COLOR_WHITE);
 
-    tft.drawText(90, 125, "KPH", COLOR_WHITE);
+    tft.drawText(90, 131, "KPH", COLOR_WHITE);
 
-    tft.drawText(24, 173, "TRIP", COLOR_WHITE);
-    tft.drawText(102, 173, "TOTAL", COLOR_WHITE);
-    tft.drawText(69, 200, "KM", COLOR_WHITE);
-    tft.drawText(138, 200, "KM", COLOR_WHITE);
-}
-
-void fill_zeroes(char *str) {
-    for (int i = 0; str[i] == ' '; i++)
-        str[i] = '0';
+    tft.drawText(23, 175, "TRIP", COLOR_WHITE);
+    tft.drawText(97, 175, "TOTAL", COLOR_WHITE);
+    tft.drawText(70, 208, "KM", COLOR_WHITE);
+    tft.drawText(139, 208, "KM", COLOR_WHITE);
 }
 
 void display_set_volts(float volts) {
     char fmt[5];
     dtostrf(volts, 4, 1, fmt);
-    fill_zeroes(fmt);
-    tft.setFont(Terminal12x16);
-    tft.drawText(24, 25, fmt, COLOR_WHITE);
+    display_draw_number(fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
 void display_set_mah(uint16_t mah) {
     char fmt[6];
     dtostrf(mah, 5, 0, fmt);
-    fill_zeroes(fmt);
-    tft.setFont(Terminal12x16);
-    tft.drawText(88, 25, fmt, COLOR_WHITE);
+    display_draw_number(fmt, 84, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
 void display_set_trip_distance(uint32_t meters, uint16_t color = COLOR_WHITE) {
     char fmt[7];
     dtostrf(meters / 1000.0, 5, 2, fmt);
-    fill_zeroes(fmt);
-    tft.setFont(Terminal12x16);
-    tft.drawText(24, 183, fmt, color);
+    display_draw_number(fmt, 24, 185, color, COLOR_BLACK, 2, 4);
 }
 
 void display_set_total_distance(uint32_t meters) {
     char fmt[6];
     dtostrf(meters / 1000.0, 4, 0, fmt);
-    fill_zeroes(fmt);
-    tft.setFont(Terminal12x16);
-    tft.drawText(102, 183, fmt, COLOR_WHITE);
+    display_draw_number(fmt, 98, 185, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
 void display_set_speed(uint8_t kph) {
     if (kph >= 10)
-        display_draw_number(kph / 10, 60, 85, COLOR_WHITE, COLOR_BLACK, 7);
+        display_draw_digit(kph / 10, 60, 91, COLOR_WHITE, COLOR_BLACK, 7);
     else
-        tft.fillRectangle(60, 85, 82, 121, COLOR_BLACK);
-    display_draw_number(kph % 10, 89, 85, COLOR_WHITE, COLOR_BLACK, 7);
+        tft.fillRectangle(60, 91, 82, 127, COLOR_BLACK);
+    display_draw_digit(kph % 10, 89, 91, COLOR_WHITE, COLOR_BLACK, 7);
 }
 
 bool draw_battery_cell(int index, bool filled, bool redraw = false) {
@@ -313,15 +320,15 @@ void display_update_speed_indicator(float speed_percent, bool redraw = false) {
 }
 
 void display_indicate_read_success(uint32_t duration_ms) {
-    tft.fillRectangle(85, 149, 89, 153, tft.setColor(0, 150, 0));
+    tft.fillRectangle(85, 155, 89, 159, tft.setColor(0, 150, 0));
     delay(duration_ms);
-    tft.fillRectangle(85, 149, 89, 153, COLOR_BLACK);
+    tft.fillRectangle(85, 155, 89, 159, COLOR_BLACK);
 }
 
 void display_indicate_read_failure(uint32_t duration_ms) {
-    tft.fillRectangle(85, 149, 89, 153, tft.setColor(150, 0, 0));
+    tft.fillRectangle(85, 155, 89, 159, tft.setColor(150, 0, 0));
     delay(duration_ms);
-    tft.fillRectangle(85, 149, 89, 153, COLOR_BLACK);
+    tft.fillRectangle(85, 155, 89, 159, COLOR_BLACK);
 }
 
 uint16_t display_make_color(uint8_t red, uint8_t green, uint8_t blue) {
