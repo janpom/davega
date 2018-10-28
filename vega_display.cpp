@@ -156,11 +156,15 @@ float distance_speed_multiplier = 1.0;
 uint8_t battery_cells_filled = 0;
 uint8_t speed_cells_filled = 0;
 
+void display_reset() {
+    tft.fillRectangle(0, 0, tft.maxX() - 1, tft.maxY() - 1, COLOR_BLACK);
+}
+
 void display_init() {
     tft.begin();
 
     tft.setOrientation(0);
-    tft.fillRectangle(0, 0, tft.maxX() - 1, tft.maxY() - 1, COLOR_BLACK);
+    display_reset();
 
     tft.setBackgroundColor(COLOR_BLACK);
 }
@@ -353,4 +357,13 @@ void display_indicate_read_failure(uint32_t duration_ms) {
 
 uint16_t display_make_color(uint8_t red, uint8_t green, uint8_t blue) {
     return tft.setColor(red, green, blue);
+}
+
+void display_set_warning(char* warning) {
+    uint16_t bg_color = tft.setColor(150, 0, 0);
+    tft.fillRectangle(0, 60, 176, 83, bg_color);
+    tft.setFont(Terminal12x16);
+    tft.setBackgroundColor(bg_color);
+    tft.drawText(5, 65, warning, COLOR_BLACK);
+    tft.setBackgroundColor(COLOR_BLACK);
 }

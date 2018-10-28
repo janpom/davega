@@ -174,3 +174,7 @@ int32_t vesc_comm_get_tachometer(uint8_t *vesc_packet) {
 int32_t vesc_comm_get_tachometer_abs(uint8_t *vesc_packet) {
     return get_long(vesc_packet, 51);
 }
+
+vesc_comm_fault_code vesc_comm_get_fault_code(uint8_t *vesc_packet) {
+    return vesc_packet[55];
+}

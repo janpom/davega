@@ -23,6 +23,7 @@
 #include <TFT_22_ILI9225.h>
 
 void display_init();
+void display_reset();
 void display_set_imperial(bool enable);
 void display_draw_labels();
 void display_set_volts(float volts);
@@ -34,6 +35,7 @@ void display_update_battery_indicator(float battery_percent, bool redraw = false
 void display_update_speed_indicator(float speed_percent, bool redraw = false);
 void display_indicate_read_success(uint32_t duration_ms);
 void display_indicate_read_failure(uint32_t duration_ms);
+void display_set_warning(char* warning);
 uint16_t display_make_color(uint8_t red, uint8_t green, uint8_t blue);
 
 #endif //VEGA_DISPLAY_H

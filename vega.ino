@@ -132,8 +132,8 @@ int32_t initial_total_distance;
 int32_t last_eeprom_written_total_distance;
 int32_t last_eeprom_update_on_stop;
 
-float last_volts;
 int32_t last_rpm;
+vesc_comm_fault_code last_fault_code;
 uint32_t button_1_last_up_time = 0;
 
 int32_t rotations_to_meters(int32_t rotations) {
@@ -167,6 +167,27 @@ bool was_battery_fully_charged(float last_volts, float current_volts) {
             ((current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE) &&
             (current_volts / max_volts > FULL_CHARGE_THRESHOLD)
     );
+}
+
+char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
+    switch (fault_code) {
+        case FAULT_CODE_NONE:
+            return "";
+        case FAULT_CODE_OVER_VOLTAGE:
+            return "OVER VOLTAGE";
+        case FAULT_CODE_UNDER_VOLTAGE:
+            return "UNDER VOLTAGE";
+        case FAULT_CODE_DRV:
+            return "DRV FAULT";
+        case FAULT_CODE_ABS_OVER_CURRENT:
+            return "OVER CURRENT";
+        case FAULT_CODE_OVER_TEMP_FET:
+            return "OVER TEMP FET";
+        case FAULT_CODE_OVER_TEMP_MOTOR:
+            return "OVER TEMP MOTOR";
+        default:
+            return "unexpected fault code";
+    }
 }
 
 void setup() {
@@ -242,6 +263,14 @@ void loop() {
         return;
     }
 
+    vesc_comm_fault_code fault_code = vesc_comm_get_fault_code(vesc_packet);
+    bool should_redraw = (fault_code == FAULT_CODE_NONE && last_fault_code != FAULT_CODE_NONE);
+
+    if (should_redraw) {
+        display_reset();
+        display_draw_labels();
+    }
+
     float volts = vesc_comm_get_voltage(vesc_packet);
     display_set_volts(volts);
 
@@ -276,17 +305,20 @@ void loop() {
     display_set_total_distance(total_distance);
 
     float speed_percent = 1.0 * kph / MAX_SPEED_KPH;
-    display_update_speed_indicator(speed_percent);
+    display_update_speed_indicator(speed_percent, should_redraw);
 
     float fully_discharged_mah = BATTERY_MAX_MAH * (1 - BATTERY_USABLE_CAPACITY);
     float mah_percent = 1.0 * (mah - fully_discharged_mah) / (BATTERY_MAX_MAH - fully_discharged_mah);
     float volts_percent = voltage_to_percent(volts);
     float battery_percent = VOLTAGE_WEIGHT * volts_percent + (1.0 - VOLTAGE_WEIGHT) * mah_percent;
-    display_update_battery_indicator(battery_percent);
+    display_update_battery_indicator(battery_percent, should_redraw);
 
     D("volts = " + String(100 * volts_percent) + "%");
     D("mah = " + String(100 * mah_percent) + "%");
     D("mean = " + String(100 * battery_percent) + "%");
+
+    if (fault_code != FAULT_CODE_NONE)
+        display_set_warning(vesc_fault_code_to_string(fault_code));
 
     bool came_to_stop = (last_rpm != 0 && rpm == 0);
     bool traveled_enough_distance = (total_distance - last_eeprom_written_total_distance >= EEPROM_UPDATE_EACH_METERS);
@@ -300,6 +332,7 @@ void loop() {
         eeprom_write_total_distance(total_distance);
     }
 
+    last_fault_code = fault_code;
     last_rpm = rpm;
 
     display_indicate_read_success(UPDATE_DELAY);  // some delay between requests is necessary
