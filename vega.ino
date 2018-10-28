@@ -32,6 +32,9 @@
 // filled). It will still show the correct number though.
 #define MAX_SPEED_KPH 50
 
+// Set to true to display the distance in miles and the speed in mph.
+#define IMPERIAL_UNITS false
+
 #define BATTERY_S 12  // number of battery cells
 #define BATTERY_MAX_MAH 8000  // battery capacity in mAh
 #define BATTERY_USABLE_CAPACITY 0.8  // [0.0, 1.0]
@@ -183,6 +186,7 @@ void setup() {
     }
 
     display_init();
+    display_set_imperial(IMPERIAL_UNITS);
     display_draw_labels();
     display_update_battery_indicator(0.0, true);
     display_update_speed_indicator(0.0, true);

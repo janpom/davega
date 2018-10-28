@@ -23,6 +23,7 @@
 #include <TFT_22_ILI9225.h>
 
 void display_init();
+void display_set_imperial(bool enable);
 void display_draw_labels();
 void display_set_volts(float volts);
 void display_set_mah(uint16_t mah);

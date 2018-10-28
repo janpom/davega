@@ -36,6 +36,8 @@
 #define SPEED_INDICATOR_CELL_WIDTH 10
 #define SPEED_INDICATOR_CELL_HEIGHT 11
 
+#define KM_PER_MILE 0.621371
+
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 typedef struct {
@@ -147,6 +149,8 @@ const bool FONT_DIGITS_3x5[10][5][3] = {
 };
 
 TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, TFT_BRIGHTNESS);
+bool imperial_units = false;
+float distance_speed_multiplier = 1.0;
 
 // Remember how many cells are currently filled so that we can update the indicators more efficiently.
 uint8_t battery_cells_filled = 0;
@@ -159,6 +163,14 @@ void display_init() {
     tft.fillRectangle(0, 0, tft.maxX() - 1, tft.maxY() - 1, COLOR_BLACK);
 
     tft.setBackgroundColor(COLOR_BLACK);
+}
+
+void display_set_imperial(bool enable) {
+    imperial_units = enable;
+    if (imperial_units)
+        distance_speed_multiplier = KM_PER_MILE;
+    else
+        distance_speed_multiplier = 1.0;
 }
 
 void
@@ -199,12 +211,19 @@ void display_draw_labels() {
     tft.drawText(36, 48, "VOLTS", COLOR_WHITE);
     tft.drawText(132, 48, "MAH", COLOR_WHITE);
 
-    tft.drawText(90, 131, "KPH", COLOR_WHITE);
+    tft.drawText(90, 131, imperial_units ? "MPH" : "KPH", COLOR_WHITE);
 
     tft.drawText(23, 175, "TRIP", COLOR_WHITE);
     tft.drawText(97, 175, "TOTAL", COLOR_WHITE);
-    tft.drawText(70, 208, "KM", COLOR_WHITE);
-    tft.drawText(139, 208, "KM", COLOR_WHITE);
+
+    if (imperial_units) {
+        tft.drawText(50, 208, "MILES", COLOR_WHITE);
+        tft.drawText(119, 208, "MILES", COLOR_WHITE);
+    }
+    else {
+        tft.drawText(70, 208, "KM", COLOR_WHITE);
+        tft.drawText(139, 208, "KM", COLOR_WHITE);
+    }
 }
 
 void display_set_volts(float volts) {
@@ -221,22 +240,23 @@ void display_set_mah(uint16_t mah) {
 
 void display_set_trip_distance(uint32_t meters, uint16_t color = COLOR_WHITE) {
     char fmt[7];
-    dtostrf(meters / 1000.0, 5, 2, fmt);
+    dtostrf(meters / 1000.0 * distance_speed_multiplier, 5, 2, fmt);
     display_draw_number(fmt, 24, 185, color, COLOR_BLACK, 2, 4);
 }
 
 void display_set_total_distance(uint32_t meters) {
     char fmt[6];
-    dtostrf(meters / 1000.0, 4, 0, fmt);
+    dtostrf(meters / 1000.0 * distance_speed_multiplier, 4, 0, fmt);
     display_draw_number(fmt, 98, 185, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
 void display_set_speed(uint8_t kph) {
-    if (kph >= 10)
-        display_draw_digit(kph / 10, 60, 91, COLOR_WHITE, COLOR_BLACK, 7);
+    uint8_t speed = round(kph * distance_speed_multiplier);
+    if (speed >= 10)
+        display_draw_digit(speed / 10, 60, 91, COLOR_WHITE, COLOR_BLACK, 7);
     else
         tft.fillRectangle(60, 91, 82, 127, COLOR_BLACK);
-    display_draw_digit(kph % 10, 89, 91, COLOR_WHITE, COLOR_BLACK, 7);
+    display_draw_digit(speed % 10, 89, 91, COLOR_WHITE, COLOR_BLACK, 7);
 }
 
 bool draw_battery_cell(int index, bool filled, bool redraw = false) {
