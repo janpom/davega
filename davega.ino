@@ -115,7 +115,7 @@ const float DISCHARGE_TICKS[] = {
 //*********************************** </CONFIG> ***********************************//
 
 #define REVISION_ID "$Id$"
-#define FW_VERSION "v0.1"
+#define FW_VERSION "master"
 
 //#define DEBUG
 #ifdef DEBUG
@@ -138,6 +138,8 @@ int32_t last_eeprom_update_on_stop;
 int32_t last_rpm;
 vesc_comm_fault_code last_fault_code;
 uint32_t button_1_last_up_time = 0;
+
+char fw_version_buffer[6];
 
 int32_t rotations_to_meters(int32_t rotations) {
     return (rotations / MOTOR_POLE_PAIRS / GEAR_RATIO) * WHEEL_CIRCUMFERENCE_MM / 1000;
@@ -170,6 +172,20 @@ bool was_battery_fully_charged(float last_volts, float current_volts) {
             ((current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE) &&
             (current_volts / max_volts > FULL_CHARGE_THRESHOLD)
     );
+}
+
+char* fw_version() {
+    if (FW_VERSION[0] == 'v') {
+        return FW_VERSION;
+    }
+    else {
+        String r = String("r");
+        String upper_rev_id = String(REVISION_ID).substring(5, 9);
+        upper_rev_id.toUpperCase();
+        r.concat(upper_rev_id);
+        r.toCharArray(fw_version_buffer, sizeof(fw_version_buffer));
+        return fw_version_buffer;
+    }
 }
 
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
@@ -212,7 +228,7 @@ void setup() {
     display_init();
     display_set_imperial(IMPERIAL_UNITS);
     display_draw_labels();
-    display_set_fw_version(FW_VERSION);
+    display_set_fw_version(fw_version());
     display_update_battery_indicator(0.0, true);
     display_update_speed_indicator(0.0, true);
     display_set_volts(eeprom_read_volts());
@@ -273,7 +289,7 @@ void loop() {
     if (should_redraw) {
         display_reset();
         display_draw_labels();
-        display_set_fw_version(FW_VERSION);
+        display_set_fw_version(fw_version());
     }
 
     float volts = vesc_comm_get_voltage(vesc_packet);
