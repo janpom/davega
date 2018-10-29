@@ -2,7 +2,7 @@ DAVEga (The VEsc GAdget), or Dave for short, is a device for displaying data rea
 
 ![DAVEga prototype](img/davega_prototype.jpg)
 
-This repository contains the DAVEga firmware. The schematics and gerber files can be obtained from [EasyEDA](https://easyeda.com/honza.pomikalek/VESC-Gauge) (yet to be re-branded).
+This repository contains the DAVEga firmware. The schematics and gerber files can be obtained from [EasyEDA](https://easyeda.com/honza.pomikalek/VESC-Gauge).
 
 ## Main features
 
