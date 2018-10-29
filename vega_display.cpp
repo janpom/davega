@@ -230,6 +230,11 @@ void display_draw_labels() {
     }
 }
 
+void display_set_fw_version(char* fw_version) {
+    tft.setFont(Terminal6x8);
+    tft.drawText(40, 140, fw_version, COLOR_WHITE);
+}
+
 void display_set_volts(float volts) {
     char fmt[5];
     dtostrf(volts, 4, 1, fmt);

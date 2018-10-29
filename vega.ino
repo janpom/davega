@@ -115,6 +115,7 @@ const float DISCHARGE_TICKS[] = {
 //*********************************** </CONFIG> ***********************************//
 
 #define REVISION_ID "$Id$"
+#define FW_VERSION "v0.1"
 
 //#define DEBUG
 #ifdef DEBUG
@@ -211,6 +212,7 @@ void setup() {
     display_init();
     display_set_imperial(IMPERIAL_UNITS);
     display_draw_labels();
+    display_set_fw_version(FW_VERSION);
     display_update_battery_indicator(0.0, true);
     display_update_speed_indicator(0.0, true);
     display_set_volts(eeprom_read_volts());
@@ -271,6 +273,7 @@ void loop() {
     if (should_redraw) {
         display_reset();
         display_draw_labels();
+        display_set_fw_version(FW_VERSION);
     }
 
     float volts = vesc_comm_get_voltage(vesc_packet);
