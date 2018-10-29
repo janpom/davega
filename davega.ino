@@ -1,24 +1,24 @@
 /*
     Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
 
-    This file is part of the VeGa firmware.
+    This file is part of the DAVEga firmware.
 
-    VeGa firmware is free software: you can redistribute it and/or modify
+    DAVEga firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    VeGa firmware is distributed in the hope that it will be useful,
+    DAVEga firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with VeGa firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "vega_display.h"
-#include "vega_eeprom.h"
+#include "davega_display.h"
+#include "davega_eeprom.h"
 #include "vesc_comm.h"
 
 //*********************************** <CONFIG> ***********************************//
@@ -94,7 +94,7 @@ const float DISCHARGE_TICKS[] = {
 // The EEPROM lasts for 100,000 write cycles. With EEPROM_UPDATE_EACH_METERS=100, the EEPROM
 // should last for 10,000 km. If the value is set lower, the EEPROM will die earlier.
 // Note that EEPROM is also updated whenever the board comes to a stop (see below), so regardless
-// of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless VeGa is accidentally
+// of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless DAVEga is accidentally
 // reset before saving to EEPROM (which shouldn't happen under normal circumstances).
 #define EEPROM_UPDATE_EACH_METERS 100
 
