@@ -13,6 +13,8 @@ This repository contains the VeGa firmware. The schematics and gerber files can 
 - remaining battery capacity
   - battery voltage
   - battery amp-hours remaining
+- VESC fault codes
+- metric or imperial units
 - Arduino compatible FW
 - low HW cost (~$10)
 - works with the latest VESC FW (v3.40)
