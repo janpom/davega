@@ -114,6 +114,8 @@ const float DISCHARGE_TICKS[] = {
 #define UPDATE_DELAY 50  // ms
 //*********************************** </CONFIG> ***********************************//
 
+#define REVISION_ID "$Id$"
+
 //#define DEBUG
 #ifdef DEBUG
 #define D(x) Serial.println(x)
