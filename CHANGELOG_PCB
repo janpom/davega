@@ -1,0 +1,11 @@
+Change log for the PCB
+https://easyeda.com/honza.pomikalek/VESC-Gauge
+
+v0.3
+- moved the right side mounting holes a hair to the right
+- moved USB-UART further from the edge so that the headers are flush with the edge
+- moved the crystal so that it doesn't rub against the chip on the display above
+- moving of other components forced by the previous
+
+v0.2
+- first manufactured version
