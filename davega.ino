@@ -39,6 +39,10 @@
 #define BATTERY_MAX_MAH 8000  // battery capacity in mAh
 #define BATTERY_USABLE_CAPACITY 0.8  // [0.0, 1.0]
 
+// If SHOW_AVG_CELL_VOLTAGE is true, average cell voltage is displayed instead of the total battery
+// pack voltage (total voltage is divided by the number of cells).
+#define SHOW_AVG_CELL_VOLTAGE false
+
 // The two options below are for detecting that battery has been fully charged (in which case
 // we reset the available mAh to the max value). We think that the battery has been fully charged
 // if the voltage has increased at least a little bit since the last remembered state AND the
@@ -209,6 +213,13 @@ char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     }
 }
 
+void set_volts(float volts) {
+    if (SHOW_AVG_CELL_VOLTAGE)
+        display_set_volts(volts / BATTERY_S, 2);
+    else
+        display_set_volts(volts, 1);
+}
+
 void setup() {
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
 
@@ -231,7 +242,7 @@ void setup() {
     display_set_fw_version(fw_version());
     display_update_battery_indicator(0.0, true);
     display_update_speed_indicator(0.0, true);
-    display_set_volts(eeprom_read_volts());
+    set_volts(eeprom_read_volts());
     display_set_mah(BATTERY_MAX_MAH - eeprom_read_mah_spent());
     display_set_trip_distance(eeprom_read_trip_distance());
     display_set_total_distance(eeprom_read_total_distance());
@@ -293,7 +304,7 @@ void loop() {
     }
 
     float volts = vesc_comm_get_voltage(vesc_packet);
-    display_set_volts(volts);
+    set_volts(volts);
 
     // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm_get_amphours_discharged(vesc_packet) -

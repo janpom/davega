@@ -235,9 +235,9 @@ void display_set_fw_version(char* fw_version) {
     tft.drawText(40, 140, fw_version, COLOR_WHITE);
 }
 
-void display_set_volts(float volts) {
+void display_set_volts(float volts, uint8_t decimals = 1) {
     char fmt[5];
-    dtostrf(volts, 4, 1, fmt);
+    dtostrf(volts, 4, decimals, fmt);
     display_draw_number(fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
