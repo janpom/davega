@@ -17,106 +17,10 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "davega_config.h"
 #include "davega_display.h"
 #include "davega_eeprom.h"
 #include "vesc_comm.h"
-
-//*********************************** <CONFIG> ***********************************//
-#define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual
-#define MOTOR_POLE_PAIRS 7
-#define WHEEL_CIRCUMFERENCE_MM 604
-#define GEAR_RATIO 4.8
-
-// Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
-// The speed indicator will merely indicate the current speed as the max speed (all blue rectangles
-// filled). It will still show the correct number though.
-#define MAX_SPEED_KPH 50
-
-// Set to true to display the distance in miles and the speed in mph.
-#define IMPERIAL_UNITS false
-
-#define BATTERY_S 12  // number of battery cells
-#define BATTERY_MAX_MAH 8000  // battery capacity in mAh
-#define BATTERY_USABLE_CAPACITY 0.8  // [0.0, 1.0]
-
-// If SHOW_AVG_CELL_VOLTAGE is true, average cell voltage is displayed instead of the total battery
-// pack voltage (total voltage is divided by the number of cells).
-#define SHOW_AVG_CELL_VOLTAGE false
-
-// The two options below are for detecting that battery has been fully charged (in which case
-// we reset the available mAh to the max value). We think that the battery has been fully charged
-// if the voltage has increased at least a little bit since the last remembered state AND the
-// battery voltage is close to the max value (which is the last value in DISCHARGE_TICKS, see below).
-
-// How much the battery voltage must increase since the last remembered state so that
-// so that we think the battery has been charged.
-#define FULL_CHARGE_MIN_INCREASE 0.01  // [0.0, 1.0]
-
-// Minimal percentage of the max battery voltage to consider the battery fully charged.
-// Example: With 0.97, if the max voltage is 50.4 V, then 48.888 V or more is considered fully charged.
-#define FULL_CHARGE_THRESHOLD 0.97  // [0.0, 1.0]
-
-// The DISCHARGE_TICKS can be used for configuring the battery discharge profile. The first value in the
-// array is the voltage for fully discharged and the last value is the voltage for fully charged. The
-// array may contain any number of values representing equidistant points of the discharge curve. For
-// example, with 5 values, the voltages will be interpreted as 0%, 25%, 50%, 75%, and 100% of the battery
-// capacity respectively.
-const float DISCHARGE_TICKS[] = {
-    3.5 * BATTERY_S,
-    3.67 * BATTERY_S,
-    3.73 * BATTERY_S,
-    3.76 * BATTERY_S,
-    3.80 * BATTERY_S,
-    3.83 * BATTERY_S,
-    3.86 * BATTERY_S,
-    3.90 * BATTERY_S,
-    4.0 * BATTERY_S,
-    4.2 * BATTERY_S,
-};
-
-// Remaining battery capacity can be estimated from the battery voltage
-// and from the VESC coulomb counter (number of mAh spent). The VOLTAGE_WEIGHT is
-// the weight of the battery voltage in the calculation. (1.0 - VOLTAGE_WEIGHT) is
-// then the weight of the coulomb counter.
-//
-// In particular,
-// 1.0 = only use battery voltage for estimating remaining capacity.
-// 0.0 = only use coulomb counter for estimating remaining capacity.
-#define VOLTAGE_WEIGHT 0.4
-
-// Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
-// the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
-// traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 42  // [1, 255]
-
-#define EEPROM_INIT_VALUE_VOLTS 0
-#define EEPROM_INIT_VALUE_MAH_SPENT 0
-#define EEPROM_INIT_VALUE_TRIP_DISTANCE 0  // meters
-#define EEPROM_INIT_VALUE_TOTAL_DISTANCE 0  // meters
-
-// After how many meters traveled should the distance (and other values) be stored to EEPROM.
-// The EEPROM lasts for 100,000 write cycles. With EEPROM_UPDATE_EACH_METERS=100, the EEPROM
-// should last for 10,000 km. If the value is set lower, the EEPROM will die earlier.
-// Note that EEPROM is also updated whenever the board comes to a stop (see below), so regardless
-// of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless DAVEga is accidentally
-// reset before saving to EEPROM (which shouldn't happen under normal circumstances).
-#define EEPROM_UPDATE_EACH_METERS 100
-
-// If the board comes to stop, update EEPROM, unless it was already updated in less than
-// EEPROM_UPDATE_MIN_DELAY_ON_STOP millis when the board stopped. This shouldn't happen
-// under normal circumstance and is mainly a safeguard against destroying EEPROM in case
-// unexpected oscillating speed readings are retrieved from the VESC.
-//
-// The EEPROM will still be updated if it was previously updated in less than
-// EEPROM_UPDATE_MIN_DELAY_ON_STOP due to EEPROM_UPDATE_EACH_METERS. (Otherwise, meters would be missed.)
-#define EEPROM_UPDATE_MIN_DELAY_ON_STOP 10000
-
-// Hold button 1 for this time to reset trip distance.
-#define TRIP_RESET_TIME 3000  // ms
-
-// This corresponds (more or less) to how often data is read from VESC.
-#define UPDATE_DELAY 50  // ms
-//*********************************** </CONFIG> ***********************************//
 
 #define REVISION_ID "$Id$"
 #define FW_VERSION "master"
@@ -130,6 +34,8 @@ const float DISCHARGE_TICKS[] = {
 
 #define BUTTON_1_PIN A3
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
+
+const float discharge_ticks[] = DISCHARGE_TICKS;
 
 uint8_t vesc_packet[PACKET_MAX_LENGTH];
 
@@ -155,15 +61,15 @@ float erpm_to_kph(uint32_t erpm) {
 }
 
 float voltage_to_percent(float voltage) {
-    if (voltage < DISCHARGE_TICKS[0])
+    if (voltage < discharge_ticks[0])
         return 0.0;
-    for (int i = 1; i < LEN(DISCHARGE_TICKS); i++) {
-        float cur_voltage = DISCHARGE_TICKS[i];
+    for (int i = 1; i < LEN(discharge_ticks); i++) {
+        float cur_voltage = discharge_ticks[i];
         if (voltage < cur_voltage) {
-            float prev_voltage = DISCHARGE_TICKS[i - 1];
+            float prev_voltage = discharge_ticks[i - 1];
             float interval_perc = (voltage - prev_voltage) / (cur_voltage - prev_voltage);
-            float low = 1.0 * (i - 1) / (LEN(DISCHARGE_TICKS) - 1);
-            float high = 1.0 * i / (LEN(DISCHARGE_TICKS) - 1);
+            float low = 1.0 * (i - 1) / (LEN(discharge_ticks) - 1);
+            float high = 1.0 * i / (LEN(discharge_ticks) - 1);
             return low + (high - low) * interval_perc;
         }
     }
@@ -171,7 +77,7 @@ float voltage_to_percent(float voltage) {
 }
 
 bool was_battery_fully_charged(float last_volts, float current_volts) {
-    float max_volts = DISCHARGE_TICKS[LEN(DISCHARGE_TICKS) - 1];
+    float max_volts = discharge_ticks[LEN(discharge_ticks) - 1];
     return (
             ((current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE) &&
             (current_volts / max_volts > FULL_CHARGE_THRESHOLD)
