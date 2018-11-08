@@ -165,6 +165,7 @@ void setup() {
     if (was_battery_fully_charged(last_volts, current_volts)) {
         // reset mAh spent
         eeprom_write_mah_spent(0);
+        eeprom_write_volts(current_volts);
     }
 
     // TODO: What to do with mAh spent if battery was only partially charged?
