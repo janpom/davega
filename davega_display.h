@@ -28,7 +28,7 @@ void display_set_imperial(bool enable);
 void display_draw_labels();
 void display_set_fw_version(char* fw_version);
 void display_set_volts(float volts, uint8_t decimals = 1);
-void display_set_mah(uint16_t mah);
+void display_set_mah(int32_t mah);
 void display_set_trip_distance(uint32_t meters, uint16_t color = COLOR_WHITE);
 void display_set_total_distance(uint32_t meters);
 void display_set_speed(uint8_t kph);

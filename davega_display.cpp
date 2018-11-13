@@ -202,6 +202,10 @@ display_draw_number(char *number, uint8_t x, uint8_t y, uint16_t fg_color, uint1
             tft.fillRectangle(cursor_x, y, cursor_x + magnify - 1, y + 5 * magnify - 1, bg_color);
             tft.fillRectangle(cursor_x, y + 4 * magnify, cursor_x + magnify - 1, y + 5 * magnify - 1, fg_color);
             cursor_x += magnify + spacing;
+        } else if (ch == '-') {
+            tft.fillRectangle(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
+            tft.fillRectangle(cursor_x, y + 2 * magnify, cursor_x + 3 * magnify - 1, y + 3 * magnify - 1, fg_color);
+            cursor_x += 3 * magnify + spacing;
         } else if (ch == ' ') {
             tft.fillRectangle(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
             cursor_x += 3 * magnify + spacing;
@@ -241,7 +245,7 @@ void display_set_volts(float volts, uint8_t decimals = 1) {
     display_draw_number(fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
-void display_set_mah(uint16_t mah) {
+void display_set_mah(int32_t mah) {
     char fmt[6];
     dtostrf(mah, 5, 0, fmt);
     display_draw_number(fmt, 84, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
