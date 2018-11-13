@@ -52,7 +52,8 @@ uint32_t button_1_last_up_time = 0;
 char fw_version_buffer[6];
 
 int32_t rotations_to_meters(int32_t rotations) {
-    return (rotations / MOTOR_POLE_PAIRS / GEAR_RATIO) * WHEEL_CIRCUMFERENCE_MM / 1000;
+    float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
+    return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_CIRCUMFERENCE_MM / 1000;
 }
 
 float erpm_to_kph(uint32_t erpm) {

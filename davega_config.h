@@ -23,7 +23,8 @@
 #define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual
 #define MOTOR_POLE_PAIRS 7
 #define WHEEL_CIRCUMFERENCE_MM 604
-#define GEAR_RATIO 4.8
+#define MOTOR_PULLEY_TEETH 15
+#define WHEEL_PULLEY_TEETH 72
 
 // Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
 // The speed indicator will merely indicate the current speed as the max speed (all blue rectangles
