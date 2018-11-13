@@ -245,10 +245,10 @@ void display_set_volts(float volts, uint8_t decimals = 1) {
     display_draw_number(fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
-void display_set_mah(int32_t mah) {
+void display_set_mah(int32_t mah, uint16_t color = COLOR_WHITE) {
     char fmt[6];
     dtostrf(mah, 5, 0, fmt);
-    display_draw_number(fmt, 84, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
+    display_draw_number(fmt, 84, 25, color, COLOR_BLACK, 2, 4);
 }
 
 void display_set_trip_distance(uint32_t meters, uint16_t color = COLOR_WHITE) {

@@ -111,7 +111,8 @@
 #define EEPROM_UPDATE_MIN_DELAY_ON_STOP 10000
 
 // Hold button 1 for this time to reset trip distance.
-#define TRIP_RESET_TIME 3000  // ms
+// Hold button 2 for this time to reset the Coulomb counter.
+#define COUNTER_RESET_TIME 3000  // ms
 
 // This corresponds (more or less) to how often data is read from VESC.
 #define UPDATE_DELAY 50  // ms
