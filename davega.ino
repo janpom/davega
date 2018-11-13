@@ -150,7 +150,7 @@ void setup() {
     display_update_battery_indicator(0.0, true);
     display_update_speed_indicator(0.0, true);
     set_volts(eeprom_read_volts());
-    display_set_mah(BATTERY_MAX_MAH - eeprom_read_mah_spent());
+    display_set_mah(BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent());
     display_set_trip_distance(eeprom_read_trip_distance());
     display_set_total_distance(eeprom_read_total_distance());
     display_set_speed(0);
@@ -218,7 +218,7 @@ void loop() {
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm_get_amphours_discharged(vesc_packet) -
                                            vesc_comm_get_amphours_charged(vesc_packet));
     int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
-    int32_t mah = BATTERY_MAX_MAH - mah_spent;
+    int32_t mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah_spent;
     display_set_mah(mah);
 
     int32_t rpm = vesc_comm_get_rpm(vesc_packet);
