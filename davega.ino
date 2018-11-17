@@ -269,8 +269,7 @@ void loop() {
     float speed_percent = 1.0 * kph / MAX_SPEED_KPH;
     display_update_speed_indicator(speed_percent, should_redraw);
 
-    float fully_discharged_mah = BATTERY_MAX_MAH * (1 - BATTERY_USABLE_CAPACITY);
-    float mah_percent = 1.0 * (mah - fully_discharged_mah) / (BATTERY_MAX_MAH - fully_discharged_mah);
+    float mah_percent = 1.0 * mah / (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY);
     float volts_percent = voltage_to_percent(volts);
     float battery_percent = VOLTAGE_WEIGHT * volts_percent + (1.0 - VOLTAGE_WEIGHT) * mah_percent;
     display_update_battery_indicator(battery_percent, should_redraw);
