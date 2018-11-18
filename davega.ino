@@ -19,6 +19,7 @@
 
 #include "davega_config.h"
 #include "davega_display.h"
+#include "davega_default_display.h"
 #include "davega_eeprom.h"
 #include "vesc_comm.h"
 
@@ -35,7 +36,29 @@
 #define BUTTON_1_PIN A3
 #define BUTTON_2_PIN A2
 #define BUTTON_3_PIN A1
+
+#define TFT_RST 12
+#define TFT_RS  9
+#define TFT_CS  10  // SS
+#define TFT_SDI 11  // MOSI
+#define TFT_CLK 13  // SCK
+#define TFT_LED 0
+
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
+
+TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
+
+t_davega_display_config display_config = {
+    IMPERIAL_UNITS,
+    SHOW_AVG_CELL_VOLTAGE,
+    BATTERY_S,
+};
+
+// TODO: displays -> screens
+DavegaDefaultDisplay d0 = DavegaDefaultDisplay(&tft, &display_config);
+DavegaDisplay* displays[] = {&d0};
+int current_display_index = 0;
+DavegaDisplay* d = displays[current_display_index];
 
 const float discharge_ticks[] = DISCHARGE_TICKS;
 
@@ -123,13 +146,6 @@ char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     }
 }
 
-void set_volts(float volts) {
-    if (SHOW_AVG_CELL_VOLTAGE)
-        display_set_volts(volts / BATTERY_S, 2);
-    else
-        display_set_volts(volts, 1);
-}
-
 void setup() {
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
@@ -148,21 +164,23 @@ void setup() {
         eeprom_write_total_distance(EEPROM_INIT_VALUE_TOTAL_DISTANCE);
     }
 
-    display_init();
-    display_set_imperial(IMPERIAL_UNITS);
-    display_draw_labels();
-    display_set_fw_version(fw_version());
-    display_update_battery_indicator(0.0, true);
-    display_update_speed_indicator(0.0, true);
-    set_volts(eeprom_read_volts());
-    display_set_mah(BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent());
-    display_set_trip_distance(eeprom_read_trip_distance());
-    display_set_total_distance(eeprom_read_total_distance());
-    display_set_speed(0);
+    tft.begin();
+    tft.setOrientation(0);
+    tft.setBackgroundColor(COLOR_BLACK);
+
+    d->reset();
+    d->set_fw_version(fw_version());
+    d->update_battery_indicator(0.0, true);
+    d->update_speed_indicator(0.0, true);
+    d->set_volts(eeprom_read_volts());
+    d->set_mah(BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent());
+    d->set_trip_distance(eeprom_read_trip_distance());
+    d->set_total_distance(eeprom_read_total_distance());
+    d->set_speed(0);
 
     uint8_t bytes_read = vesc_comm_fetch_packet(vesc_packet);
     while (!vesc_comm_is_expected_packet(vesc_packet, bytes_read)) {
-        display_indicate_read_failure(UPDATE_DELAY);  // some delay between requests is necessary
+        d->indicate_read_failure(UPDATE_DELAY);  // some delay between requests is necessary
         bytes_read = vesc_comm_fetch_packet(vesc_packet);
     }
 
@@ -206,7 +224,7 @@ void loop() {
     uint8_t bytes_read = vesc_comm_fetch_packet(vesc_packet);
 
     if (!vesc_comm_is_expected_packet(vesc_packet, bytes_read)) {
-        display_indicate_read_failure(UPDATE_DELAY);  // some delay between requests is necessary
+        d->indicate_read_failure(UPDATE_DELAY);  // some delay between requests is necessary
         return;
     }
 
@@ -214,13 +232,12 @@ void loop() {
     bool should_redraw = (fault_code == FAULT_CODE_NONE && last_fault_code != FAULT_CODE_NONE);
 
     if (should_redraw) {
-        display_reset();
-        display_draw_labels();
-        display_set_fw_version(fw_version());
+        d->reset();
+        d->set_fw_version(fw_version());
     }
 
     float volts = vesc_comm_get_voltage(vesc_packet);
-    set_volts(volts);
+    d->set_volts(volts);
 
     // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm_get_amphours_discharged(vesc_packet) -
@@ -237,15 +254,13 @@ void loop() {
         initial_mah_spent = mah_spent - vesc_mah_spent;
     }
 
+    d->set_mah(mah);
     // dim mAh if the counter is about to be reset
-    uint16_t mah_brightness = 255 - min(255.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 255);
-    uint16_t mah_color = display_make_color(mah_brightness, mah_brightness, mah_brightness);
-
-    display_set_mah(mah, mah_color);
+    d->set_mah_reset_progress(min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0));
 
     int32_t rpm = vesc_comm_get_rpm(vesc_packet);
     float kph = max(erpm_to_kph(rpm), 0);
-    display_set_speed((int) (kph + 0.5));
+    d->set_speed((int) (kph + 0.5));
 
     int32_t tachometer = rotations_to_meters(vesc_comm_get_tachometer(vesc_packet) / 6);
 
@@ -256,30 +271,27 @@ void loop() {
         initial_trip_distance = -tachometer;
     }
 
-    // dim trip distance if it's about to be reset
-    uint16_t trip_distance_brightness = 255 - min(255.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 255);
-    uint16_t trip_distance_color = display_make_color(
-            trip_distance_brightness, trip_distance_brightness, trip_distance_brightness);
-
     int32_t trip_distance = initial_trip_distance + tachometer;
     int32_t total_distance = initial_total_distance + tachometer;
-    display_set_trip_distance(trip_distance, trip_distance_color);
-    display_set_total_distance(total_distance);
+    d->set_trip_distance(trip_distance);
+    // dim trip distance if it's about to be reset
+    d->set_mah_reset_progress(min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0));
+    d->set_total_distance(total_distance);
 
     float speed_percent = 1.0 * kph / MAX_SPEED_KPH;
-    display_update_speed_indicator(speed_percent, should_redraw);
+    d->update_speed_indicator(speed_percent, should_redraw);
 
     float mah_percent = 1.0 * mah / (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY);
     float volts_percent = voltage_to_percent(volts);
     float battery_percent = VOLTAGE_WEIGHT * volts_percent + (1.0 - VOLTAGE_WEIGHT) * mah_percent;
-    display_update_battery_indicator(battery_percent, should_redraw);
+    d->update_battery_indicator(battery_percent, should_redraw);
 
     D("volts = " + String(100 * volts_percent) + "%");
     D("mah = " + String(100 * mah_percent) + "%");
     D("mean = " + String(100 * battery_percent) + "%");
 
     if (fault_code != FAULT_CODE_NONE)
-        display_set_warning(vesc_fault_code_to_string(fault_code));
+        d->set_warning(vesc_fault_code_to_string(fault_code));
 
     bool came_to_stop = (last_rpm != 0 && rpm == 0);
     bool traveled_enough_distance = (total_distance - last_eeprom_written_total_distance >= EEPROM_UPDATE_EACH_METERS);
@@ -296,5 +308,5 @@ void loop() {
     last_fault_code = fault_code;
     last_rpm = rpm;
 
-    display_indicate_read_success(UPDATE_DELAY);  // some delay between requests is necessary
+    d->indicate_read_success(UPDATE_DELAY);  // some delay between requests is necessary
 }

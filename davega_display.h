@@ -20,23 +20,28 @@
 #ifndef DAVEGA_DISPLAY_H
 #define DAVEGA_DISPLAY_H
 
-#include <TFT_22_ILI9225.h>
+typedef struct {
+    bool imperial_units;
+    bool per_cell_voltage;
+    uint8_t battery_cells;
+} t_davega_display_config;
 
-void display_init();
-void display_reset();
-void display_set_imperial(bool enable);
-void display_draw_labels();
-void display_set_fw_version(char* fw_version);
-void display_set_volts(float volts, uint8_t decimals = 1);
-void display_set_mah(int32_t mah, uint16_t color = COLOR_WHITE);
-void display_set_trip_distance(uint32_t meters, uint16_t color = COLOR_WHITE);
-void display_set_total_distance(uint32_t meters);
-void display_set_speed(uint8_t kph);
-void display_update_battery_indicator(float battery_percent, bool redraw = false);
-void display_update_speed_indicator(float speed_percent, bool redraw = false);
-void display_indicate_read_success(uint32_t duration_ms);
-void display_indicate_read_failure(uint32_t duration_ms);
-void display_set_warning(char* warning);
-uint16_t display_make_color(uint8_t red, uint8_t green, uint8_t blue);
+class DavegaDisplay {
+public:
+    virtual void reset() = 0;
+    virtual void set_fw_version(char* fw_version) = 0;
+    virtual void set_volts(float volts) = 0;
+    virtual void set_mah(int32_t mah) = 0;
+    virtual void set_mah_reset_progress(float progress) = 0;
+    virtual void set_trip_distance(uint32_t meters) = 0;
+    virtual void set_trip_reset_progress(float progress) = 0;
+    virtual void set_total_distance(uint32_t meters) = 0;
+    virtual void set_speed(uint8_t kph) = 0;
+    virtual void update_battery_indicator(float battery_percent, bool redraw = false) = 0;
+    virtual void update_speed_indicator(float speed_percent, bool redraw = false) = 0;
+    virtual void indicate_read_success(uint32_t duration_ms) = 0;
+    virtual void indicate_read_failure(uint32_t duration_ms) = 0;
+    virtual void set_warning(char* warning) = 0;
+};
 
 #endif //DAVEGA_DISPLAY_H
