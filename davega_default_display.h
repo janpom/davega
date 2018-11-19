@@ -54,8 +54,6 @@ protected:
     uint8_t _speed_cells_filled = 0;
 
     void _draw_labels();
-    void _draw_digit(uint8_t digit, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t magnify = 1);
-    void _draw_number(char *number, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify = 1);
     void _draw_volts(float volts, uint8_t decimals);
     void _draw_mah(int32_t mah, uint16_t color);
     void _draw_trip_distance(uint32_t meters, uint16_t color);

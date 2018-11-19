@@ -20,6 +20,7 @@
 #include "davega_default_display.h"
 #include "davega_display.h"
 #include "vesc_comm.h"
+#include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
 #define BATTERY_INDICATOR_CELL_WIDTH 14
@@ -66,80 +67,6 @@ const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
     {138, 151}, {122, 151}, {106, 151},
 };
 
-// TODO: PROGMEM
-const bool FONT_DIGITS_3x5[10][5][3] = {
-    {
-        {1, 1, 1},
-        {1, 0, 1},
-        {1, 0, 1},
-        {1, 0, 1},
-        {1, 1, 1},
-    },
-    {
-        {0, 0, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-    },
-    {
-        {1, 1, 1},
-        {0, 0, 1},
-        {1, 1, 1},
-        {1, 0, 0},
-        {1, 1, 1},
-    },
-    {
-        {1, 1, 1},
-        {0, 0, 1},
-        {0, 1, 1},
-        {0, 0, 1},
-        {1, 1, 1},
-    },
-    {
-        {1, 0, 1},
-        {1, 0, 1},
-        {1, 1, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-    },
-    {
-        {1, 1, 1},
-        {1, 0, 0},
-        {1, 1, 1},
-        {0, 0, 1},
-        {1, 1, 1},
-    },
-    {
-        {1, 1, 1},
-        {1, 0, 0},
-        {1, 1, 1},
-        {1, 0, 1},
-        {1, 1, 1},
-    },
-    {
-        {1, 1, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-        {0, 0, 1},
-    },
-    {
-        {1, 1, 1},
-        {1, 0, 1},
-        {1, 1, 1},
-        {1, 0, 1},
-        {1, 1, 1},
-    },
-    {
-        {1, 1, 1},
-        {1, 0, 1},
-        {1, 1, 1},
-        {0, 0, 1},
-        {1, 1, 1},
-    }
-};
-
 DavegaDefaultDisplay::DavegaDefaultDisplay(TFT_22_ILI9225* tft, t_davega_display_config* config) {
     _tft = tft;
     _config = config;
@@ -153,42 +80,6 @@ DavegaDefaultDisplay::DavegaDefaultDisplay(TFT_22_ILI9225* tft, t_davega_display
 void DavegaDefaultDisplay::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
     _draw_labels();
-}
-
-void
-DavegaDefaultDisplay::_draw_digit(uint8_t digit, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t magnify = 1) {
-    for (int xx = 0; xx < 3; xx++) {
-        for (int yy = 0; yy < 5; yy++) {
-            uint16_t color = FONT_DIGITS_3x5[digit][yy][xx] ? fg_color : bg_color;
-            int x1 = x + xx * magnify;
-            int y1 = y + yy * magnify;
-            _tft->fillRectangle(x1, y1, x1 + magnify - 1, y1 + magnify - 1, color);
-        }
-    }
-}
-
-void
-DavegaDefaultDisplay::_draw_number(char *number, uint8_t x, uint8_t y, uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify = 1) {
-    int cursor_x = x;
-    int number_len = strlen(number);
-    for (int i=0; i < number_len; i++) {
-        char ch = number[i];
-        if (ch >= '0' and ch <= '9') {
-            _draw_digit(ch - '0', cursor_x, y, fg_color, bg_color, magnify);
-            cursor_x += 3 * magnify + spacing;
-        } else if (ch == '.') {
-            _tft->fillRectangle(cursor_x, y, cursor_x + magnify - 1, y + 5 * magnify - 1, bg_color);
-            _tft->fillRectangle(cursor_x, y + 4 * magnify, cursor_x + magnify - 1, y + 5 * magnify - 1, fg_color);
-            cursor_x += magnify + spacing;
-        } else if (ch == '-') {
-            _tft->fillRectangle(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
-            _tft->fillRectangle(cursor_x, y + 2 * magnify, cursor_x + 3 * magnify - 1, y + 3 * magnify - 1, fg_color);
-            cursor_x += 3 * magnify + spacing;
-        } else if (ch == ' ') {
-            _tft->fillRectangle(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);
-            cursor_x += 3 * magnify + spacing;
-        }
-    }
 }
 
 void DavegaDefaultDisplay::_draw_labels() {
@@ -227,7 +118,7 @@ void DavegaDefaultDisplay::set_volts(float volts) {
 void DavegaDefaultDisplay::_draw_volts(float volts, uint8_t decimals) {
     char fmt[5];
     dtostrf(volts, 4, decimals, fmt);
-    _draw_number(fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 24, 25, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
 void DavegaDefaultDisplay::set_mah(int32_t mah) {
@@ -244,7 +135,7 @@ void DavegaDefaultDisplay::set_mah_reset_progress(float progress){
 void DavegaDefaultDisplay::_draw_mah(int32_t mah, uint16_t color) {
     char fmt[6];
     dtostrf(mah, 5, 0, fmt);
-    _draw_number(fmt, 84, 25, color, COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 84, 25, color, COLOR_BLACK, 2, 4);
 }
 
 void DavegaDefaultDisplay::set_trip_distance(uint32_t meters) {
@@ -261,22 +152,22 @@ void DavegaDefaultDisplay::set_trip_reset_progress(float progress) {
 void DavegaDefaultDisplay::_draw_trip_distance(uint32_t meters, uint16_t color) {
     char fmt[7];
     dtostrf(meters / 1000.0 * _distance_speed_multiplier, 5, 2, fmt);
-    _draw_number(fmt, 24, 185, color, COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 24, 185, color, COLOR_BLACK, 2, 4);
 }
 
 void DavegaDefaultDisplay::set_total_distance(uint32_t meters) {
     char fmt[6];
     dtostrf(meters / 1000.0 * _distance_speed_multiplier, 4, 0, fmt);
-    _draw_number(fmt, 98, 185, COLOR_WHITE, COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 98, 185, COLOR_WHITE, COLOR_BLACK, 2, 4);
 }
 
 void DavegaDefaultDisplay::set_speed(uint8_t kph) {
     uint8_t speed = round(kph * _distance_speed_multiplier);
     if (speed >= 10)
-        _draw_digit(speed / 10, 60, 91, COLOR_WHITE, COLOR_BLACK, 7);
+        tft_util_draw_digit(_tft, speed / 10, 60, 91, COLOR_WHITE, COLOR_BLACK, 7);
     else
         _tft->fillRectangle(60, 91, 82, 127, COLOR_BLACK);
-    _draw_digit(speed % 10, 89, 91, COLOR_WHITE, COLOR_BLACK, 7);
+    tft_util_draw_digit(_tft, speed % 10, 89, 91, COLOR_WHITE, COLOR_BLACK, 7);
 }
 
 bool DavegaDefaultDisplay::_draw_battery_cell(int index, bool filled, bool redraw = false) {
