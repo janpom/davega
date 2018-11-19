@@ -20,6 +20,7 @@
 #include "davega_config.h"
 #include "davega_screen.h"
 #include "davega_default_screen.h"
+#include "davega_text_screen.h"
 #include "davega_eeprom.h"
 #include "vesc_comm.h"
 
@@ -55,8 +56,9 @@ t_davega_screen_config screen_config = {
 };
 
 DavegaDefaultScreen screen0 = DavegaDefaultScreen(&tft, &screen_config);
-DavegaScreen* screens[] = {&screen0};
-int current_screen_index = 0;
+DavegaTextScreen screen1 = DavegaTextScreen(&tft, &screen_config);
+DavegaScreen* screens[] = {&screen0, &screen1};
+int current_screen_index = 1;
 DavegaScreen* scr = screens[current_screen_index];
 
 const float discharge_ticks[] = DISCHARGE_TICKS;
