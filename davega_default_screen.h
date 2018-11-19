@@ -17,15 +17,15 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_DEFAULT_DISPLAY_H
-#define DAVEGA_DEFAULT_DISPLAY_H
+#ifndef DAVEGA_DEFAULT_SCREEN_H
+#define DAVEGA_DEFAULT_SCREEN_H
 
 #include <TFT_22_ILI9225.h>
-#include "davega_display.h"
+#include "davega_screen.h"
 
-class DavegaDefaultDisplay: public DavegaDisplay {
+class DavegaDefaultScreen: public DavegaScreen {
 public:
-    DavegaDefaultDisplay(TFT_22_ILI9225* tft, t_davega_display_config* config);
+    DavegaDefaultScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config);
     void reset();
     void set_fw_version(char* fw_version);
     void set_volts(float volts);
@@ -43,7 +43,7 @@ public:
 
 protected:
     TFT_22_ILI9225* _tft;
-    t_davega_display_config* _config;
+    t_davega_screen_config* _config;
 
     float _distance_speed_multiplier = 1.0;
     uint32_t _trip_distance;
@@ -61,4 +61,4 @@ protected:
     void _draw_speed_cell(int index, bool filled, bool redraw = false);
 };
 
-#endif //DAVEGA_DEFAULT_DISPLAY_H
+#endif //DAVEGA_DEFAULT_SCREEN_H

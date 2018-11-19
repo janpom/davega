@@ -17,16 +17,16 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_DISPLAY_H
-#define DAVEGA_DISPLAY_H
+#ifndef DAVEGA_SCREEN_H
+#define DAVEGA_SCREEN_H
 
 typedef struct {
     bool imperial_units;
     bool per_cell_voltage;
     uint8_t battery_cells;
-} t_davega_display_config;
+} t_davega_screen_config;
 
-class DavegaDisplay {
+class DavegaScreen {
 public:
     virtual void reset() = 0;
     virtual void set_fw_version(char* fw_version) = 0;
@@ -44,4 +44,4 @@ public:
     virtual void set_warning(char* warning) = 0;
 };
 
-#endif //DAVEGA_DISPLAY_H
+#endif //DAVEGA_SCREEN_H
