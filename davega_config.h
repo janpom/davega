@@ -110,6 +110,9 @@
 // EEPROM_UPDATE_MIN_DELAY_ON_STOP due to EEPROM_UPDATE_EACH_METERS. (Otherwise, meters would be missed.)
 #define EEPROM_UPDATE_MIN_DELAY_ON_STOP 10000
 
+// 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
+#define DISPLAY_ORIENTATION 1
+
 // Hold button 1 for this time to reset trip distance.
 // Hold button 2 for this time to reset the Coulomb counter.
 #define COUNTER_RESET_TIME 3000  // ms

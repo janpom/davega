@@ -21,6 +21,7 @@
 #include "davega_screen.h"
 #include "davega_default_screen.h"
 #include "davega_text_screen.h"
+#include "davega_simple_horizontal_screen.h"
 #include "davega_eeprom.h"
 #include "vesc_comm.h"
 
@@ -57,8 +58,9 @@ t_davega_screen_config screen_config = {
 
 DavegaDefaultScreen screen0 = DavegaDefaultScreen(&tft, &screen_config);
 DavegaTextScreen screen1 = DavegaTextScreen(&tft, &screen_config);
-DavegaScreen* screens[] = {&screen0, &screen1};
-int current_screen_index = 1;
+DavegaSimpleHorizontalScreen screen2 = DavegaSimpleHorizontalScreen(&tft, &screen_config);
+DavegaScreen* screens[] = {&screen0, &screen1, &screen2};
+int current_screen_index = 2;
 DavegaScreen* scr = screens[current_screen_index];
 
 const float discharge_ticks[] = DISCHARGE_TICKS;
@@ -166,7 +168,7 @@ void setup() {
     }
 
     tft.begin();
-    tft.setOrientation(0);
+    tft.setOrientation(DISPLAY_ORIENTATION);
     tft.setBackgroundColor(COLOR_BLACK);
 
     scr->reset();
