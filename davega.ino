@@ -23,6 +23,8 @@
 #include "davega_text_screen.h"
 #include "davega_simple_horizontal_screen.h"
 #include "davega_eeprom.h"
+#include "davega_data.h"
+#include "davega_util.h"
 #include "vesc_comm.h"
 
 #define REVISION_ID "$Id$"
@@ -51,6 +53,7 @@
 TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
 
 t_davega_screen_config screen_config = {
+    make_fw_version(FW_VERSION, REVISION_ID),
     IMPERIAL_UNITS,
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
@@ -67,6 +70,7 @@ const float discharge_ticks[] = DISCHARGE_TICKS;
 
 uint8_t vesc_packet[PACKET_MAX_LENGTH];
 
+t_davega_data data;
 int16_t initial_mah_spent;
 int32_t initial_trip_distance;
 int32_t initial_total_distance;
@@ -77,8 +81,6 @@ int32_t last_rpm;
 vesc_comm_fault_code last_fault_code;
 uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
-
-char fw_version_buffer[6];
 
 int32_t rotations_to_meters(int32_t rotations) {
     float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
@@ -114,41 +116,6 @@ bool was_battery_fully_charged(float last_volts, float current_volts) {
     );
 }
 
-char* fw_version() {
-    if (FW_VERSION[0] == 'v') {
-        return FW_VERSION;
-    }
-    else {
-        String r = String("r");
-        String upper_rev_id = String(REVISION_ID).substring(5, 9);
-        upper_rev_id.toUpperCase();
-        r.concat(upper_rev_id);
-        r.toCharArray(fw_version_buffer, sizeof(fw_version_buffer));
-        return fw_version_buffer;
-    }
-}
-
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
-    switch (fault_code) {
-        case FAULT_CODE_NONE:
-            return "";
-        case FAULT_CODE_OVER_VOLTAGE:
-            return "OVER VOLTAGE";
-        case FAULT_CODE_UNDER_VOLTAGE:
-            return "UNDER VOLTAGE";
-        case FAULT_CODE_DRV:
-            return "DRV FAULT";
-        case FAULT_CODE_ABS_OVER_CURRENT:
-            return "OVER CURRENT";
-        case FAULT_CODE_OVER_TEMP_FET:
-            return "OVER TEMP FET";
-        case FAULT_CODE_OVER_TEMP_MOTOR:
-            return "OVER TEMP MOTOR";
-        default:
-            return "unexpected fault code";
-    }
-}
-
 void setup() {
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
@@ -171,19 +138,17 @@ void setup() {
     tft.setOrientation(DISPLAY_ORIENTATION);
     tft.setBackgroundColor(COLOR_BLACK);
 
+    data.voltage = eeprom_read_volts();
+    data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
+    data.trip_km = eeprom_read_trip_distance() / 1000.0;
+    data.total_km = eeprom_read_total_distance() / 1000.0;
+
     scr->reset();
-    scr->set_fw_version(fw_version());
-    scr->update_battery_indicator(0.0, true);
-    scr->update_speed_indicator(0.0, true);
-    scr->set_volts(eeprom_read_volts());
-    scr->set_mah(BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent());
-    scr->set_trip_distance(eeprom_read_trip_distance());
-    scr->set_total_distance(eeprom_read_total_distance());
-    scr->set_speed(0);
+    scr->update(&data);
 
     uint8_t bytes_read = vesc_comm_fetch_packet(vesc_packet);
     while (!vesc_comm_is_expected_packet(vesc_packet, bytes_read)) {
-        scr->indicate_read_failure(UPDATE_DELAY);  // some delay between requests is necessary
+        scr->heartbeat(UPDATE_DELAY, false);
         bytes_read = vesc_comm_fetch_packet(vesc_packet);
     }
 
@@ -194,8 +159,6 @@ void setup() {
         eeprom_write_mah_spent(0);
         eeprom_write_volts(current_volts);
     }
-
-    // TODO: What to do with mAh spent if battery was only partially charged?
 
     initial_mah_spent = eeprom_read_mah_spent();
     initial_trip_distance = eeprom_read_trip_distance();
@@ -218,6 +181,13 @@ void setup() {
 }
 
 void loop() {
+    if (digitalRead(BUTTON_3_PIN) == LOW) {
+        current_screen_index = (current_screen_index + 1) % LEN(screens);
+        scr = screens[current_screen_index];
+        scr->reset();
+        delay(UPDATE_DELAY);
+    }
+
     if (digitalRead(BUTTON_1_PIN) == HIGH)
         button_1_last_up_time = millis();
 
@@ -227,20 +197,12 @@ void loop() {
     uint8_t bytes_read = vesc_comm_fetch_packet(vesc_packet);
 
     if (!vesc_comm_is_expected_packet(vesc_packet, bytes_read)) {
-        scr->indicate_read_failure(UPDATE_DELAY);  // some delay between requests is necessary
+        scr->heartbeat(UPDATE_DELAY, false);
         return;
     }
 
-    vesc_comm_fault_code fault_code = vesc_comm_get_fault_code(vesc_packet);
-    bool should_redraw = (fault_code == FAULT_CODE_NONE && last_fault_code != FAULT_CODE_NONE);
-
-    if (should_redraw) {
-        scr->reset();
-        scr->set_fw_version(fw_version());
-    }
-
-    float volts = vesc_comm_get_voltage(vesc_packet);
-    scr->set_volts(volts);
+    data.vesc_fault_code = vesc_comm_get_fault_code(vesc_packet);
+    data.voltage = vesc_comm_get_voltage(vesc_packet);
 
     // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm_get_amphours_discharged(vesc_packet) -
@@ -251,19 +213,19 @@ void loop() {
     uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
     if (button_2_down_elapsed > COUNTER_RESET_TIME) {
         // reset coulomb counter
-        mah = voltage_to_percent(volts) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
+        mah = voltage_to_percent(data.voltage) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
         mah_spent = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah;
         eeprom_write_mah_spent(mah_spent);
         initial_mah_spent = mah_spent - vesc_mah_spent;
     }
 
-    scr->set_mah(mah);
+    data.mah = mah;
+
     // dim mAh if the counter is about to be reset
-    scr->set_mah_reset_progress(min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0));
+    data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
     int32_t rpm = vesc_comm_get_rpm(vesc_packet);
-    float kph = max(erpm_to_kph(rpm), 0);
-    scr->set_speed((int) (kph + 0.5));
+    data.speed_kph = max(erpm_to_kph(rpm), 0);
 
     int32_t tachometer = rotations_to_meters(vesc_comm_get_tachometer(vesc_packet) / 6);
 
@@ -276,25 +238,18 @@ void loop() {
 
     int32_t trip_distance = initial_trip_distance + tachometer;
     int32_t total_distance = initial_total_distance + tachometer;
-    scr->set_trip_distance(trip_distance);
+
     // dim trip distance if it's about to be reset
-    scr->set_mah_reset_progress(min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0));
-    scr->set_total_distance(total_distance);
+    data.trip_reset_progress = min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
-    float speed_percent = 1.0 * kph / MAX_SPEED_KPH;
-    scr->update_speed_indicator(speed_percent, should_redraw);
+    data.trip_km = trip_distance / 1000.0;
+    data.total_km = total_distance / 1000.0;
 
-    float mah_percent = 1.0 * mah / (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY);
-    float volts_percent = voltage_to_percent(volts);
-    float battery_percent = VOLTAGE_WEIGHT * volts_percent + (1.0 - VOLTAGE_WEIGHT) * mah_percent;
-    scr->update_battery_indicator(battery_percent, should_redraw);
+    data.speed_percent = 1.0 * data.speed_kph / MAX_SPEED_KPH;
 
-    D("volts = " + String(100 * volts_percent) + "%");
-    D("mah = " + String(100 * mah_percent) + "%");
-    D("mean = " + String(100 * battery_percent) + "%");
-
-    if (fault_code != FAULT_CODE_NONE)
-        scr->set_warning(vesc_fault_code_to_string(fault_code));
+    data.mah_percent = 1.0 * mah / (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY);
+    data.voltage_percent = voltage_to_percent(data.voltage);
+    data.battery_percent = VOLTAGE_WEIGHT * data.voltage_percent + (1.0 - VOLTAGE_WEIGHT) * data.mah_percent;
 
     bool came_to_stop = (last_rpm != 0 && rpm == 0);
     bool traveled_enough_distance = (total_distance - last_eeprom_written_total_distance >= EEPROM_UPDATE_EACH_METERS);
@@ -302,14 +257,14 @@ void loop() {
         if (came_to_stop)
             last_eeprom_update_on_stop = millis();
         last_eeprom_written_total_distance = total_distance;
-        eeprom_write_volts(volts);
+        eeprom_write_volts(data.voltage);
         eeprom_write_mah_spent(mah_spent);
         eeprom_write_trip_distance(trip_distance);
         eeprom_write_total_distance(total_distance);
     }
 
-    last_fault_code = fault_code;
     last_rpm = rpm;
 
-    scr->indicate_read_success(UPDATE_DELAY);  // some delay between requests is necessary
+    scr->update(&data);
+    scr->heartbeat(UPDATE_DELAY, true);
 }

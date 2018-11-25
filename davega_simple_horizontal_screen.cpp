@@ -19,22 +19,14 @@
 
 #include "davega_simple_horizontal_screen.h"
 #include "davega_screen.h"
+#include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-#define KM_PER_MILE 0.621371
-
-#define LEN(X) (sizeof(X) / sizeof(X[0]))
-
 DavegaSimpleHorizontalScreen::DavegaSimpleHorizontalScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config) {
     _tft = tft;
     _config = config;
-
-    if (_config->imperial_units)
-        _distance_speed_multiplier = KM_PER_MILE;
-    else
-        _distance_speed_multiplier = 1.0;
 }
 
 void DavegaSimpleHorizontalScreen::reset() {
@@ -42,107 +34,79 @@ void DavegaSimpleHorizontalScreen::reset() {
 
     // labels
     _tft->setFont(Terminal6x8);
-    _tft->drawText(165, 35, "TRIP (KM)", COLOR_WHITE);
+    _tft->drawText(165, 35, _config->imperial_units ? "TRIP (MI)" : "TRIP (KM)", COLOR_WHITE);
     _tft->drawText(159, 115, "BATTERY %", COLOR_WHITE);
-    _tft->drawText(122, 115, "KPH", COLOR_WHITE);
+    _tft->drawText(122, 115, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
 
-    //set_warning("OVER TEMP MOTOR");  // FIXME
+    // FW version
+    _tft->drawText(0, 115, _config->fw_version, COLOR_WHITE);
+
+    _just_reset = true;
 }
 
-void DavegaSimpleHorizontalScreen::set_fw_version(char* fw_version) {
-    String s = String("FW version: ") + String(fw_version);
-    _write_line(&s, 0);
-}
+void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
+    char fmt[10];
 
-void DavegaSimpleHorizontalScreen::set_volts(float volts) {
-    if (_config->per_cell_voltage)
-        _draw_volts(volts / _config->battery_cells, 2);
+    // speed
+    uint16_t color;
+    if (data->speed_kph > SHS_RED_SPEED_KPH)
+        color = COLOR_RED;
+    else if (data->speed_kph > SHS_YELLOW_SPEED_KPH)
+        color = COLOR_YELLOW;
     else
-        _draw_volts(volts, 1);
+        color = COLOR_WHITE;
+    dtostrf(convert_speed(data->speed_kph, _config->imperial_units), 2, 0, fmt);
+    tft_util_draw_number(_tft, fmt, 0, 0, color, COLOR_BLACK, 10, 22);
+
+    // trip
+    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
+    tft_util_draw_number(_tft, fmt, 155, 0, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 6);
+
+    // battery %
+    dtostrf(min(100 * data->battery_percent, 99), 2, 0, fmt);
+    tft_util_draw_number(_tft, fmt, 155, 60, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 4, 10);
+
+    // warning
+    if (data->vesc_fault_code != FAULT_CODE_NONE) {
+        uint16_t bg_color = _tft->setColor(150, 0, 0);
+        _tft->fillRectangle(0, 140, 220, 176, bg_color);
+        _tft->setFont(Terminal12x16);
+        _tft->setBackgroundColor(bg_color);
+        _tft->drawText(5, 151, vesc_fault_code_to_string(data->vesc_fault_code), COLOR_BLACK);
+        _tft->setBackgroundColor(COLOR_BLACK);
+    }
+
+    _update_battery_indicator(data->battery_percent, _just_reset);
+
+    _last_fault_code = data->vesc_fault_code;
+    _just_reset = false;
 }
 
-void DavegaSimpleHorizontalScreen::_draw_volts(float volts, uint8_t decimals) {
-    String s = String("voltage: ") + String(volts) + String(" V");
-    _write_line(&s, 1);
-}
-
-void DavegaSimpleHorizontalScreen::set_mah(int32_t mah) {
-    _mah = mah;
-    _draw_mah(_mah, COLOR_WHITE);
-}
-
-void DavegaSimpleHorizontalScreen::set_mah_reset_progress(float progress){
-    float brightness = 255.0 * (1.0 - progress);
-    uint16_t color = _tft->setColor(brightness, brightness, brightness);
-    _draw_mah(_mah, color);
-}
-
-void DavegaSimpleHorizontalScreen::_draw_mah(int32_t mah, uint16_t color) {
-    String s = String("capacity: ") + String(mah) + String(" mAh");
-    _write_line(&s, 2, color);
-}
-
-void DavegaSimpleHorizontalScreen::set_trip_distance(uint32_t meters) {
-    _trip_distance = meters;
-    _draw_trip_distance(_trip_distance, COLOR_WHITE);
-}
-
-void DavegaSimpleHorizontalScreen::set_trip_reset_progress(float progress) {
-    float brightness = 255.0 * (1.0 - progress);
-    uint16_t color = _tft->setColor(brightness, brightness, brightness);
-    _draw_trip_distance(_trip_distance, COLOR_WHITE);
-}
-
-void DavegaSimpleHorizontalScreen::_draw_trip_distance(uint32_t meters, uint16_t color) {
-    tft_util_draw_number(_tft, "24.7", 155, 0, COLOR_WHITE, COLOR_BLACK, 2, 6);
-}
-
-void DavegaSimpleHorizontalScreen::set_total_distance(uint32_t meters) {
-    String s = String("total: ") + String(meters) + String(" m");
-    _write_line(&s, 5);
-}
-
-void DavegaSimpleHorizontalScreen::set_speed(uint8_t kph) {
-    tft_util_draw_number(_tft, "62", 0, 0, COLOR_RED, COLOR_BLACK, 10, 22);
-}
-
-void DavegaSimpleHorizontalScreen::update_battery_indicator(float battery_percent, bool redraw = false) {
-    char fmt[3];
-    dtostrf(100 * battery_percent, 2, 0, fmt);
-    tft_util_draw_number(_tft, "68", 155, 60, COLOR_WHITE, COLOR_BLACK, 4, 10);
-
+void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
     int width = 17;
     int space = 3;
     int cell_count = 11;
+
+    int cells_to_fill = round(battery_percent * cell_count);
     for (int i=0; i<cell_count; i++) {
-        int x = i * (width + space);
-        uint8_t red = (uint8_t)(255.0 / (cell_count - 1) * i);
-        uint8_t green = 255 - red;
-        uint16_t color = _tft->setColor(red, green, 0);
-        _tft->fillRectangle(x, 140, x + width, 175, color);
-        if (i < 4)
-            _tft->fillRectangle(x + 1, 140 + 1, x + width - 1, 175 - 1, COLOR_BLACK);
+        bool is_filled = (i < _battery_cells_filled);
+        bool should_be_filled = (i < cells_to_fill);
+        if (should_be_filled != is_filled || redraw) {
+            int x = (cell_count - i - 1) * (width + space);
+            uint8_t green = (uint8_t)(255.0 / (cell_count - 1) * i);
+            uint8_t red = 255 - green;
+            uint16_t color = _tft->setColor(red, green, 0);
+            _tft->fillRectangle(x, 140, x + width, 175, color);
+            if (!should_be_filled)
+                _tft->fillRectangle(x + 1, 140 + 1, x + width - 1, 175 - 1, COLOR_BLACK);
+        }
     }
+    _battery_cells_filled = cells_to_fill;
 }
 
-void DavegaSimpleHorizontalScreen::update_speed_indicator(float speed_percent, bool redraw = false) {}
-
-void DavegaSimpleHorizontalScreen::indicate_read_success(uint32_t duration_ms) {
+void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+    uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
+    _tft->fillRectangle(68, 116, 72, 120, color);
     delay(duration_ms);
-}
-
-void DavegaSimpleHorizontalScreen::indicate_read_failure(uint32_t duration_ms) {
-    delay(duration_ms);
-}
-
-void DavegaSimpleHorizontalScreen::set_warning(char* warning) {
-    uint16_t bg_color = _tft->setColor(150, 0, 0);
-    _tft->fillRectangle(0, 140, 220, 176, bg_color);
-    _tft->setFont(Terminal12x16);
-    _tft->setBackgroundColor(bg_color);
-    _tft->drawText(5, 151, warning, COLOR_BLACK);
-    _tft->setBackgroundColor(COLOR_BLACK);
-}
-
-void DavegaSimpleHorizontalScreen::_write_line(String *text, int lineno, uint16_t color = COLOR_WHITE) {
+    _tft->fillRectangle(68, 116, 72, 120, COLOR_BLACK);
 }

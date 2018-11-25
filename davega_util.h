@@ -17,23 +17,18 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_SCREEN_H
-#define DAVEGA_SCREEN_H
+#ifndef DAVEGA_UTIL_H
+#define DAVEGA_UTIL_H
 
-#include "davega_data.h"
+#include "vesc_comm.h"
+#include <TFT_22_ILI9225.h>
 
-typedef struct {
-    char* fw_version;
-    bool imperial_units;
-    bool per_cell_voltage;
-    uint8_t battery_cells;
-} t_davega_screen_config;
+#define KM_PER_MILE 0.621371
 
-class DavegaScreen {
-public:
-    virtual void reset() = 0;
-    virtual void update(t_davega_data* data) = 0;
-    virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
-};
+char* make_fw_version(char* fw_version, char* revision_id);
+float convert_distance(float distance_km, bool imperial_units);
+float convert_speed(float speed_kph, bool imperial_units);
+char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
+uint16_t progress_to_color(float progress, TFT_22_ILI9225* tft);
 
-#endif //DAVEGA_SCREEN_H
+#endif //DAVEGA_UTIL_H

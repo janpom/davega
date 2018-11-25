@@ -19,109 +19,62 @@
 
 #include "davega_text_screen.h"
 #include "davega_screen.h"
+#include "davega_util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-#define KM_PER_MILE 0.621371
-
-#define LEN(X) (sizeof(X) / sizeof(X[0]))
-
 DavegaTextScreen::DavegaTextScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config) {
     _tft = tft;
     _config = config;
-
-    if (_config->imperial_units)
-        _distance_speed_multiplier = KM_PER_MILE;
-    else
-        _distance_speed_multiplier = 1.0;
 }
 
 void DavegaTextScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
-}
 
-void DavegaTextScreen::set_fw_version(char* fw_version) {
-    String s = String("FW version: ") + String(fw_version);
+    String s = String("FW version: ") + String(_config->fw_version);
     _write_line(&s, 0);
 }
 
-void DavegaTextScreen::set_volts(float volts) {
-    if (_config->per_cell_voltage)
-        _draw_volts(volts / _config->battery_cells, 2);
-    else
-        _draw_volts(volts, 1);
+void DavegaTextScreen::update(t_davega_data *data) {
+    int line = 1;
+    String s;
+
+    s = String("total voltage: ") + String(data->voltage) + String(" V");
+    _write_line(&s, line++);
+
+    s = String("avg cell voltage: ") + String(data->voltage / _config->battery_cells) + String(" V");
+    _write_line(&s, line++);
+
+    s = String("capacity: ") + String(data->mah) + String(" mAh");
+    _write_line(&s, line++, progress_to_color(data->mah_reset_progress, _tft));
+
+    s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
+    _write_line(&s, line++);
+
+    // TODO: imperial
+    s = String("trip: ") + String(data->trip_km) + String(" km");
+    _write_line(&s, line++, progress_to_color(data->trip_reset_progress, _tft));
+
+    // TODO: imperial
+    s = String("total: ") + String(data->total_km) + String(" km");
+    _write_line(&s, line++);
+
+    // TODO: imperial
+    s = String("speed: ") + String(data->speed_kph) + String(" km/h");
+    _write_line(&s, line++);
+
+    s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
+    _write_line(&s, line++);
 }
 
-void DavegaTextScreen::_draw_volts(float volts, uint8_t decimals) {
-    String s = String("voltage: ") + String(volts) + String(" V");
-    _write_line(&s, 1);
-}
-
-void DavegaTextScreen::set_mah(int32_t mah) {
-    _mah = mah;
-    _draw_mah(_mah, COLOR_WHITE);
-}
-
-void DavegaTextScreen::set_mah_reset_progress(float progress){
-    float brightness = 255.0 * (1.0 - progress);
-    uint16_t color = _tft->setColor(brightness, brightness, brightness);
-    _draw_mah(_mah, color);
-}
-
-void DavegaTextScreen::_draw_mah(int32_t mah, uint16_t color) {
-    String s = String("capacity: ") + String(mah) + String(" mAh");
-    _write_line(&s, 2, color);
-}
-
-void DavegaTextScreen::set_trip_distance(uint32_t meters) {
-    _trip_distance = meters;
-    _draw_trip_distance(_trip_distance, COLOR_WHITE);
-}
-
-void DavegaTextScreen::set_trip_reset_progress(float progress) {
-    float brightness = 255.0 * (1.0 - progress);
-    uint16_t color = _tft->setColor(brightness, brightness, brightness);
-    _draw_trip_distance(_trip_distance, COLOR_WHITE);
-}
-
-void DavegaTextScreen::_draw_trip_distance(uint32_t meters, uint16_t color) {
-    String s = String("trip: ") + String(meters) + String(" m");
-    _write_line(&s, 4, color);
-}
-
-void DavegaTextScreen::set_total_distance(uint32_t meters) {
-    String s = String("total: ") + String(meters) + String(" m");
-    _write_line(&s, 5);
-}
-
-void DavegaTextScreen::set_speed(uint8_t kph) {
-    String s = String("speed: ") + String(kph) + String(" km/h");
-    _write_line(&s, 6);
-}
-
-void DavegaTextScreen::update_battery_indicator(float battery_percent, bool redraw = false) {
-    String s = String("capacity: ") + String(battery_percent * 100) + String("%");
-    _write_line(&s, 3);
-}
-
-void DavegaTextScreen::update_speed_indicator(float speed_percent, bool redraw = false) {}
-
-void DavegaTextScreen::indicate_read_success(uint32_t duration_ms) {
+void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+    // TODO: indicator
     delay(duration_ms);
-}
-
-void DavegaTextScreen::indicate_read_failure(uint32_t duration_ms) {
-    delay(duration_ms);
-}
-
-void DavegaTextScreen::set_warning(char* warning) {
-    String s = String("warning: ") + String(warning);
-    _write_line(&s, 7);
 }
 
 void DavegaTextScreen::_write_line(String *text, int lineno, uint16_t color = COLOR_WHITE) {
-    const int max_line_length = 23;
+    const int max_line_length = 30;
     char line_buffer[max_line_length + 1];
     String s = String("") + *text;
     while (s.length() < max_line_length)

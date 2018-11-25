@@ -17,23 +17,24 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_SCREEN_H
-#define DAVEGA_SCREEN_H
+#ifndef DAVEGA_DATA_H
+#define DAVEGA_DATA_H
 
-#include "davega_data.h"
+#include "vesc_comm.h"
 
 typedef struct {
-    char* fw_version;
-    bool imperial_units;
-    bool per_cell_voltage;
-    uint8_t battery_cells;
-} t_davega_screen_config;
+    float voltage;
+    float voltage_percent;
+    int32_t mah;
+    float mah_reset_progress;
+    float mah_percent;
+    float battery_percent;
+    float speed_kph;
+    float speed_percent;
+    float trip_km;
+    float trip_reset_progress;
+    float total_km;
+    vesc_comm_fault_code vesc_fault_code = FAULT_CODE_NONE;
+} t_davega_data;
 
-class DavegaScreen {
-public:
-    virtual void reset() = 0;
-    virtual void update(t_davega_data* data) = 0;
-    virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
-};
-
-#endif //DAVEGA_SCREEN_H
+#endif //DAVEGA_DATA_H

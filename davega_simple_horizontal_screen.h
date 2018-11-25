@@ -23,36 +23,30 @@
 #include <TFT_22_ILI9225.h>
 #include "davega_screen.h"
 
+#define SHS_YELLOW_SPEED_KPH 25
+#define SHS_RED_SPEED_KPH 35
+
 class DavegaSimpleHorizontalScreen: public DavegaScreen {
 public:
     DavegaSimpleHorizontalScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config);
     void reset();
-    void set_fw_version(char* fw_version);
-    void set_volts(float volts);
-    void set_mah(int32_t mah);
-    void set_mah_reset_progress(float progress);
-    void set_trip_distance(uint32_t meters);
-    void set_trip_reset_progress(float progress);
-    void set_total_distance(uint32_t meters);
-    void set_speed(uint8_t kph);
-    void update_battery_indicator(float battery_percent, bool redraw = false);
-    void update_speed_indicator(float speed_percent, bool redraw = false);
-    void indicate_read_success(uint32_t duration_ms);
-    void indicate_read_failure(uint32_t duration_ms);
-    void set_warning(char* warning);
+    void update(t_davega_data* data);
+    void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
 
 protected:
     TFT_22_ILI9225* _tft;
     t_davega_screen_config* _config;
 
-    float _distance_speed_multiplier = 1.0;
-    uint32_t _trip_distance;
-    uint32_t _mah;
+    // Have we just reset the screen? Unset by the first update() call.
+    bool _just_reset = false;
 
-    void _draw_volts(float volts, uint8_t decimals);
-    void _draw_mah(int32_t mah, uint16_t color);
-    void _draw_trip_distance(uint32_t meters, uint16_t color);
-    void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
+    // Remember how many cells are currently filled so that we can update the indicators more efficiently.
+    uint8_t _battery_cells_filled = 0;
+
+    vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
+
+//    bool _draw_battery_cell(int index, bool filled, bool redraw = false);
+    void _update_battery_indicator(float battery_percent, bool redraw = false);
 };
 
 #endif //DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
