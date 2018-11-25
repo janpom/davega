@@ -59,8 +59,8 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     tft_util_draw_number(_tft, fmt, 0, 0, color, COLOR_BLACK, 10, 22);
 
     // trip
-    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 155, 0, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 4, 1, fmt);
+    tft_util_draw_number(_tft, fmt, 154, 0, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 6);
 
     // battery %
     dtostrf(min(100 * data->battery_percent, 99), 2, 0, fmt);
