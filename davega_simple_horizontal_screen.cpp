@@ -47,6 +47,9 @@ void DavegaSimpleHorizontalScreen::reset() {
 void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     char fmt[10];
 
+    if (data->vesc_fault_code != _last_fault_code)
+        reset();
+
     // speed
     uint16_t color;
     if (data->speed_kph > SHS_RED_SPEED_KPH)
