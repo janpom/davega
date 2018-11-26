@@ -117,4 +117,19 @@
 // This corresponds (more or less) to how often data is read from VESC.
 #define UPDATE_DELAY 50  // ms
 
+// 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
+#define SCREEN_ORIENTATION 1
+
+// Screens
+#include "davega_screen.h"
+#include "davega_default_screen.h"
+#include "davega_simple_horizontal_screen.h"
+#include "davega_text_screen.h"
+
+DavegaScreen* davega_screens[] = {
+//    &davega_default_screen,
+    &davega_simple_horizontal_screen,
+    &davega_text_screen,
+};
+
 #endif //DAVEGA_DAVEGA_CONFIG_H
