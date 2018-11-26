@@ -52,16 +52,16 @@ void DavegaTextScreen::update(t_davega_data *data) {
     s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
     _write_line(&s, line++);
 
-    // TODO: imperial
-    s = String("trip: ") + String(data->trip_km) + String(" km");
+    s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
+            + String(" ") + String(_config->imperial_units ? "mi" : "km"));
     _write_line(&s, line++, progress_to_color(data->trip_reset_progress, _tft));
 
-    // TODO: imperial
-    s = String("total: ") + String(data->total_km) + String(" km");
+    s = (String("total: ") + String(convert_distance(data->total_km, _config->imperial_units))
+            + String(" ") + String(_config->imperial_units ? "mi" : "km"));
     _write_line(&s, line++);
 
-    // TODO: imperial
-    s = String("speed: ") + String(data->speed_kph) + String(" km/h");
+    s = (String("speed: ") + String(convert_distance(data->speed_kph, _config->imperial_units))
+            + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
     _write_line(&s, line++);
 
     s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
@@ -69,8 +69,10 @@ void DavegaTextScreen::update(t_davega_data *data) {
 }
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
-    // TODO: indicator
+    uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
+    _tft->fillRectangle(167, 5, 171, 9, color);
     delay(duration_ms);
+    _tft->fillRectangle(167, 5, 171, 9, COLOR_BLACK);
 }
 
 void DavegaTextScreen::_write_line(String *text, int lineno, uint16_t color = COLOR_WHITE) {
