@@ -66,11 +66,6 @@ const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
     {138, 151}, {122, 151}, {106, 151},
 };
 
-DavegaDefaultScreen::DavegaDefaultScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config) {
-    _tft = tft;
-    _config = config;
-}
-
 void DavegaDefaultScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
     _draw_labels();
@@ -239,3 +234,5 @@ void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redr
     }
     _speed_cells_filled = cells_to_fill;
 }
+
+DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();

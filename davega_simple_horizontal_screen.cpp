@@ -24,11 +24,6 @@
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-DavegaSimpleHorizontalScreen::DavegaSimpleHorizontalScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config) {
-    _tft = tft;
-    _config = config;
-}
-
 void DavegaSimpleHorizontalScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
 
@@ -113,3 +108,5 @@ void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successf
     delay(duration_ms);
     _tft->fillRectangle(68, 116, 72, 120, COLOR_BLACK);
 }
+
+DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen();

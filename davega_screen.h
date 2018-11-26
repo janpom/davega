@@ -20,6 +20,7 @@
 #ifndef DAVEGA_SCREEN_H
 #define DAVEGA_SCREEN_H
 
+#include <TFT_22_ILI9225.h>
 #include "davega_data.h"
 
 typedef struct {
@@ -31,9 +32,14 @@ typedef struct {
 
 class DavegaScreen {
 public:
+    void init(TFT_22_ILI9225* tft, t_davega_screen_config* config) { _tft = tft; _config = config; };
     virtual void reset() = 0;
     virtual void update(t_davega_data* data) = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
+
+protected:
+    TFT_22_ILI9225* _tft;
+    t_davega_screen_config* _config;
 };
 
 #endif //DAVEGA_SCREEN_H

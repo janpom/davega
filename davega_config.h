@@ -110,14 +110,26 @@
 // EEPROM_UPDATE_MIN_DELAY_ON_STOP due to EEPROM_UPDATE_EACH_METERS. (Otherwise, meters would be missed.)
 #define EEPROM_UPDATE_MIN_DELAY_ON_STOP 10000
 
-// 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define DISPLAY_ORIENTATION 1
-
 // Hold button 1 for this time to reset trip distance.
 // Hold button 2 for this time to reset the Coulomb counter.
 #define COUNTER_RESET_TIME 3000  // ms
 
 // This corresponds (more or less) to how often data is read from VESC.
 #define UPDATE_DELAY 50  // ms
+
+// 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
+#define SCREEN_ORIENTATION 1
+
+// Screens
+#include "davega_screen.h"
+#include "davega_default_screen.h"
+#include "davega_simple_horizontal_screen.h"
+#include "davega_text_screen.h"
+
+DavegaScreen* davega_screens[] = {
+//    &davega_default_screen,
+    &davega_simple_horizontal_screen,
+    &davega_text_screen,
+};
 
 #endif //DAVEGA_DAVEGA_CONFIG_H

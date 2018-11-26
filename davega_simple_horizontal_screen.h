@@ -28,15 +28,11 @@
 
 class DavegaSimpleHorizontalScreen: public DavegaScreen {
 public:
-    DavegaSimpleHorizontalScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config);
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
 
 protected:
-    TFT_22_ILI9225* _tft;
-    t_davega_screen_config* _config;
-
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
 
@@ -45,8 +41,9 @@ protected:
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 
-//    bool _draw_battery_cell(int index, bool filled, bool redraw = false);
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 };
+
+extern DavegaSimpleHorizontalScreen davega_simple_horizontal_screen;
 
 #endif //DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H

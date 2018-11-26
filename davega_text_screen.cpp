@@ -24,11 +24,6 @@
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-DavegaTextScreen::DavegaTextScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config) {
-    _tft = tft;
-    _config = config;
-}
-
 void DavegaTextScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
 
@@ -87,3 +82,5 @@ void DavegaTextScreen::_write_line(String *text, int lineno, uint16_t color = CO
     _tft->setFont(Terminal6x8);
     _tft->drawText(5, y, line_buffer, color);
 }
+
+DavegaTextScreen davega_text_screen = DavegaTextScreen();

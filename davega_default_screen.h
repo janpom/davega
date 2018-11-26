@@ -26,15 +26,11 @@
 
 class DavegaDefaultScreen: public DavegaScreen {
 public:
-    DavegaDefaultScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config);
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
 
 protected:
-    TFT_22_ILI9225* _tft;
-    t_davega_screen_config* _config;
-
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
 
@@ -50,5 +46,7 @@ protected:
     void _update_battery_indicator(float battery_percent, bool redraw = false);
     void _update_speed_indicator(float speed_percent, bool redraw = false);
 };
+
+extern DavegaDefaultScreen davega_default_screen;
 
 #endif //DAVEGA_DEFAULT_SCREEN_H

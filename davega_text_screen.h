@@ -25,16 +25,14 @@
 
 class DavegaTextScreen: public DavegaScreen {
 public:
-    DavegaTextScreen(TFT_22_ILI9225* tft, t_davega_screen_config* config);
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
 
 protected:
-    TFT_22_ILI9225* _tft;
-    t_davega_screen_config* _config;
-
     void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
 };
+
+extern DavegaTextScreen davega_text_screen;
 
 #endif //DAVEGA_TEXT_SCREEN_H

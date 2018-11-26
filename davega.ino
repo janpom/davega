@@ -19,9 +19,6 @@
 
 #include "davega_config.h"
 #include "davega_screen.h"
-#include "davega_default_screen.h"
-#include "davega_text_screen.h"
-#include "davega_simple_horizontal_screen.h"
 #include "davega_eeprom.h"
 #include "davega_data.h"
 #include "davega_util.h"
@@ -59,12 +56,8 @@ t_davega_screen_config screen_config = {
     BATTERY_S,
 };
 
-DavegaDefaultScreen screen0 = DavegaDefaultScreen(&tft, &screen_config);
-DavegaTextScreen screen1 = DavegaTextScreen(&tft, &screen_config);
-DavegaSimpleHorizontalScreen screen2 = DavegaSimpleHorizontalScreen(&tft, &screen_config);
-DavegaScreen* screens[] = {&screen0, &screen1, &screen2};
-int current_screen_index = 2;
-DavegaScreen* scr = screens[current_screen_index];
+int current_screen_index = 0;
+DavegaScreen* scr;
 
 const float discharge_ticks[] = DISCHARGE_TICKS;
 
@@ -135,8 +128,12 @@ void setup() {
     }
 
     tft.begin();
-    tft.setOrientation(DISPLAY_ORIENTATION);
+    tft.setOrientation(SCREEN_ORIENTATION);
     tft.setBackgroundColor(COLOR_BLACK);
+
+    for (int i=0; i<LEN(davega_screens); i++)
+        davega_screens[i]->init(&tft, &screen_config);
+    scr = davega_screens[current_screen_index];
 
     data.voltage = eeprom_read_volts();
     data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
@@ -182,8 +179,8 @@ void setup() {
 
 void loop() {
     if (digitalRead(BUTTON_3_PIN) == LOW) {
-        current_screen_index = (current_screen_index + 1) % LEN(screens);
-        scr = screens[current_screen_index];
+        current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
+        scr = davega_screens[current_screen_index];
         scr->reset();
         delay(UPDATE_DELAY);
     }
