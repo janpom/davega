@@ -38,6 +38,13 @@ The firmware has to be configured for a particular e-skate. At the very least, t
    - Port: the port to which the USB-UART is connected (e.g. `/dev/cu.SLAB_USBtoUART` for CP2102 adapter on a Mac)
 7. Upload.
 
+## Configuring the ESC
+
+In the [VESC Tool](https://vesc-project.com/vesc_tool) set:
+
+1. App Settings > General > App to Use: **PPM and UART**
+2. App Settings > UART > Baudrate: **115200 bps**
+
 ## License
 
 DAVEga firmware and hardware design is released under [GNU GPL v3](LICENSE).
