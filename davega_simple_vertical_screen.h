@@ -17,14 +17,14 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
-#define DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
+#ifndef DAVEGA_SIMPLE_VERTICAL_SCREEN_H
+#define DAVEGA_SIMPLE_VERTICAL_SCREEN_H
 
 #include <TFT_22_ILI9225.h>
 #include "davega_screen.h"
 #include "davega_simple_screen.h"
 
-class DavegaSimpleHorizontalScreen: public DavegaScreen {
+class DavegaSimpleVerticalScreen: public DavegaScreen {
 public:
     void reset();
     void update(t_davega_data* data);
@@ -42,6 +42,6 @@ protected:
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 };
 
-extern DavegaSimpleHorizontalScreen davega_simple_horizontal_screen;
+extern DavegaSimpleVerticalScreen davega_simple_vertical_screen;
 
-#endif //DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
+#endif //DAVEGA_SIMPLE_VERTICAL_SCREEN_H
