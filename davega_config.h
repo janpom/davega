@@ -118,17 +118,19 @@
 #define UPDATE_DELAY 50  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define SCREEN_ORIENTATION 1
+#define SCREEN_ORIENTATION 0
 
 // Screens
 #include "davega_screen.h"
 #include "davega_default_screen.h"
 #include "davega_simple_horizontal_screen.h"
+#include "davega_simple_vertical_screen.h"
 #include "davega_text_screen.h"
 
 DavegaScreen* davega_screens[] = {
 //    &davega_default_screen,
-    &davega_simple_horizontal_screen,
+//    &davega_simple_horizontal_screen,
+    &davega_simple_vertical_screen,
     &davega_text_screen,
 };
 
