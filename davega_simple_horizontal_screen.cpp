@@ -29,9 +29,10 @@ void DavegaSimpleHorizontalScreen::reset() {
 
     // labels
     _tft->setFont(Terminal6x8);
-    _tft->drawText(165, 35, _config->imperial_units ? "TRIP (MI)" : "TRIP (KM)", COLOR_WHITE);
-    _tft->drawText(159, 115, "BATTERY %", COLOR_WHITE);
-    _tft->drawText(122, 115, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+    _tft->drawText(174, 29, _config->imperial_units ? "TRIP MI" : "TRIP KM", COLOR_WHITE);
+    _tft->drawText(166, 72, _config->imperial_units ? "TOTAL MI" : "TOTAL KM", COLOR_WHITE);
+    _tft->drawText(158, 115, "BATTERY V", COLOR_WHITE);
+    _tft->drawText(119, 115, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
 
     // FW version
     _tft->drawText(0, 115, _config->fw_version, COLOR_WHITE);
@@ -54,15 +55,22 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     else
         color = COLOR_WHITE;
     dtostrf(convert_speed(data->speed_kph, _config->imperial_units), 2, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 0, color, COLOR_BLACK, 10, 22);
+    tft_util_draw_number(_tft, fmt, 0, 0, color, COLOR_BLACK, 7, 22);
 
-    // trip
-    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 154, 0, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    // trip distance
+    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
+    tft_util_draw_number(_tft, fmt, 147, 0, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 5);
 
-    // battery %
-    dtostrf(min(100 * data->battery_percent, 99), 2, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 155, 60, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 4, 10);
+    // total distance
+    dtostrf(convert_distance(data->total_km, _config->imperial_units), 5, 1, fmt);
+    tft_util_draw_number(_tft, fmt, 147, 43, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 5);
+
+    // battery voltage
+    if (_config->per_cell_voltage)
+        dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
+    else
+        dtostrf(data->voltage, 4, 1, fmt);
+    tft_util_draw_number(_tft, fmt, 163, 86, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 5);
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
@@ -104,9 +112,9 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
 
 void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
-    _tft->fillRectangle(68, 116, 72, 120, color);
+    _tft->fillRectangle(67, 116, 71, 120, color);
     delay(duration_ms);
-    _tft->fillRectangle(68, 116, 72, 120, COLOR_BLACK);
+    _tft->fillRectangle(67, 116, 71, 120, COLOR_BLACK);
 }
 
 DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen();
