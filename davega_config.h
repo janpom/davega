@@ -86,10 +86,14 @@
 // Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
 // the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
 // traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 42  // [1, 255]
+#define EEPROM_MAGIC_VALUE 43  // [1, 255]
 
 #define EEPROM_INIT_VALUE_VOLTS 0
 #define EEPROM_INIT_VALUE_MAH_SPENT 0
+#define EEPROM_INIT_VALUE_MAX_SPEED 0
+#define EEPROM_INIT_VALUE_MILLIS_ELAPSED 0
+#define EEPROM_INIT_VALUE_MILLIS_RIDING 0
+#define EEPROM_INIT_VALUE_MIN_VOLTAGE 60
 #define EEPROM_INIT_VALUE_TRIP_DISTANCE 0  // meters
 #define EEPROM_INIT_VALUE_TOTAL_DISTANCE 0  // meters
 
@@ -110,7 +114,7 @@
 // EEPROM_UPDATE_MIN_DELAY_ON_STOP due to EEPROM_UPDATE_EACH_METERS. (Otherwise, meters would be missed.)
 #define EEPROM_UPDATE_MIN_DELAY_ON_STOP 10000
 
-// Hold button 1 for this time to reset trip distance.
+// Hold button 1 for this time to reset session data.
 // Hold button 2 for this time to reset the Coulomb counter.
 #define COUNTER_RESET_TIME 3000  // ms
 

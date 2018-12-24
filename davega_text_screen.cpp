@@ -34,8 +34,12 @@ void DavegaTextScreen::reset() {
 void DavegaTextScreen::update(t_davega_data *data) {
     int line = 1;
     String s;
+    uint16_t session_data_color = progress_to_color(data->session_reset_progress, _tft);
 
     s = String("total voltage: ") + String(data->voltage) + String(" V");
+    _write_line(&s, line++);
+
+    s = String("min total voltage: ") + String(data->session->min_voltage) + String(" V");
     _write_line(&s, line++);
 
     s = String("avg cell voltage: ") + String(data->voltage / _config->battery_cells) + String(" V");
@@ -49,7 +53,7 @@ void DavegaTextScreen::update(t_davega_data *data) {
 
     s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
             + String(" ") + String(_config->imperial_units ? "mi" : "km"));
-    _write_line(&s, line++, progress_to_color(data->trip_reset_progress, _tft));
+    _write_line(&s, line++, session_data_color);
 
     s = (String("total: ") + String(convert_distance(data->total_km, _config->imperial_units))
             + String(" ") + String(_config->imperial_units ? "mi" : "km"));
@@ -59,8 +63,19 @@ void DavegaTextScreen::update(t_davega_data *data) {
             + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
     _write_line(&s, line++);
 
+    s = (String("max speed: ") + String(convert_distance(data->session->max_speed_kph, _config->imperial_units))
+            + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+    _write_line(&s, line++, session_data_color);
+
     s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
     _write_line(&s, line++);
+
+    // TODO: format time hh:mm:ss
+    s = String("time elapsed: ") + String(data->session->millis_elapsed / 1000) + String(" s");
+    _write_line(&s, line++, session_data_color);
+
+    s = String("time riding: ") + String(data->session->millis_riding / 1000) + String(" s");
+    _write_line(&s, line++, session_data_color);
 }
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {

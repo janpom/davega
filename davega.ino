@@ -64,9 +64,12 @@ const float discharge_ticks[] = DISCHARGE_TICKS;
 uint8_t vesc_packet[PACKET_MAX_LENGTH];
 
 t_davega_data data;
+t_davega_session_data session_data;
 int16_t initial_mah_spent;
 int32_t initial_trip_distance;
 int32_t initial_total_distance;
+int32_t initial_millis_elapsed;
+int32_t last_millis = 0;
 int32_t last_eeprom_written_total_distance;
 int32_t last_eeprom_update_on_stop;
 
@@ -123,8 +126,13 @@ void setup() {
         eeprom_initialize(EEPROM_MAGIC_VALUE);
         eeprom_write_volts(EEPROM_INIT_VALUE_VOLTS);
         eeprom_write_mah_spent(EEPROM_INIT_VALUE_MAH_SPENT);
-        eeprom_write_trip_distance(EEPROM_INIT_VALUE_TRIP_DISTANCE);
         eeprom_write_total_distance(EEPROM_INIT_VALUE_TOTAL_DISTANCE);
+        session_data.max_speed_kph = EEPROM_INIT_VALUE_MAX_SPEED;
+        session_data.millis_elapsed = EEPROM_INIT_VALUE_MILLIS_ELAPSED;
+        session_data.millis_riding = EEPROM_INIT_VALUE_MILLIS_RIDING;
+        session_data.min_voltage = EEPROM_INIT_VALUE_MIN_VOLTAGE;
+        session_data.trip_meters = EEPROM_INIT_VALUE_TRIP_DISTANCE;
+        eeprom_write_session_data(session_data);
     }
 
     tft.begin();
@@ -135,9 +143,10 @@ void setup() {
         davega_screens[i]->init(&tft, &screen_config);
     scr = davega_screens[current_screen_index];
 
+    session_data = eeprom_read_session_data();
     data.voltage = eeprom_read_volts();
     data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
-    data.trip_km = eeprom_read_trip_distance() / 1000.0;
+    data.trip_km = session_data.trip_meters / 1000.0;
     data.total_km = eeprom_read_total_distance() / 1000.0;
 
     scr->reset();
@@ -158,8 +167,9 @@ void setup() {
     }
 
     initial_mah_spent = eeprom_read_mah_spent();
-    initial_trip_distance = eeprom_read_trip_distance();
+    initial_trip_distance = session_data.trip_meters;
     initial_total_distance = eeprom_read_total_distance();
+    initial_millis_elapsed = session_data.millis_elapsed;
 
     last_eeprom_written_total_distance = initial_total_distance;
     last_eeprom_update_on_stop = millis();
@@ -175,6 +185,8 @@ void setup() {
     int32_t tachometer = rotations_to_meters(vesc_comm_get_tachometer(vesc_packet) / 6);
     initial_trip_distance -= tachometer;
     initial_total_distance -= tachometer;
+
+    data.session = &session_data;
 }
 
 void loop() {
@@ -228,8 +240,13 @@ void loop() {
 
     uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
     if (button_1_down_elapsed > COUNTER_RESET_TIME) {
-        // reset trip distance
-        eeprom_write_trip_distance(0);
+        // reset session
+        session_data.trip_meters = 0;
+        session_data.max_speed_kph = 0;
+        session_data.millis_elapsed = 0;
+        session_data.millis_riding = 0;
+        session_data.min_voltage = data.voltage;
+        eeprom_write_session_data(session_data);
         initial_trip_distance = -tachometer;
     }
 
@@ -237,7 +254,7 @@ void loop() {
     int32_t total_distance = initial_total_distance + tachometer;
 
     // dim trip distance if it's about to be reset
-    data.trip_reset_progress = min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0);
+    data.session_reset_progress = min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
     data.trip_km = trip_distance / 1000.0;
     data.total_km = total_distance / 1000.0;
@@ -248,6 +265,21 @@ void loop() {
     data.voltage_percent = voltage_to_percent(data.voltage);
     data.battery_percent = VOLTAGE_WEIGHT * data.voltage_percent + (1.0 - VOLTAGE_WEIGHT) * data.mah_percent;
 
+    // extreme values
+    if (data.speed_kph > session_data.max_speed_kph)
+        session_data.max_speed_kph = data.speed_kph;
+
+    if (data.voltage < session_data.min_voltage)
+        session_data.min_voltage = data.voltage;
+
+    // time elapsed
+    session_data.millis_elapsed = initial_millis_elapsed + millis();
+
+    if (rpm > 0)
+        session_data.millis_riding += millis() - last_millis;
+    last_millis = millis();
+
+    // update EEPROM
     bool came_to_stop = (last_rpm != 0 && rpm == 0);
     bool traveled_enough_distance = (total_distance - last_eeprom_written_total_distance >= EEPROM_UPDATE_EACH_METERS);
     if (traveled_enough_distance || (came_to_stop && millis() - last_eeprom_update_on_stop > EEPROM_UPDATE_MIN_DELAY_ON_STOP)) {
@@ -256,8 +288,8 @@ void loop() {
         last_eeprom_written_total_distance = total_distance;
         eeprom_write_volts(data.voltage);
         eeprom_write_mah_spent(mah_spent);
-        eeprom_write_trip_distance(trip_distance);
         eeprom_write_total_distance(total_distance);
+        eeprom_write_session_data(session_data);
     }
 
     last_rpm = rpm;

@@ -23,6 +23,24 @@
 #include "vesc_comm.h"
 
 typedef struct {
+    uint32_t millis_elapsed;
+    uint32_t millis_riding;
+    float max_speed_kph;
+    float min_voltage;
+    int32_t trip_meters;
+
+    // TODO:
+    // max_motor_temp
+    // max_fet_temp
+    // max_current
+    // min_current
+    // wh_spent
+    // avg_speed_kph (derived)
+    // wh_per_km (derived)
+    // range_km (derived)
+} t_davega_session_data;
+
+typedef struct {
     float voltage;
     float voltage_percent;
     int32_t mah;
@@ -32,9 +50,10 @@ typedef struct {
     float speed_kph;
     float speed_percent;
     float trip_km;
-    float trip_reset_progress;
+    float session_reset_progress;
     float total_km;
     vesc_comm_fault_code vesc_fault_code = FAULT_CODE_NONE;
+    t_davega_session_data* session;
 } t_davega_data;
 
 #endif //DAVEGA_DATA_H

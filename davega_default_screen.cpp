@@ -96,7 +96,7 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
 
     // draw trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 24, 185, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 4);
+    tft_util_draw_number(_tft, fmt, 24, 185, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 4);
 
     // draw total distance
     dtostrf(convert_distance(data->total_km, _config->imperial_units), 4, 0, fmt);
