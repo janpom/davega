@@ -24,6 +24,13 @@
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
+String format_time(uint32_t milliseconds) {
+    uint32_t seconds = milliseconds / 1000;
+    uint32_t minutes = seconds / 60;
+    seconds = seconds % 60;
+    return String(minutes) + ":" + String(seconds < 10 ? "0" : "") + String(seconds);
+}
+
 void DavegaTextScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
 
@@ -70,11 +77,10 @@ void DavegaTextScreen::update(t_davega_data *data) {
     s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
     _write_line(&s, line++);
 
-    // TODO: format time hh:mm:ss
-    s = String("time elapsed: ") + String(data->session->millis_elapsed / 1000) + String(" s");
+    s = String("time elapsed: ") + format_time(data->session->millis_elapsed) + String(" mins");
     _write_line(&s, line++, session_data_color);
 
-    s = String("time riding: ") + String(data->session->millis_riding / 1000) + String(" s");
+    s = String("time riding: ") + format_time(data->session->millis_riding) + String(" mins");
     _write_line(&s, line++, session_data_color);
 }
 
