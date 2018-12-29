@@ -121,5 +121,3 @@ void DavegaSimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful
     delay(duration_ms);
     _tft->fillRectangle(68, 1, 72, 5, COLOR_BLACK);
 }
-
-DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen();

@@ -234,5 +234,3 @@ void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redr
     }
     _speed_cells_filled = cells_to_fill;
 }
-
-DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();

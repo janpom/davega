@@ -47,6 +47,4 @@ protected:
     void _update_speed_indicator(float speed_percent, bool redraw = false);
 };
 
-extern DavegaDefaultScreen davega_default_screen;
-
 #endif //DAVEGA_DEFAULT_SCREEN_H
