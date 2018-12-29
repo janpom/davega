@@ -42,6 +42,4 @@ protected:
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 };
 
-extern DavegaSimpleVerticalScreen davega_simple_vertical_screen;
-
 #endif //DAVEGA_SIMPLE_VERTICAL_SCREEN_H
