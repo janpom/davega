@@ -281,6 +281,7 @@ void loop() {
         session_data.min_voltage = data.voltage;
         eeprom_write_session_data(session_data);
         initial_trip_meters = -tachometer;
+        initial_millis_elapsed = -millis();
     }
 
     session_data.trip_meters = initial_trip_meters + tachometer;
