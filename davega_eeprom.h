@@ -20,6 +20,7 @@
 #ifndef DAVEGA_EEPROM_H
 #define DAVEGA_EEPROM_H
 
+#include "davega_data.h"
 #include <Arduino.h>
 
 bool eeprom_is_initialized(uint8_t magic_value);
@@ -31,10 +32,10 @@ void eeprom_write_volts(float volts);
 uint16_t eeprom_read_mah_spent();
 void eeprom_write_mah_spent(uint16_t mah_spent);
 
-uint32_t eeprom_read_trip_distance();
-void eeprom_write_trip_distance(uint32_t meters);
-
 uint32_t eeprom_read_total_distance();
 void eeprom_write_total_distance(uint32_t meters);
+
+t_davega_session_data eeprom_read_session_data();
+void eeprom_write_session_data(t_davega_session_data session_data);
 
 #endif //DAVEGA_EEPROM_H

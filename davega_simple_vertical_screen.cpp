@@ -60,11 +60,11 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
 
     // trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
 
     // total distance
     dtostrf(convert_distance(data->total_km, _config->imperial_units), 5, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 190, progress_to_color(data->trip_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
 
     // battery %
     dtostrf(min(100 * data->battery_percent, 99.9), 4, 1, fmt);
@@ -75,7 +75,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
         dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
     else
         dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 110, 190, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {

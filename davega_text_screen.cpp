@@ -24,6 +24,13 @@
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
+String format_time(uint32_t milliseconds) {
+    uint32_t seconds = milliseconds / 1000;
+    uint32_t minutes = seconds / 60;
+    seconds = seconds % 60;
+    return String(minutes) + ":" + String(seconds < 10 ? "0" : "") + String(seconds);
+}
+
 void DavegaTextScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
 
@@ -34,22 +41,27 @@ void DavegaTextScreen::reset() {
 void DavegaTextScreen::update(t_davega_data *data) {
     int line = 1;
     String s;
+    uint16_t session_data_color = progress_to_color(data->session_reset_progress, _tft);
+    uint16_t capacity_data_color = progress_to_color(data->mah_reset_progress, _tft);
 
     s = String("total voltage: ") + String(data->voltage) + String(" V");
+    _write_line(&s, line++);
+
+    s = String("min total voltage: ") + String(data->session->min_voltage) + String(" V");
     _write_line(&s, line++);
 
     s = String("avg cell voltage: ") + String(data->voltage / _config->battery_cells) + String(" V");
     _write_line(&s, line++);
 
     s = String("capacity: ") + String(data->mah) + String(" mAh");
-    _write_line(&s, line++, progress_to_color(data->mah_reset_progress, _tft));
+    _write_line(&s, line++, capacity_data_color);
 
     s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
-    _write_line(&s, line++);
+    _write_line(&s, line++, capacity_data_color);
 
     s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
             + String(" ") + String(_config->imperial_units ? "mi" : "km"));
-    _write_line(&s, line++, progress_to_color(data->trip_reset_progress, _tft));
+    _write_line(&s, line++, session_data_color);
 
     s = (String("total: ") + String(convert_distance(data->total_km, _config->imperial_units))
             + String(" ") + String(_config->imperial_units ? "mi" : "km"));
@@ -58,6 +70,23 @@ void DavegaTextScreen::update(t_davega_data *data) {
     s = (String("speed: ") + String(convert_distance(data->speed_kph, _config->imperial_units))
             + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
     _write_line(&s, line++);
+
+    s = (String("max speed: ") + String(convert_distance(data->session->max_speed_kph, _config->imperial_units))
+            + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+    _write_line(&s, line++, session_data_color);
+
+    float avg_speed_kph = data->session->millis_riding > 0
+            ? 3600.0 * data->session->trip_meters / data->session->millis_riding
+            : 0;
+    s = (String("avg speed: ") + String(convert_distance(avg_speed_kph, _config->imperial_units))
+         + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+    _write_line(&s, line++, session_data_color);
+
+    s = String("time elapsed: ") + format_time(data->session->millis_elapsed) + String(" mins");
+    _write_line(&s, line++, session_data_color);
+
+    s = String("time riding: ") + format_time(data->session->millis_riding) + String(" mins");
+    _write_line(&s, line++, session_data_color);
 
     s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
     _write_line(&s, line++);
