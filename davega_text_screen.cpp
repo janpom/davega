@@ -75,6 +75,13 @@ void DavegaTextScreen::update(t_davega_data *data) {
             + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
     _write_line(&s, line++, session_data_color);
 
+    float avg_speed_kph = data->session->millis_riding > 0
+            ? 3600.0 * data->session->trip_meters / data->session->millis_riding
+            : 0;
+    s = (String("avg speed: ") + String(convert_distance(avg_speed_kph, _config->imperial_units))
+         + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+    _write_line(&s, line++, session_data_color);
+
     s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
     _write_line(&s, line++);
 
