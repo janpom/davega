@@ -75,7 +75,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
         dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
     else
         dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 110, 190, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {
