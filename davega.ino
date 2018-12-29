@@ -99,11 +99,11 @@ uint8_t vesc_packet[PACKET_MAX_LENGTH];
 t_davega_data data;
 t_davega_session_data session_data;
 int16_t initial_mah_spent;
-int32_t initial_trip_distance;
-int32_t initial_total_distance;
+int32_t initial_trip_meters;
+int32_t initial_total_meters;
 int32_t initial_millis_elapsed;
 int32_t last_millis = 0;
-int32_t last_eeprom_written_total_distance;
+int32_t last_eeprom_written_total_meters;
 int32_t last_eeprom_update_on_stop;
 
 int32_t last_rpm;
@@ -200,11 +200,11 @@ void setup() {
     }
 
     initial_mah_spent = eeprom_read_mah_spent();
-    initial_trip_distance = session_data.trip_meters;
-    initial_total_distance = eeprom_read_total_distance();
+    initial_trip_meters = session_data.trip_meters;
+    initial_total_meters = eeprom_read_total_distance();
     initial_millis_elapsed = session_data.millis_elapsed;
 
-    last_eeprom_written_total_distance = initial_total_distance;
+    last_eeprom_written_total_meters = initial_total_meters;
     last_eeprom_update_on_stop = millis();
 
     // Subtract current VESC values, which could be non-zero in case the display
@@ -216,8 +216,8 @@ void setup() {
                                            vesc_comm_get_amphours_charged(vesc_packet));
     initial_mah_spent -= vesc_mah_spent;
     int32_t tachometer = rotations_to_meters(vesc_comm_get_tachometer(vesc_packet) / 6);
-    initial_trip_distance -= tachometer;
-    initial_total_distance -= tachometer;
+    initial_trip_meters -= tachometer;
+    initial_total_meters -= tachometer;
 
     data.session = &session_data;
 }
@@ -280,17 +280,17 @@ void loop() {
         session_data.millis_riding = 0;
         session_data.min_voltage = data.voltage;
         eeprom_write_session_data(session_data);
-        initial_trip_distance = -tachometer;
+        initial_trip_meters = -tachometer;
     }
 
-    int32_t trip_distance = initial_trip_distance + tachometer;
-    int32_t total_distance = initial_total_distance + tachometer;
+    session_data.trip_meters = initial_trip_meters + tachometer;
+    int32_t total_meters = initial_total_meters + tachometer;
 
     // dim trip distance if it's about to be reset
     data.session_reset_progress = min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
-    data.trip_km = trip_distance / 1000.0;
-    data.total_km = total_distance / 1000.0;
+    data.trip_km = session_data.trip_meters / 1000.0;
+    data.total_km = total_meters / 1000.0;
 
     data.speed_percent = 1.0 * data.speed_kph / MAX_SPEED_KPH;
 
@@ -314,14 +314,14 @@ void loop() {
 
     // update EEPROM
     bool came_to_stop = (last_rpm != 0 && rpm == 0);
-    bool traveled_enough_distance = (total_distance - last_eeprom_written_total_distance >= EEPROM_UPDATE_EACH_METERS);
+    bool traveled_enough_distance = (total_meters - last_eeprom_written_total_meters >= EEPROM_UPDATE_EACH_METERS);
     if (traveled_enough_distance || (came_to_stop && millis() - last_eeprom_update_on_stop > EEPROM_UPDATE_MIN_DELAY_ON_STOP)) {
         if (came_to_stop)
             last_eeprom_update_on_stop = millis();
-        last_eeprom_written_total_distance = total_distance;
+        last_eeprom_written_total_meters = total_meters;
         eeprom_write_volts(data.voltage);
         eeprom_write_mah_spent(mah_spent);
-        eeprom_write_total_distance(total_distance);
+        eeprom_write_total_distance(total_meters);
         eeprom_write_session_data(session_data);
     }
 
