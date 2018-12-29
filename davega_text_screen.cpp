@@ -82,14 +82,14 @@ void DavegaTextScreen::update(t_davega_data *data) {
          + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
     _write_line(&s, line++, session_data_color);
 
-    s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
-    _write_line(&s, line++);
-
     s = String("time elapsed: ") + format_time(data->session->millis_elapsed) + String(" mins");
     _write_line(&s, line++, session_data_color);
 
     s = String("time riding: ") + format_time(data->session->millis_riding) + String(" mins");
     _write_line(&s, line++, session_data_color);
+
+    s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
+    _write_line(&s, line++);
 }
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
