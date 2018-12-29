@@ -33,6 +33,4 @@ protected:
     void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
 };
 
-extern DavegaTextScreen davega_text_screen;
-
 #endif //DAVEGA_TEXT_SCREEN_H

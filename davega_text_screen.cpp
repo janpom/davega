@@ -82,5 +82,3 @@ void DavegaTextScreen::_write_line(String *text, int lineno, uint16_t color = CO
     _tft->setFont(Terminal6x8);
     _tft->drawText(5, y, line_buffer, color);
 }
-
-DavegaTextScreen davega_text_screen = DavegaTextScreen();
