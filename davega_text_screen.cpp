@@ -42,6 +42,7 @@ void DavegaTextScreen::update(t_davega_data *data) {
     int line = 1;
     String s;
     uint16_t session_data_color = progress_to_color(data->session_reset_progress, _tft);
+    uint16_t capacity_data_color = progress_to_color(data->mah_reset_progress, _tft);
 
     s = String("total voltage: ") + String(data->voltage) + String(" V");
     _write_line(&s, line++);
@@ -53,10 +54,10 @@ void DavegaTextScreen::update(t_davega_data *data) {
     _write_line(&s, line++);
 
     s = String("capacity: ") + String(data->mah) + String(" mAh");
-    _write_line(&s, line++, progress_to_color(data->mah_reset_progress, _tft));
+    _write_line(&s, line++, capacity_data_color);
 
     s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
-    _write_line(&s, line++);
+    _write_line(&s, line++, capacity_data_color);
 
     s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
             + String(" ") + String(_config->imperial_units ? "mi" : "km"));
