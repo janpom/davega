@@ -49,6 +49,14 @@ In the [VESC Tool](https://vesc-project.com/vesc_tool) set:
 
 DAVEga firmware and hardware design is released under [GNU GPL v3](LICENSE).
 
+## Enclosures
+
+3D-printable DAVEga enclosures are available on the [Thingiverse](https://thingiverse.com/).
+- [by @mmaner (v2)](https://www.thingiverse.com/thing:3218890)
+- [by @mmaner (v3)](https://www.thingiverse.com/thing:3274207)
+- [by @lrdesigns](https://www.thingiverse.com/thing:3171000)
+- [by @JonathanLau1983](https://www.thingiverse.com/thing:3248802)
+
 ## Links
 
 - [DAVEga video presentation](https://youtu.be/u4e83JhVZNA)
