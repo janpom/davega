@@ -33,63 +33,82 @@ String format_time(uint32_t milliseconds) {
 
 void DavegaTextScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
-
-    String s = String("FW version: ") + String(_config->fw_version);
-    _write_line(&s, 0);
 }
 
 void DavegaTextScreen::update(t_davega_data *data) {
-    int line = 1;
     String s;
     uint16_t session_data_color = progress_to_color(data->session_reset_progress, _tft);
     uint16_t capacity_data_color = progress_to_color(data->mah_reset_progress, _tft);
+    float avg_speed_kph;
 
-    s = String("total voltage: ") + String(data->voltage) + String(" V");
-    _write_line(&s, line++);
+    for (int i=0; i < _config->text_screen_items_count; i++) {
+        uint16_t color = COLOR_WHITE;
 
-    s = String("min total voltage: ") + String(data->session->min_voltage) + String(" V");
-    _write_line(&s, line++);
+        switch (_config->text_screen_items[i]) {
+            case TSCR_FW_VERSION:
+                s = String("FW version: ") + String(_config->fw_version);
+                break;
+            case TSCR_TOTAL_VOLTAGE:
+                s = String("total voltage: ") + String(data->voltage) + String(" V");
+                break;
+            case TSCR_MIN_TOTAL_VOLTAGE:
+                s = String("min total voltage: ") + String(data->session->min_voltage) + String(" V");
+                break;
+            case TSCR_AVG_CELL_VOLTAGE:
+                s = String("avg cell voltage: ") + String(data->voltage / _config->battery_cells) + String(" V");
+                break;
+            case TSCR_BATTERY_CAPACITY_MAH:
+                s = String("capacity: ") + String(data->mah) + String(" mAh");
+                color = capacity_data_color;
+                break;
+            case TSCR_BATTERY_CAPACITY_PERCENT:
+                s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
+                color = capacity_data_color;
+                break;
+            case TSCR_TRIP_DISTANCE:
+                s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
+                     + String(" ") + String(_config->imperial_units ? "mi" : "km"));
+                color = session_data_color;
+                break;
+            case TSCR_TOTAL_DISTANCE:
+                s = (String("total: ") + String(convert_distance(data->total_km, _config->imperial_units))
+                     + String(" ") + String(_config->imperial_units ? "mi" : "km"));
+                break;
+            case TSCR_SPEED:
+                s = (String("speed: ") + String(convert_distance(data->speed_kph, _config->imperial_units))
+                     + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+                break;
+            case TSCR_MAX_SPEED:
+                s = (String("max speed: ") + String(convert_distance(data->session->max_speed_kph, _config->imperial_units))
+                     + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+                break;
+            case TSCR_AVG_SPEED:
+                avg_speed_kph = data->session->millis_riding > 0
+                                ? 3600.0 * data->session->trip_meters / data->session->millis_riding
+                                : 0;
+                s = (String("avg speed: ") + String(convert_distance(avg_speed_kph, _config->imperial_units))
+                     + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
+                color = session_data_color;
+                break;
+            case TSCR_TIME_ELAPSED:
+                s = String("time elapsed: ") + format_time(data->session->millis_elapsed) + String(" mins");
+                color = session_data_color;
+                break;
+            case TSCR_TIME_RIDING:
+                s = String("time riding: ") + format_time(data->session->millis_riding) + String(" mins");
+                color = session_data_color;
+                break;
+            case TSCR_FAULT_CODE:
+                s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
+                break;
+            default:
+                s = String("ERROR: unknown item");
+        }
 
-    s = String("avg cell voltage: ") + String(data->voltage / _config->battery_cells) + String(" V");
-    _write_line(&s, line++);
+        _write_line(&s, i, color);
+    }
 
-    s = String("capacity: ") + String(data->mah) + String(" mAh");
-    _write_line(&s, line++, capacity_data_color);
 
-    s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
-    _write_line(&s, line++, capacity_data_color);
-
-    s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
-            + String(" ") + String(_config->imperial_units ? "mi" : "km"));
-    _write_line(&s, line++, session_data_color);
-
-    s = (String("total: ") + String(convert_distance(data->total_km, _config->imperial_units))
-            + String(" ") + String(_config->imperial_units ? "mi" : "km"));
-    _write_line(&s, line++);
-
-    s = (String("speed: ") + String(convert_distance(data->speed_kph, _config->imperial_units))
-            + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
-    _write_line(&s, line++);
-
-    s = (String("max speed: ") + String(convert_distance(data->session->max_speed_kph, _config->imperial_units))
-            + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
-    _write_line(&s, line++, session_data_color);
-
-    float avg_speed_kph = data->session->millis_riding > 0
-            ? 3600.0 * data->session->trip_meters / data->session->millis_riding
-            : 0;
-    s = (String("avg speed: ") + String(convert_distance(avg_speed_kph, _config->imperial_units))
-         + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
-    _write_line(&s, line++, session_data_color);
-
-    s = String("time elapsed: ") + format_time(data->session->millis_elapsed) + String(" mins");
-    _write_line(&s, line++, session_data_color);
-
-    s = String("time riding: ") + format_time(data->session->millis_riding) + String(" mins");
-    _write_line(&s, line++, session_data_color);
-
-    s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
-    _write_line(&s, line++);
 }
 
 void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
@@ -107,7 +126,7 @@ void DavegaTextScreen::_write_line(String *text, int lineno, uint16_t color = CO
         s.concat(String(" "));
     s.toCharArray(line_buffer, sizeof(line_buffer));
 
-    int y = lineno * 12 + 5;
-    _tft->setFont(Terminal6x8);
+    int y = lineno * (_config->big_font ? 19 : 12) + 5;
+    _tft->setFont(_config->big_font ? Terminal11x16 : Terminal6x8);
     _tft->drawText(5, y, line_buffer, color);
 }

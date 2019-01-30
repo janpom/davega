@@ -82,11 +82,16 @@ DavegaScreen* davega_screens[] = {
 
 TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
 
+const t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
+
 t_davega_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
     IMPERIAL_UNITS,
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
+    TEXT_SCREEN_BIG_FONT,
+    text_screen_items,
+    LEN(text_screen_items)
 };
 
 int current_screen_index = 0;
