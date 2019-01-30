@@ -124,7 +124,7 @@
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
 #define SCREEN_ORIENTATION 0
 
-// Screens. Uncomment the ones you want enabled
+// Screens. Uncomment the ones you want enabled.
 //#define DEFAULT_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 1
@@ -160,5 +160,9 @@
     TSCR_TIME_RIDING, \
     TSCR_FAULT_CODE, \
 }
+
+// Big font is only recommended for landscape orientation. 9 lines fit on the screen then.
+// Some items overflow the right order. You may want to adjust the labels in davega_text_screen.cpp.
+#define TEXT_SCREEN_BIG_FONT false
 
 #endif //DAVEGA_DAVEGA_CONFIG_H

@@ -89,6 +89,7 @@ t_davega_screen_config screen_config = {
     IMPERIAL_UNITS,
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
+    TEXT_SCREEN_BIG_FONT,
     text_screen_items,
     LEN(text_screen_items)
 };

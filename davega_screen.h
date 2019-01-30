@@ -45,6 +45,7 @@ typedef struct {
     bool imperial_units;
     bool per_cell_voltage;
     uint8_t battery_cells;
+    bool big_font;
     t_text_screen_item* text_screen_items;
     uint8_t text_screen_items_count;
 } t_davega_screen_config;

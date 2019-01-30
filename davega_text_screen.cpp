@@ -126,7 +126,7 @@ void DavegaTextScreen::_write_line(String *text, int lineno, uint16_t color = CO
         s.concat(String(" "));
     s.toCharArray(line_buffer, sizeof(line_buffer));
 
-    int y = lineno * 12 + 5;
-    _tft->setFont(Terminal6x8);
+    int y = lineno * (_config->big_font ? 19 : 12) + 5;
+    _tft->setFont(_config->big_font ? Terminal11x16 : Terminal6x8);
     _tft->drawText(5, y, line_buffer, color);
 }
