@@ -35,12 +35,16 @@ typedef struct {
     // max_current
     // min_current
     // wh_spent
-    // avg_speed_kph (derived)
     // wh_per_km (derived)
     // range_km (derived)
 } t_davega_session_data;
 
 typedef struct {
+    float mosfet_celsius;
+    float motor_celsius;
+    float motor_amps;
+    float battery_amps;
+    float duty_cycle;
     float voltage;
     float voltage_percent;
     int32_t mah;

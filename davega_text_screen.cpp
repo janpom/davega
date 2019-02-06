@@ -48,6 +48,23 @@ void DavegaTextScreen::update(t_davega_data *data) {
             case TSCR_FW_VERSION:
                 s = String("FW version: ") + String(_config->fw_version);
                 break;
+            case TSCR_MOSFET_TEMPERATURE:
+                s = String("MOSFET temp: ") + String(convert_temperature(data->mosfet_celsius, _config->imperial_units))
+                        + String(" ") + String(_config->imperial_units ? "'F" : "'C");
+                break;
+            case TSCR_MOTOR_TEMPERATURE:
+                s = String("motor temp: ") + String(convert_temperature(data->motor_celsius, _config->imperial_units))
+                        + String(" ") + String(_config->imperial_units ? "'F" : "'C");
+                break;
+            case TSCR_MOTOR_CURRENT:
+                s = String("motor current: ") + String(data->motor_amps) + String(" A");
+                break;
+            case TSCR_BATTERY_CURRENT:
+                s = String("battery current: ") + String(data->battery_amps) + String(" A");
+                break;
+            case TSCR_DUTY_CYCLE:
+                s = String("duty cycle: ") + String(data->duty_cycle);
+                break;
             case TSCR_TOTAL_VOLTAGE:
                 s = String("total voltage: ") + String(data->voltage) + String(" V");
                 break;

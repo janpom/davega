@@ -28,6 +28,7 @@
 char* make_fw_version(char* fw_version, char* revision_id);
 float convert_distance(float distance_km, bool imperial_units);
 float convert_speed(float speed_kph, bool imperial_units);
+float convert_temperature(float temp_celsius, bool imperial_units);
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
 uint16_t progress_to_color(float progress, TFT_22_ILI9225* tft);
 

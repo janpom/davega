@@ -248,6 +248,11 @@ void loop() {
         return;
     }
 
+    data.mosfet_celsius = vesc_comm_get_temp_mosfet(vesc_packet);
+    data.motor_celsius = vesc_comm_get_temp_motor(vesc_packet);
+    data.motor_amps = vesc_comm_get_motor_current(vesc_packet);
+    data.battery_amps = vesc_comm_get_battery_current(vesc_packet);
+    data.duty_cycle = vesc_comm_get_duty_cycle(vesc_packet);
     data.vesc_fault_code = vesc_comm_get_fault_code(vesc_packet);
     data.voltage = vesc_comm_get_voltage(vesc_packet);
 

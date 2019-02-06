@@ -151,6 +151,26 @@ bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
     return true;
 }
 
+float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet) {
+    return ((int16_t) get_word(vesc_packet, 3)) / 10.0;
+}
+
+float vesc_comm_get_temp_motor(uint8_t *vesc_packet) {
+    return ((int16_t) get_word(vesc_packet, 5)) / 10.0;
+}
+
+float vesc_comm_get_motor_current(uint8_t *vesc_packet) {
+    return ((int32_t) get_long(vesc_packet, 7)) / 100.0;
+}
+
+float vesc_comm_get_battery_current(uint8_t *vesc_packet) {
+    return ((int32_t) get_long(vesc_packet, 11)) / 100.0;
+}
+
+float vesc_comm_get_duty_cycle(uint8_t *vesc_packet) {
+    return get_word(vesc_packet, 23) / 1000.0;
+}
+
 int32_t vesc_comm_get_rpm(uint8_t *vesc_packet) {
     return get_long(vesc_packet, 25);
 }

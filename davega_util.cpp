@@ -50,6 +50,13 @@ float convert_speed(float speed_kph, bool imperial_units)
     return convert_distance(speed_kph, imperial_units);
 }
 
+float convert_temperature(float temp_celsius, bool imperial_units) {
+    if (imperial_units)
+        return temp_celsius * 9.0 / 5.0 + 32;
+    else
+        return temp_celsius;
+}
+
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     switch (fault_code) {
         case FAULT_CODE_NONE:
