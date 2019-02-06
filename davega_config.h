@@ -133,7 +133,7 @@
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:
 //    TSCR_FW_VERSION
-d//    TSCR_MOSFET_TEMPERATURE
+//    TSCR_MOSFET_TEMPERATURE
 //    TSCR_MOTOR_TEMPERATURE
 //    TSCR_MOTOR_CURRENT
 //    TSCR_BATTERY_CURRENT
