@@ -49,11 +49,11 @@ void DavegaTextScreen::update(t_davega_data *data) {
                 s = String("FW version: ") + String(_config->fw_version);
                 break;
             case TSCR_MOSFET_TEMPERATURE:
-                s = String("MOSFET temp: ") + String(convert_temperature(data->mosfet_celsius, _config->imperial_units))
+                s = String("MOSFET temp: ") + String(convert_temperature(data->mosfet_celsius, _config->use_fahrenheit))
                         + String(" ") + String(_config->use_fahrenheit ? "'F" : "'C");
                 break;
             case TSCR_MOTOR_TEMPERATURE:
-                s = String("motor temp: ") + String(convert_temperature(data->motor_celsius, _config->imperial_units))
+                s = String("motor temp: ") + String(convert_temperature(data->motor_celsius, _config->use_fahrenheit))
                         + String(" ") + String(_config->use_fahrenheit ? "'F" : "'C");
                 break;
             case TSCR_MOTOR_CURRENT:
