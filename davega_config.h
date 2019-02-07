@@ -34,6 +34,9 @@
 // Set to true to display the distance in miles and the speed in mph.
 #define IMPERIAL_UNITS false
 
+// Set to true to display the temperature in Fahrenheit instead of Celsius.
+#define USE_FAHRENHEIT false
+
 #define BATTERY_S 12  // number of battery cells
 #define BATTERY_MAX_MAH 8000  // battery capacity in mAh
 #define BATTERY_USABLE_CAPACITY 0.8  // [0.0, 1.0]

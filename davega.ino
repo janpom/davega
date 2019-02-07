@@ -87,6 +87,7 @@ const t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 t_davega_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
     IMPERIAL_UNITS,
+    USE_FAHRENHEIT,
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
     TEXT_SCREEN_BIG_FONT,

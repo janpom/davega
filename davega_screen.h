@@ -48,6 +48,7 @@ typedef enum {
 typedef struct {
     char* fw_version;
     bool imperial_units;
+    bool use_fahrenheit;
     bool per_cell_voltage;
     uint8_t battery_cells;
     bool big_font;
