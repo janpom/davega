@@ -63,7 +63,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
 
     // total distance
-    dtostrf(convert_distance(data->total_km, _config->imperial_units), 5, 1, fmt);
+    format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
     tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
 
     // battery %
