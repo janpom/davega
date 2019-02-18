@@ -22,7 +22,7 @@
 
 #define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual
 #define MOTOR_POLE_PAIRS 7
-#define WHEEL_CIRCUMFERENCE_MM 604
+#define WHEEL_DIAMETER_MM 192
 #define MOTOR_PULLEY_TEETH 15
 #define WHEEL_PULLEY_TEETH 72
 

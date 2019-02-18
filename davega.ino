@@ -118,7 +118,7 @@ uint32_t button_2_last_up_time = 0;
 
 int32_t rotations_to_meters(int32_t rotations) {
     float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
-    return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_CIRCUMFERENCE_MM / 1000;
+    return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
 }
 
 float erpm_to_kph(uint32_t erpm) {
