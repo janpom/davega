@@ -43,7 +43,7 @@
 
 // If SHOW_AVG_CELL_VOLTAGE is true, average cell voltage is displayed instead of the total battery
 // pack voltage (total voltage is divided by the number of cells).
-#define SHOW_AVG_CELL_VOLTAGE false
+#define SHOW_AVG_CELL_VOLTAGE true
 
 // The two options below are for detecting that battery has been fully charged (in which case
 // we reset the available mAh to the max value). We think that the battery has been fully charged
