@@ -59,9 +59,9 @@ float convert_temperature(float temp_celsius, bool imperial_units) {
 
 void format_total_distance(float total_distance, char* result) {
     if (total_distance >= 1000)
-        dtostrf(((int) round(total_distance)) % 10000, 4, 0, fmt);
+        dtostrf(((int) round(total_distance)) % 10000, 4, 0, result);
     else
-        dtostrf(total_distance, 5, 1, fmt);
+        dtostrf(total_distance, 5, 1, result);
 }
 
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
