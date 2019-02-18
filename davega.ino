@@ -82,7 +82,7 @@ DavegaScreen* davega_screens[] = {
 
 TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
 
-const t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
+t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
 t_davega_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
@@ -104,7 +104,7 @@ uint8_t vesc_packet[PACKET_MAX_LENGTH];
 
 t_davega_data data;
 t_davega_session_data session_data;
-int16_t initial_mah_spent;
+int32_t initial_mah_spent;
 int32_t initial_trip_meters;
 int32_t initial_total_meters;
 int32_t initial_millis_elapsed;
@@ -113,7 +113,6 @@ int32_t last_eeprom_written_total_meters;
 int32_t last_eeprom_update_on_stop;
 
 int32_t last_rpm;
-vesc_comm_fault_code last_fault_code;
 uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
 
