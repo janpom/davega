@@ -17,18 +17,24 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_UTIL_H
-#define DAVEGA_UTIL_H
+#include "davega_mini_screen.h"
 
-#include "vesc_comm.h"
+void DavegaMiniScreen::reset() {
+    _oled->clearDisplay();
+}
 
-#define KM_PER_MILE 0.621371
+void DavegaMiniScreen::update(t_davega_data *data) {
+    _oled->clearDisplay();
+    _oled->setTextSize(1);
+    _oled->setTextColor(WHITE);
+    _oled->setCursor(0,0);
+    _oled->println(String(data->session->max_speed_kph) + String(" km/h [max spd]"));
+    _oled->println(String(data->voltage / _config->battery_cells) + String(" V [battery]"));
+    _oled->println(String(data->trip_km) + String(" km [trip]"));
+    _oled->println(String(data->total_km) + String(" km [total]"));
+    _oled->display();
+}
 
-char* make_fw_version(char* fw_version, char* revision_id);
-float convert_distance(float distance_km, bool imperial_units);
-float convert_speed(float speed_kph, bool imperial_units);
-float convert_temperature(float temp_celsius, bool imperial_units);
-void format_total_distance(float total_distance, char* result);
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
-
-#endif //DAVEGA_UTIL_H
+void DavegaMiniScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+    // TODO
+}

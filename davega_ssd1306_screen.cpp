@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -17,18 +17,18 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_UTIL_H
-#define DAVEGA_UTIL_H
+#include "davega_mini_screen.h"
 
-#include "vesc_comm.h"
+#define OLED_RESET 4
+Adafruit_SSD1306 oled(OLED_RESET);
+Adafruit_SSD1306* p_oled = nullptr;
 
-#define KM_PER_MILE 0.621371
-
-char* make_fw_version(char* fw_version, char* revision_id);
-float convert_distance(float distance_km, bool imperial_units);
-float convert_speed(float speed_kph, bool imperial_units);
-float convert_temperature(float temp_celsius, bool imperial_units);
-void format_total_distance(float total_distance, char* result);
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
-
-#endif //DAVEGA_UTIL_H
+void DavegaSSD1306Screen::init(t_davega_screen_config *config) {
+    DavegaScreen::init(config);
+    if (!p_oled) {
+        p_oled = &oled;
+        p_oled->begin(SSD1306_SWITCHCAPVCC, 0x3C);
+        p_oled->clearDisplay();
+    }
+    _oled = p_oled;
+}

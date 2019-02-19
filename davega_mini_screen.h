@@ -17,18 +17,16 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_UTIL_H
-#define DAVEGA_UTIL_H
+#ifndef DAVEGA_MINI_SCREEN_H
+#define DAVEGA_MINI_SCREEN_H
 
-#include "vesc_comm.h"
+#include "davega_ssd1306_screen.h"
 
-#define KM_PER_MILE 0.621371
+class DavegaMiniScreen: public DavegaSSD1306Screen {
+public:
+    void reset();
+    void update(t_davega_data* data);
+    void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+};
 
-char* make_fw_version(char* fw_version, char* revision_id);
-float convert_distance(float distance_km, bool imperial_units);
-float convert_speed(float speed_kph, bool imperial_units);
-float convert_temperature(float temp_celsius, bool imperial_units);
-void format_total_distance(float total_distance, char* result);
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
-
-#endif //DAVEGA_UTIL_H
+#endif //DAVEGA_MINI_SCREEN_H

@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -17,18 +17,21 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_UTIL_H
-#define DAVEGA_UTIL_H
+#ifndef DAVEGA_SSD1306_SCREEN_H
+#define DAVEGA_SSD1306_SCREEN_H
 
-#include "vesc_comm.h"
+#include "davega_screen.h"
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-#define KM_PER_MILE 0.621371
+class DavegaSSD1306Screen: public DavegaScreen {
+public:
+    void init(t_davega_screen_config* config) override;
 
-char* make_fw_version(char* fw_version, char* revision_id);
-float convert_distance(float distance_km, bool imperial_units);
-float convert_speed(float speed_kph, bool imperial_units);
-float convert_temperature(float temp_celsius, bool imperial_units);
-void format_total_distance(float total_distance, char* result);
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
+protected:
+    Adafruit_SSD1306* _oled;
+};
 
-#endif //DAVEGA_UTIL_H
+#endif //DAVEGA_SSD1306_SCREEN_H

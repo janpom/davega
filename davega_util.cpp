@@ -19,7 +19,6 @@
 
 #include "davega_util.h"
 #include "vesc_comm.h"
-#include <TFT_22_ILI9225.h>
 
 char fw_version_buffer[6];
 
