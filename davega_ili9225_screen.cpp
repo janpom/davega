@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -17,20 +17,25 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_TEXT_SCREEN_H
-#define DAVEGA_TEXT_SCREEN_H
-
-#include <TFT_22_ILI9225.h>
 #include "davega_ili9225_screen.h"
 
-class DavegaTextScreen: public DavegaILI9225Screen {
-public:
-    void reset();
-    void update(t_davega_data* data);
-    void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+#define TFT_RST 12
+#define TFT_RS  9
+#define TFT_CS  10  // SS
+#define TFT_SDI 11  // MOSI
+#define TFT_CLK 13  // SCK
+#define TFT_LED 0
 
-protected:
-    void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
-};
+TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
+TFT_22_ILI9225* p_tft = nullptr;
 
-#endif //DAVEGA_TEXT_SCREEN_H
+void DavegaILI9225Screen::init(t_davega_screen_config *config) {
+    DavegaScreen::init(config);
+    if (!p_tft) {
+        p_tft = &tft;
+        p_tft->begin();
+        p_tft->setOrientation(config->orientation);
+        p_tft->setBackgroundColor(COLOR_BLACK);
+    }
+    _tft = p_tft;
+}

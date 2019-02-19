@@ -43,13 +43,6 @@
 #define BUTTON_2_PIN A2
 #define BUTTON_3_PIN A1
 
-#define TFT_RST 12
-#define TFT_RS  9
-#define TFT_CS  10  // SS
-#define TFT_SDI 11  // MOSI
-#define TFT_CLK 13  // SCK
-#define TFT_LED 0
-
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 #ifdef DEFAULT_SCREEN_ENABLED
@@ -80,8 +73,6 @@ DavegaScreen* davega_screens[] = {
 #endif
 };
 
-TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
-
 t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
 t_davega_screen_config screen_config = {
@@ -92,7 +83,8 @@ t_davega_screen_config screen_config = {
     BATTERY_S,
     TEXT_SCREEN_BIG_FONT,
     text_screen_items,
-    LEN(text_screen_items)
+    LEN(text_screen_items),
+    SCREEN_ORIENTATION
 };
 
 int current_screen_index = 0;
@@ -173,12 +165,8 @@ void setup() {
         eeprom_write_session_data(session_data);
     }
 
-    tft.begin();
-    tft.setOrientation(SCREEN_ORIENTATION);
-    tft.setBackgroundColor(COLOR_BLACK);
-
     for (int i=0; i<LEN(davega_screens); i++)
-        davega_screens[i]->init(&tft, &screen_config);
+        davega_screens[i]->init(&screen_config);
     scr = davega_screens[current_screen_index];
 
     session_data = eeprom_read_session_data();

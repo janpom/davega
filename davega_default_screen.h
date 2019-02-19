@@ -21,10 +21,10 @@
 #define DAVEGA_DEFAULT_SCREEN_H
 
 #include <TFT_22_ILI9225.h>
-#include "davega_screen.h"
+#include "davega_ili9225_screen.h"
 #include "vesc_comm.h"
 
-class DavegaDefaultScreen: public DavegaScreen {
+class DavegaDefaultScreen: public DavegaILI9225Screen {
 public:
     void reset();
     void update(t_davega_data* data);

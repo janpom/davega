@@ -20,7 +20,6 @@
 #ifndef DAVEGA_SCREEN_H
 #define DAVEGA_SCREEN_H
 
-#include <TFT_22_ILI9225.h>
 #include "davega_data.h"
 
 typedef enum {
@@ -54,17 +53,17 @@ typedef struct {
     bool big_font;
     t_text_screen_item* text_screen_items;
     uint8_t text_screen_items_count;
+    uint8_t orientation;
 } t_davega_screen_config;
 
 class DavegaScreen {
 public:
-    void init(TFT_22_ILI9225* tft, t_davega_screen_config* config) { _tft = tft; _config = config; };
+    virtual void init(t_davega_screen_config* config) { _config = config; };
     virtual void reset() = 0;
     virtual void update(t_davega_data* data) = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
 
 protected:
-    TFT_22_ILI9225* _tft;
     t_davega_screen_config* _config;
 };
 
