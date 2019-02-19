@@ -18,15 +18,10 @@
 */
 
 #include "davega_config.h"
-#include "davega_screen.h"
 #include "davega_eeprom.h"
 #include "davega_data.h"
 #include "davega_util.h"
 #include "davega_screen.h"
-#include "davega_default_screen.h"
-#include "davega_simple_horizontal_screen.h"
-#include "davega_simple_vertical_screen.h"
-#include "davega_text_screen.h"
 #include "vesc_comm.h"
 
 #define REVISION_ID "$Id$"
@@ -46,15 +41,19 @@
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 #ifdef DEFAULT_SCREEN_ENABLED
+#include "davega_default_screen.h"
 DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
+#include "davega_simple_horizontal_screen.h"
 DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen();
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
+#include "davega_simple_vertical_screen.h"
 DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen();
 #endif
 #ifdef TEXT_SCREEN_ENABLED
+#include "davega_text_screen.h"
 DavegaTextScreen davega_text_screen = DavegaTextScreen();
 #endif
 
