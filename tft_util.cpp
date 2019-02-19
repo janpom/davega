@@ -18,7 +18,6 @@
 */
 
 #include "tft_util.h"
-#include <TFT_22_ILI9225.h>
 
 // TODO: PROGMEM
 const bool FONT_DIGITS_3x5[10][5][3] = {
@@ -130,4 +129,9 @@ void tft_util_draw_number(
             cursor_x += 3 * magnify + spacing;
         }
     }
+}
+
+uint16_t progress_to_color(float progress, TFT_22_ILI9225* tft) {
+    float brightness = 255.0 * (1.0 - progress);
+    return  tft->setColor(brightness, brightness, brightness);
 }

@@ -84,8 +84,3 @@ char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
             return "unexpected fault code";
     }
 }
-
-uint16_t progress_to_color(float progress, TFT_22_ILI9225* tft) {
-    float brightness = 255.0 * (1.0 - progress);
-    return  tft->setColor(brightness, brightness, brightness);
-}
