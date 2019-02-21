@@ -18,15 +18,10 @@
 */
 
 #include "davega_config.h"
-#include "davega_screen.h"
 #include "davega_eeprom.h"
 #include "davega_data.h"
 #include "davega_util.h"
 #include "davega_screen.h"
-#include "davega_default_screen.h"
-#include "davega_simple_horizontal_screen.h"
-#include "davega_simple_vertical_screen.h"
-#include "davega_text_screen.h"
 #include "vesc_comm.h"
 
 #define REVISION_ID "$Id$"
@@ -43,26 +38,27 @@
 #define BUTTON_2_PIN A2
 #define BUTTON_3_PIN A1
 
-#define TFT_RST 12
-#define TFT_RS  9
-#define TFT_CS  10  // SS
-#define TFT_SDI 11  // MOSI
-#define TFT_CLK 13  // SCK
-#define TFT_LED 0
-
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 #ifdef DEFAULT_SCREEN_ENABLED
+#include "davega_default_screen.h"
 DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
+#include "davega_simple_horizontal_screen.h"
 DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen();
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
+#include "davega_simple_vertical_screen.h"
 DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen();
 #endif
 #ifdef TEXT_SCREEN_ENABLED
+#include "davega_text_screen.h"
 DavegaTextScreen davega_text_screen = DavegaTextScreen();
+#endif
+#ifdef MINI_SCREEN_ENABLED
+#include "davega_mini_screen.h"
+DavegaMiniScreen davega_mini_screen = DavegaMiniScreen();
 #endif
 
 DavegaScreen* davega_screens[] = {
@@ -78,9 +74,10 @@ DavegaScreen* davega_screens[] = {
 #ifdef TEXT_SCREEN_ENABLED
     &davega_text_screen,
 #endif
+#ifdef MINI_SCREEN_ENABLED
+    &davega_mini_screen,
+#endif
 };
-
-TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200);
 
 t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
@@ -92,7 +89,8 @@ t_davega_screen_config screen_config = {
     BATTERY_S,
     TEXT_SCREEN_BIG_FONT,
     text_screen_items,
-    LEN(text_screen_items)
+    LEN(text_screen_items),
+    SCREEN_ORIENTATION
 };
 
 int current_screen_index = 0;
@@ -173,12 +171,8 @@ void setup() {
         eeprom_write_session_data(session_data);
     }
 
-    tft.begin();
-    tft.setOrientation(SCREEN_ORIENTATION);
-    tft.setBackgroundColor(COLOR_BLACK);
-
     for (int i=0; i<LEN(davega_screens); i++)
-        davega_screens[i]->init(&tft, &screen_config);
+        davega_screens[i]->init(&screen_config);
     scr = davega_screens[current_screen_index];
 
     session_data = eeprom_read_session_data();

@@ -30,4 +30,6 @@ void tft_util_draw_number(
         TFT_22_ILI9225* tft, char *number, uint8_t x, uint8_t y,
         uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify = 1);
 
+uint16_t progress_to_color(float progress, TFT_22_ILI9225* tft);
+
 #endif //TFT_UTIL_H

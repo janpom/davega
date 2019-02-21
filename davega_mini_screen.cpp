@@ -17,20 +17,24 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_TEXT_SCREEN_H
-#define DAVEGA_TEXT_SCREEN_H
+#include "davega_mini_screen.h"
 
-#include <TFT_22_ILI9225.h>
-#include "davega_ili9225_screen.h"
+void DavegaMiniScreen::reset() {
+    _oled->clearDisplay();
+}
 
-class DavegaTextScreen: public DavegaILI9225Screen {
-public:
-    void reset();
-    void update(t_davega_data* data);
-    void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+void DavegaMiniScreen::update(t_davega_data *data) {
+    _oled->clearDisplay();
+    _oled->setTextSize(1);
+    _oled->setTextColor(WHITE);
+    _oled->setCursor(0,0);
+    _oled->println(String(data->session->max_speed_kph) + String(" km/h [max spd]"));
+    _oled->println(String(data->voltage / _config->battery_cells) + String(" V [battery]"));
+    _oled->println(String(data->trip_km) + String(" km [trip]"));
+    _oled->println(String(data->total_km) + String(" km [total]"));
+    _oled->display();
+}
 
-protected:
-    void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
-};
-
-#endif //DAVEGA_TEXT_SCREEN_H
+void DavegaMiniScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+    // TODO
+}

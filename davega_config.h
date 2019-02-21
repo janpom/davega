@@ -128,10 +128,15 @@
 #define SCREEN_ORIENTATION 0
 
 // Screens. Uncomment the ones you want enabled.
+
+// TFT ILI9225 Screens
 //#define DEFAULT_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
-#define SIMPLE_VERTICAL_SCREEN_ENABLED 1
-#define TEXT_SCREEN_ENABLED 1
+//#define SIMPLE_VERTICAL_SCREEN_ENABLED 1
+//#define TEXT_SCREEN_ENABLED 1
+
+// OLED SSD1306 Screens
+#define MINI_SCREEN_ENABLED 1
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:

@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -17,20 +17,18 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_TEXT_SCREEN_H
-#define DAVEGA_TEXT_SCREEN_H
+#include "davega_mini_screen.h"
 
-#include <TFT_22_ILI9225.h>
-#include "davega_ili9225_screen.h"
+#define OLED_RESET 4
+Adafruit_SSD1306 oled(OLED_RESET);
+Adafruit_SSD1306* p_oled = nullptr;
 
-class DavegaTextScreen: public DavegaILI9225Screen {
-public:
-    void reset();
-    void update(t_davega_data* data);
-    void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
-
-protected:
-    void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
-};
-
-#endif //DAVEGA_TEXT_SCREEN_H
+void DavegaSSD1306Screen::init(t_davega_screen_config *config) {
+    DavegaScreen::init(config);
+    if (!p_oled) {
+        p_oled = &oled;
+        p_oled->begin(SSD1306_SWITCHCAPVCC, 0x3C);
+        p_oled->clearDisplay();
+    }
+    _oled = p_oled;
+}

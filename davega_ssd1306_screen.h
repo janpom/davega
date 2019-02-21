@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -17,20 +17,21 @@
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_TEXT_SCREEN_H
-#define DAVEGA_TEXT_SCREEN_H
+#ifndef DAVEGA_SSD1306_SCREEN_H
+#define DAVEGA_SSD1306_SCREEN_H
 
-#include <TFT_22_ILI9225.h>
-#include "davega_ili9225_screen.h"
+#include "davega_screen.h"
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-class DavegaTextScreen: public DavegaILI9225Screen {
+class DavegaSSD1306Screen: public DavegaScreen {
 public:
-    void reset();
-    void update(t_davega_data* data);
-    void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+    void init(t_davega_screen_config* config) override;
 
 protected:
-    void _write_line(String *text, int lineno, uint16_t color = COLOR_WHITE);
+    Adafruit_SSD1306* _oled;
 };
 
-#endif //DAVEGA_TEXT_SCREEN_H
+#endif //DAVEGA_SSD1306_SCREEN_H

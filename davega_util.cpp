@@ -19,7 +19,6 @@
 
 #include "davega_util.h"
 #include "vesc_comm.h"
-#include <TFT_22_ILI9225.h>
 
 char fw_version_buffer[6];
 
@@ -83,9 +82,4 @@ char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
         default:
             return "unexpected fault code";
     }
-}
-
-uint16_t progress_to_color(float progress, TFT_22_ILI9225* tft) {
-    float brightness = 255.0 * (1.0 - progress);
-    return  tft->setColor(brightness, brightness, brightness);
 }
