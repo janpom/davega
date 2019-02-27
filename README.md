@@ -1,8 +1,8 @@
-DAVEga (The VEsc GAuge/GAdget), or Dave for short, is a device for displaying data read from a [VESC](https://www.vesc-project.com/) based controller, such as speed, remaining battery capacity, and travelled distance. It was originally named VeGa, but was later re-branded due to the insistence of the e-skate lobby ([[1]](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/8?u=janpom), [[2]](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/145?u=janpom), [[3]](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/213?u=janpom)).
-
-![DAVEga](img/davega.jpg)
+DAVEga (The VEsc GAuge/GAdget), or Dave for short, displays speed, battery capacity, traveled distance and other useful info retrieved from read from a [VESC](https://www.vesc-project.com/) based controller.
 
 This repository contains the DAVEga firmware. The gerber files can be downloaded from the [gerbers](gerbers/) directory or from [EasyEDA](https://easyeda.com/honza.pomikalek/VESC-Gauge).
+
+There's a story behind the name, but it's a long one. It all started on [esk8 builders](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509). Here's some [highlights](https://drive.google.com/open?id=1wQXwRZDEmFR0n38wdO90uCEpWIoIBl2a) from the discussion.
 
 ## Main features
 
@@ -17,7 +17,7 @@ This repository contains the DAVEga firmware. The gerber files can be downloaded
 - metric or imperial units
 - Arduino compatible FW
 - low HW cost (~$10)
-- works with the latest VESC FW (v3.40)
+- known to work well with the VESC FW v3.48 and v3.40
   - previous versions not tested but should work as well unless too old
 
 ## Configuring and installing firmware
