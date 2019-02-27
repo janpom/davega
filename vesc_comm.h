@@ -22,7 +22,7 @@
 #ifndef VESC_COMM_H
 #define VESC_COMM_H
 
-#define PACKET_MAX_LENGTH 64
+#define PACKET_MAX_LENGTH 70
 
 typedef enum {
     FAULT_CODE_NONE = 0,
@@ -35,8 +35,8 @@ typedef enum {
 } vesc_comm_fault_code;
 
 void vesc_comm_init(uint32_t baud);
-uint8_t vesc_comm_fetch_packet(uint8_t *vesc_packet);
-uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet);
+uint8_t vesc_comm_fetch_packet(uint8_t *vesc_packet, uint16_t timeout = 100);
+uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet, uint16_t timeout);
 bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length);
 float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet);
 float vesc_comm_get_temp_motor(uint8_t *vesc_packet);

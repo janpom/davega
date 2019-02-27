@@ -85,28 +85,39 @@ unsigned short crc16(unsigned char *buf, unsigned int len) {
 }
 // </VESC CRC code>
 
+uint8_t expected_packet_length(uint8_t payload_length) {
+    return (1 + 1 + payload_length + 2 + 1);
+}
+
 void vesc_comm_init(uint32_t baud) {
     vesc_serial.begin(baud);
 }
 
-uint8_t vesc_comm_fetch_packet(uint8_t *vesc_packet) {
+uint8_t vesc_comm_fetch_packet(uint8_t *vesc_packet, uint16_t timeout) {
     vesc_serial.write(GET_VALUES_PACKET, sizeof(GET_VALUES_PACKET));
-    delay(50);
-    return vesc_comm_receive_packet(vesc_packet);
+    return vesc_comm_receive_packet(vesc_packet, timeout);
 }
 
-uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet) {
+uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet, uint16_t timeout) {
+    int32_t start = millis();
     uint8_t bytes_read = 0;
-    for (int i = 0; i < PACKET_MAX_LENGTH && vesc_serial.available(); i++) {
-        vesc_packet[i] = vesc_serial.read();
-//        D(String(vesc_packet[i]));
-        bytes_read++;
+    while (millis() - start < timeout) {
+        if (vesc_serial.available())
+            vesc_packet[bytes_read++] = vesc_serial.read();
+
+        if (bytes_read >= PACKET_MAX_LENGTH)
+            break;
+
+        if (bytes_read >= 2 && vesc_packet[0] != PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) {
+            uint8_t payload_length = vesc_packet[1];
+            if (bytes_read >= expected_packet_length(payload_length))
+                break;
+        }
     }
     // read any left-over bytes without storing
     while (vesc_serial.available()) {
         // TODO: warning
         vesc_serial.read();
-        bytes_read++;
     }
     return bytes_read;
 }
@@ -123,7 +134,7 @@ uint32_t get_long(uint8_t *packet, uint8_t index) {
 }
 
 bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
-    if (packet_length < 63) {
+    if (packet_length < 3) {
         D("packet too short (" + String(packet_length) + " bytes)");
         return false;
     }
@@ -141,6 +152,12 @@ bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
     }
 
     uint8_t payload_length = vesc_packet[1];
+    if (packet_length != expected_packet_length(payload_length)) {
+        D("packet length (" + String(payload_length) + ") does not correspond to the payload length (" +
+          String(payload_length) + ")");
+        return false;
+    }
+
     uint16_t crc = get_word(vesc_packet, payload_length + 2);
     uint16_t expected_crc = crc16(&vesc_packet[2], payload_length);
     if (crc != expected_crc) {
