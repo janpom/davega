@@ -56,10 +56,6 @@ DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalS
 #include "davega_text_screen.h"
 DavegaTextScreen davega_text_screen = DavegaTextScreen();
 #endif
-#ifdef MINI_SCREEN_ENABLED
-#include "davega_mini_screen.h"
-DavegaMiniScreen davega_mini_screen = DavegaMiniScreen();
-#endif
 
 DavegaScreen* davega_screens[] = {
 #ifdef DEFAULT_SCREEN_ENABLED
@@ -73,9 +69,6 @@ DavegaScreen* davega_screens[] = {
 #endif
 #ifdef TEXT_SCREEN_ENABLED
     &davega_text_screen,
-#endif
-#ifdef MINI_SCREEN_ENABLED
-    &davega_mini_screen,
 #endif
 };
 
