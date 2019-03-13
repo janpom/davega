@@ -23,26 +23,26 @@
 #include "davega_data.h"
 
 typedef enum {
-    TSCR_FW_VERSION = 0,
-    TSCR_MOSFET_TEMPERATURE,
-    TSCR_MOTOR_TEMPERATURE,
-    TSCR_MOTOR_CURRENT,
-    TSCR_BATTERY_CURRENT,
-    TSCR_DUTY_CYCLE,
-    TSCR_TOTAL_VOLTAGE,
-    TSCR_MIN_TOTAL_VOLTAGE,
-    TSCR_AVG_CELL_VOLTAGE,
-    TSCR_BATTERY_CAPACITY_MAH,
-    TSCR_BATTERY_CAPACITY_PERCENT,
-    TSCR_TRIP_DISTANCE,
-    TSCR_TOTAL_DISTANCE,
-    TSCR_SPEED,
-    TSCR_MAX_SPEED,
-    TSCR_AVG_SPEED,
-    TSCR_TIME_ELAPSED,
-    TSCR_TIME_RIDING,
-    TSCR_FAULT_CODE
-} t_text_screen_item;
+    SCR_FW_VERSION = 0,
+    SCR_MOSFET_TEMPERATURE,
+    SCR_MOTOR_TEMPERATURE,
+    SCR_MOTOR_CURRENT,
+    SCR_BATTERY_CURRENT,
+    SCR_DUTY_CYCLE,
+    SCR_TOTAL_VOLTAGE,
+    SCR_MIN_TOTAL_VOLTAGE,
+    SCR_AVG_CELL_VOLTAGE,
+    SCR_BATTERY_CAPACITY_MAH,
+    SCR_BATTERY_CAPACITY_PERCENT,
+    SCR_TRIP_DISTANCE,
+    SCR_TOTAL_DISTANCE,
+    SCR_SPEED,
+    SCR_MAX_SPEED,
+    SCR_AVG_SPEED,
+    SCR_TIME_ELAPSED,
+    SCR_TIME_RIDING,
+    SCR_FAULT_CODE
+} t_screen_item;
 
 typedef struct {
     char* fw_version;
@@ -51,7 +51,7 @@ typedef struct {
     bool per_cell_voltage;
     uint8_t battery_cells;
     bool big_font;
-    t_text_screen_item* text_screen_items;
+    t_screen_item* text_screen_items;
     uint8_t text_screen_items_count;
     uint8_t orientation;
 } t_davega_screen_config;

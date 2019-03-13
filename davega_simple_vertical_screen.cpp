@@ -29,11 +29,21 @@ void DavegaSimpleVerticalScreen::reset() {
 
     // labels
     _tft->setFont(Terminal6x8);
-    _tft->drawText(122, 0, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
     _tft->drawText(0, 130, _config->imperial_units ? "TRIP MI" : "TRIP KM", COLOR_WHITE);
     _tft->drawText(0, 180, _config->imperial_units ? "TOTAL MI" : "TOTAL KM", COLOR_WHITE);
     _tft->drawText(110, 130, "BATTERY %", COLOR_WHITE);
     _tft->drawText(110, 180, "BATTERY V", COLOR_WHITE);
+
+    switch (_primary_item) {
+        case SCR_BATTERY_CURRENT:
+            _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
+            break;
+        case SCR_MOTOR_CURRENT:
+            _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
+            break;
+        default:
+            _tft->drawText(122, 0, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+    }
 
     // FW version
     _tft->drawText(0, 0, _config->fw_version, COLOR_WHITE);
@@ -47,15 +57,10 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     if (data->vesc_fault_code != _last_fault_code)
         reset();
 
-    // speed
-    uint16_t color;
-    if (data->speed_kph > SS_RED_SPEED_KPH)
-        color = COLOR_RED;
-    else if (data->speed_kph > SS_YELLOW_SPEED_KPH)
-        color = COLOR_YELLOW;
-    else
-        color = COLOR_WHITE;
-    dtostrf(convert_speed(data->speed_kph, _config->imperial_units), 2, 0, fmt);
+    // primary display item
+    uint8_t value = primary_item_value(_primary_item, data, _config);
+    uint16_t color = primary_item_color(_primary_item, data, _config);
+    dtostrf(value, 2, 0, fmt);
     tft_util_draw_number(_tft, fmt, 0, 10, color, COLOR_BLACK, 10, 22);
 
     // trip distance

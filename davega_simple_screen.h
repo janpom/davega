@@ -20,7 +20,12 @@
 #ifndef DAVEGA_SIMPLE_SCREEN_H
 #define DAVEGA_SIMPLE_SCREEN_H
 
+#include "davega_screen.h"
+
 #define SS_YELLOW_SPEED_KPH 25
 #define SS_RED_SPEED_KPH 35
+
+uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config);
+uint8_t primary_item_value(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config);
 
 #endif //DAVEGA_SIMPLE_SCREEN_H

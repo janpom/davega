@@ -46,11 +46,27 @@ DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
 #include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen();
+DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen(SCR_SPEED);
+#endif
+#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
+#include "davega_simple_horizontal_screen.h"
+DavegaSimpleHorizontalScreen davega_simple_horizontal_screen_with_battery_current = DavegaSimpleHorizontalScreen(SCR_BATTERY_CURRENT);
+#endif
+#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
+#include "davega_simple_horizontal_screen.h"
+DavegaSimpleHorizontalScreen davega_simple_horizontal_screen_with_motor_current = DavegaSimpleHorizontalScreen(SCR_MOTOR_CURRENT);
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
 #include "davega_simple_vertical_screen.h"
-DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen();
+DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen(SCR_SPEED);
+#endif
+#ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
+#include "davega_simple_vertical_screen.h"
+DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_battery_current = DavegaSimpleVerticalScreen(SCR_BATTERY_CURRENT);
+#endif
+#ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
+#include "davega_simple_vertical_screen.h"
+DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_motor_current = DavegaSimpleVerticalScreen(SCR_MOTOR_CURRENT);
 #endif
 #ifdef TEXT_SCREEN_ENABLED
 #include "davega_text_screen.h"
@@ -64,15 +80,27 @@ DavegaScreen* davega_screens[] = {
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
     &davega_simple_horizontal_screen,
 #endif
+#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
+    &davega_simple_horizontal_screen_with_battery_current,
+#endif
+#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
+    &davega_simple_horizontal_screen_with_motor_current,
+#endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
     &davega_simple_vertical_screen,
+#endif
+#ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
+    &davega_simple_vertical_screen_with_battery_current,
+#endif
+#ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
+    &davega_simple_vertical_screen_with_motor_current,
 #endif
 #ifdef TEXT_SCREEN_ENABLED
     &davega_text_screen,
 #endif
 };
 
-t_text_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
+t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
 t_davega_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
@@ -238,7 +266,7 @@ void loop() {
     data.mosfet_celsius = vesc_comm_get_temp_mosfet(vesc_packet);
     data.motor_celsius = vesc_comm_get_temp_motor(vesc_packet);
     data.motor_amps = vesc_comm_get_motor_current(vesc_packet);
-    data.battery_amps = vesc_comm_get_battery_current(vesc_packet);
+    data.battery_amps = vesc_comm_get_battery_current(vesc_packet) * VESC_COUNT;
     data.duty_cycle = vesc_comm_get_duty_cycle(vesc_packet);
     data.vesc_fault_code = vesc_comm_get_fault_code(vesc_packet);
     data.voltage = vesc_comm_get_voltage(vesc_packet);
