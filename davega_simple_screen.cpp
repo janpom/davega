@@ -24,7 +24,7 @@
 uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config) {
     uint16_t color = COLOR_WHITE;
     if (screen_item == SCR_BATTERY_CURRENT || screen_item == SCR_MOTOR_CURRENT) {
-        float value = primary_item_value(screen_item, data, config);
+        float value = screen_item == SCR_BATTERY_CURRENT ? data->battery_amps : data->motor_amps;
         if (value >= 100)
             color = COLOR_YELLOW;
         if (value >= 200)
