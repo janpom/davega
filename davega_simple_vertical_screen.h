@@ -26,6 +26,7 @@
 
 class DavegaSimpleVerticalScreen: public DavegaILI9225Screen {
 public:
+    DavegaSimpleVerticalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
     void reset();
     void update(t_davega_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
@@ -38,6 +39,8 @@ protected:
     uint8_t _battery_cells_filled = 0;
 
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
+
+    t_screen_item _primary_item = _primary_item;
 
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 };

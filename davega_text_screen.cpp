@@ -45,61 +45,61 @@ void DavegaTextScreen::update(t_davega_data *data) {
         uint16_t color = COLOR_WHITE;
 
         switch (_config->text_screen_items[i]) {
-            case TSCR_FW_VERSION:
+            case SCR_FW_VERSION:
                 s = String("FW version: ") + String(_config->fw_version);
                 break;
-            case TSCR_MOSFET_TEMPERATURE:
+            case SCR_MOSFET_TEMPERATURE:
                 s = String("MOSFET temp: ") + String(convert_temperature(data->mosfet_celsius, _config->use_fahrenheit))
                         + String(" ") + String(_config->use_fahrenheit ? "'F" : "'C");
                 break;
-            case TSCR_MOTOR_TEMPERATURE:
+            case SCR_MOTOR_TEMPERATURE:
                 s = String("motor temp: ") + String(convert_temperature(data->motor_celsius, _config->use_fahrenheit))
                         + String(" ") + String(_config->use_fahrenheit ? "'F" : "'C");
                 break;
-            case TSCR_MOTOR_CURRENT:
+            case SCR_MOTOR_CURRENT:
                 s = String("motor current: ") + String(data->motor_amps) + String(" A");
                 break;
-            case TSCR_BATTERY_CURRENT:
+            case SCR_BATTERY_CURRENT:
                 s = String("battery current: ") + String(data->battery_amps) + String(" A");
                 break;
-            case TSCR_DUTY_CYCLE:
+            case SCR_DUTY_CYCLE:
                 s = String("duty cycle: ") + String(data->duty_cycle);
                 break;
-            case TSCR_TOTAL_VOLTAGE:
+            case SCR_TOTAL_VOLTAGE:
                 s = String("total voltage: ") + String(data->voltage) + String(" V");
                 break;
-            case TSCR_MIN_TOTAL_VOLTAGE:
+            case SCR_MIN_TOTAL_VOLTAGE:
                 s = String("min total voltage: ") + String(data->session->min_voltage) + String(" V");
                 break;
-            case TSCR_AVG_CELL_VOLTAGE:
+            case SCR_AVG_CELL_VOLTAGE:
                 s = String("avg cell voltage: ") + String(data->voltage / _config->battery_cells) + String(" V");
                 break;
-            case TSCR_BATTERY_CAPACITY_MAH:
+            case SCR_BATTERY_CAPACITY_MAH:
                 s = String("capacity: ") + String(data->mah) + String(" mAh");
                 color = capacity_data_color;
                 break;
-            case TSCR_BATTERY_CAPACITY_PERCENT:
+            case SCR_BATTERY_CAPACITY_PERCENT:
                 s = String("capacity: ") + String(data->battery_percent * 100) + String("%");
                 color = capacity_data_color;
                 break;
-            case TSCR_TRIP_DISTANCE:
+            case SCR_TRIP_DISTANCE:
                 s = (String("trip: ") + String(convert_distance(data->trip_km, _config->imperial_units))
                      + String(" ") + String(_config->imperial_units ? "mi" : "km"));
                 color = session_data_color;
                 break;
-            case TSCR_TOTAL_DISTANCE:
+            case SCR_TOTAL_DISTANCE:
                 s = (String("total: ") + String(convert_distance(data->total_km, _config->imperial_units))
                      + String(" ") + String(_config->imperial_units ? "mi" : "km"));
                 break;
-            case TSCR_SPEED:
+            case SCR_SPEED:
                 s = (String("speed: ") + String(convert_distance(data->speed_kph, _config->imperial_units))
                      + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
                 break;
-            case TSCR_MAX_SPEED:
+            case SCR_MAX_SPEED:
                 s = (String("max speed: ") + String(convert_distance(data->session->max_speed_kph, _config->imperial_units))
                      + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
                 break;
-            case TSCR_AVG_SPEED:
+            case SCR_AVG_SPEED:
                 avg_speed_kph = data->session->millis_riding > 0
                                 ? 3600.0 * data->session->trip_meters / data->session->millis_riding
                                 : 0;
@@ -107,15 +107,15 @@ void DavegaTextScreen::update(t_davega_data *data) {
                      + String(" ") + String(_config->imperial_units ? "mi/h" : "km/h"));
                 color = session_data_color;
                 break;
-            case TSCR_TIME_ELAPSED:
+            case SCR_TIME_ELAPSED:
                 s = String("time elapsed: ") + format_time(data->session->millis_elapsed) + String(" mins");
                 color = session_data_color;
                 break;
-            case TSCR_TIME_RIDING:
+            case SCR_TIME_RIDING:
                 s = String("time riding: ") + format_time(data->session->millis_riding) + String(" mins");
                 color = session_data_color;
                 break;
-            case TSCR_FAULT_CODE:
+            case SCR_FAULT_CODE:
                 s = String("fault code: ") + String(vesc_fault_code_to_string(data->vesc_fault_code));
                 break;
             default:
