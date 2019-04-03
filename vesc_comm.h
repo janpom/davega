@@ -22,7 +22,13 @@
 #ifndef VESC_COMM_H
 #define VESC_COMM_H
 
-#define PACKET_MAX_LENGTH 70
+//#define FOCBOX_UNITY
+
+#ifndef FOCBOX_UNITY
+    #define PACKET_MAX_LENGTH 70
+#else
+    #define PACKET_MAX_LENGTH 89
+#endif
 
 typedef enum {
     FAULT_CODE_NONE = 0,

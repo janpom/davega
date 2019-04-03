@@ -20,7 +20,11 @@
 #ifndef DAVEGA_CONFIG_H
 #define DAVEGA_CONFIG_H
 
-#define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual
+// To compile for FOCBOX Unity, uncomment the
+// #define FOCBOX_UNITY
+// line in the vesc_comm.h file.
+
+#define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
 #define MOTOR_POLE_PAIRS 7
 #define WHEEL_DIAMETER_MM 192
 #define MOTOR_PULLEY_TEETH 15

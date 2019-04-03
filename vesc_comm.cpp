@@ -168,6 +168,7 @@ bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
     return true;
 }
 
+#ifndef FOCBOX_UNITY
 float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet) {
     return ((int16_t) get_word(vesc_packet, 3)) / 10.0;
 }
@@ -215,3 +216,52 @@ int32_t vesc_comm_get_tachometer_abs(uint8_t *vesc_packet) {
 vesc_comm_fault_code vesc_comm_get_fault_code(uint8_t *vesc_packet) {
     return vesc_packet[55];
 }
+#else  // FOCBOX_UNITY
+float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet) {
+    return (((int16_t) get_word(vesc_packet, 3)) + ((int16_t) get_word(vesc_packet, 5))) / 2.0 / 10.0;
+}
+
+float vesc_comm_get_temp_motor(uint8_t *vesc_packet) {
+    return (((int16_t) get_word(vesc_packet, 7)) + ((int16_t) get_word(vesc_packet, 9))) / 2.0 / 10.0;
+}
+
+float vesc_comm_get_motor_current(uint8_t *vesc_packet) {
+    return (((int32_t) get_long(vesc_packet, 11)) + ((int32_t) get_long(vesc_packet, 15))) / 2.0 / 100.0;
+}
+
+float vesc_comm_get_battery_current(uint8_t *vesc_packet) {
+    return ((int32_t) get_long(vesc_packet, 19)) / 100.0;
+}
+
+float vesc_comm_get_duty_cycle(uint8_t *vesc_packet) {
+    return (get_word(vesc_packet, 39) + get_word(vesc_packet, 41)) / 2.0 / 1000.0;
+}
+
+int32_t vesc_comm_get_rpm(uint8_t *vesc_packet) {
+    return (((int32_t) get_long(vesc_packet, 43)) + ((int32_t) get_long(vesc_packet, 47))) / 2;
+}
+
+float vesc_comm_get_voltage(uint8_t *vesc_packet) {
+    return get_word(vesc_packet, 51) / 10.0;
+}
+
+float vesc_comm_get_amphours_discharged(uint8_t *vesc_packet) {
+    return get_long(vesc_packet, 53) / 10.0;
+}
+
+float vesc_comm_get_amphours_charged(uint8_t *vesc_packet) {
+    return get_long(vesc_packet, 57) / 10.0;
+}
+
+int32_t vesc_comm_get_tachometer(uint8_t *vesc_packet) {
+    return ((int32_t) get_long(vesc_packet, 69)) + ((int32_t) get_long(vesc_packet, 73)) / 2;
+}
+
+int32_t vesc_comm_get_tachometer_abs(uint8_t *vesc_packet) {
+    return (((int32_t) get_long(vesc_packet, 77)) + ((int32_t) get_long(vesc_packet, 81))) / 2;
+}
+
+vesc_comm_fault_code vesc_comm_get_fault_code(uint8_t *vesc_packet) {
+    return vesc_packet[85];
+}
+#endif // FOCBOX_UNITY
