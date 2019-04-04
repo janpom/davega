@@ -41,28 +41,33 @@ uint8_t expected_packet_length(uint8_t payload_length) {
     return (1 + 1 + payload_length + 2 + 1);
 }
 
+VescComm::~VescComm() {
+    if (_packet != NULL)
+        free(_packet);
+}
+
 void VescComm::init(uint32_t baud) {
     vesc_serial.begin(baud);
 }
 
-uint8_t VescComm::fetch_packet(uint8_t *vesc_packet, uint16_t timeout) {
+uint8_t VescComm::fetch_packet(uint16_t timeout) {
     vesc_serial.write(GET_VALUES_PACKET, sizeof(GET_VALUES_PACKET));
-    return receive_packet(vesc_packet, timeout);
+    return receive_packet(timeout);
 }
 
-uint8_t VescComm::receive_packet(uint8_t *vesc_packet, uint16_t timeout) {
+uint8_t VescComm::receive_packet(uint16_t timeout) {
     int32_t start = millis();
-    uint8_t bytes_read = 0;
+    _bytes_read = 0;
     while (millis() - start < timeout) {
         if (vesc_serial.available())
-            vesc_packet[bytes_read++] = vesc_serial.read();
+            _packet[_bytes_read++] = vesc_serial.read();
 
-        if (bytes_read >= _max_packet_length)
+        if (_bytes_read >= _max_packet_length)
             break;
 
-        if (bytes_read >= 2 && vesc_packet[0] != PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) {
-            uint8_t payload_length = vesc_packet[1];
-            if (bytes_read >= expected_packet_length(payload_length))
+        if (_bytes_read >= 2 && _packet[0] != PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) {
+            uint8_t payload_length = _packet[1];
+            if (_bytes_read >= expected_packet_length(payload_length))
                 break;
         }
     }
@@ -71,36 +76,36 @@ uint8_t VescComm::receive_packet(uint8_t *vesc_packet, uint16_t timeout) {
         // TODO: warning
         vesc_serial.read();
     }
-    return bytes_read;
+    return _bytes_read;
 }
 
-bool VescComm::is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
-    if (packet_length < 3) {
-        D("packet too short (" + String(packet_length) + " bytes)");
+bool VescComm::is_expected_packet() {
+    if (_bytes_read < 3) {
+        D("packet too short (" + String(_bytes_read) + " bytes)");
         return false;
     }
 
-    if (vesc_packet[0] != PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) {
+    if (_packet[0] != PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) {
         D("unexpected length id byte: expected " + String(PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) +
-          ", got " + String(vesc_packet[0]));
+          ", got " + String(_packet[0]));
         return false;
     }
 
-    if (vesc_packet[2] != PACKET_GET_VALUES_TYPE) {
+    if (_packet[2] != PACKET_GET_VALUES_TYPE) {
         D("unexpected packet type: expected " + String(PACKET_GET_VALUES_TYPE) +
-          ", got " + String(vesc_packet[2]));
+          ", got " + String(_packet[2]));
         return false;
     }
 
-    uint8_t payload_length = vesc_packet[1];
-    if (packet_length != expected_packet_length(payload_length)) {
+    uint8_t payload_length = _packet[1];
+    if (_bytes_read != expected_packet_length(payload_length)) {
         D("packet length (" + String(payload_length) + ") does not correspond to the payload length (" +
           String(payload_length) + ")");
         return false;
     }
 
-    uint16_t crc = get_word(vesc_packet, payload_length + 2);
-    uint16_t expected_crc = crc16(&vesc_packet[2], payload_length);
+    uint16_t crc = get_word(payload_length + 2);
+    uint16_t expected_crc = crc16(&_packet[2], payload_length);
     if (crc != expected_crc) {
         D("CRC error: expected " + String(expected_crc) + ", got " + String(crc));
         return false;
@@ -109,13 +114,13 @@ bool VescComm::is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
     return true;
 }
 
-uint16_t VescComm::get_word(uint8_t *packet, uint8_t index) {
-    return ((uint16_t) packet[index]) << 8 | ((uint16_t) packet[index + 1]);
+uint16_t VescComm::get_word(uint8_t index) {
+    return ((uint16_t) _packet[index]) << 8 | ((uint16_t) _packet[index + 1]);
 }
 
-uint32_t VescComm::get_long(uint8_t *packet, uint8_t index) {
-    return ((uint32_t) packet[index]) << 24 |
-           ((uint32_t) packet[index + 1]) << 16 |
-           ((uint32_t) packet[index + 2]) << 8 |
-           ((uint32_t) packet[index + 3]);
+uint32_t VescComm::get_long(uint8_t index) {
+    return ((uint32_t) _packet[index]) << 24 |
+           ((uint32_t) _packet[index + 1]) << 16 |
+           ((uint32_t) _packet[index + 2]) << 8 |
+           ((uint32_t) _packet[index + 3]);
 }

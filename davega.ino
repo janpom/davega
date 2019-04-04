@@ -40,8 +40,6 @@
 
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
-#define PACKET_MAX_LENGTH 89  //FIXME hack
-
 #ifdef FOCBOX_UNITY
 #include "vesc_comm_unity.h"
 VescCommUnity vesc_comm = VescCommUnity();
@@ -129,8 +127,6 @@ DavegaScreen* scr;
 
 const float discharge_ticks[] = DISCHARGE_TICKS;
 
-uint8_t vesc_packet[PACKET_MAX_LENGTH];
-
 t_davega_data data;
 t_davega_session_data session_data;
 int32_t initial_mah_spent;
@@ -215,14 +211,14 @@ void setup() {
     scr->reset();
     scr->update(&data);
 
-    uint8_t bytes_read = vesc_comm.fetch_packet(vesc_packet, PACKET_MAX_LENGTH);
-    while (!vesc_comm.is_expected_packet(vesc_packet, bytes_read)) {
+    vesc_comm.fetch_packet();
+    while (!vesc_comm.is_expected_packet()) {
         scr->heartbeat(UPDATE_DELAY, false);
-        bytes_read = vesc_comm.fetch_packet(vesc_packet, PACKET_MAX_LENGTH);
+        vesc_comm.fetch_packet();
     }
 
     float last_volts = eeprom_read_volts();
-    float current_volts = vesc_comm.get_voltage(vesc_packet);
+    float current_volts = vesc_comm.get_voltage();
     if (was_battery_fully_charged(last_volts, current_volts)) {
         // reset mAh spent
         eeprom_write_mah_spent(0);
@@ -242,10 +238,10 @@ void setup() {
     //   current value = initial value + VESC value
     // and that works correctly with the default initial values in case the VESC values
     // start from 0. If that's not the case though we need to lower the initial values.
-    int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged(vesc_packet) -
-                                           vesc_comm.get_amphours_charged(vesc_packet));
+    int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
+                                           vesc_comm.get_amphours_charged());
     initial_mah_spent -= vesc_mah_spent;
-    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer(vesc_packet) / 6);
+    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
     initial_trip_meters -= tachometer;
     initial_total_meters -= tachometer;
 
@@ -266,24 +262,24 @@ void loop() {
     if (digitalRead(BUTTON_2_PIN) == HIGH)
         button_2_last_up_time = millis();
 
-    uint8_t bytes_read = vesc_comm.fetch_packet(vesc_packet, PACKET_MAX_LENGTH);
+    vesc_comm.fetch_packet();
 
-    if (!vesc_comm.is_expected_packet(vesc_packet, bytes_read)) {
+    if (!vesc_comm.is_expected_packet()) {
         scr->heartbeat(UPDATE_DELAY, false);
         return;
     }
 
-    data.mosfet_celsius = vesc_comm.get_temp_mosfet(vesc_packet);
-    data.motor_celsius = vesc_comm.get_temp_motor(vesc_packet);
-    data.motor_amps = vesc_comm.get_motor_current(vesc_packet);
-    data.battery_amps = vesc_comm.get_battery_current(vesc_packet) * VESC_COUNT;
-    data.duty_cycle = vesc_comm.get_duty_cycle(vesc_packet);
-    data.vesc_fault_code = vesc_comm.get_fault_code(vesc_packet);
-    data.voltage = vesc_comm.get_voltage(vesc_packet);
+    data.mosfet_celsius = vesc_comm.get_temp_mosfet();
+    data.motor_celsius = vesc_comm.get_temp_motor();
+    data.motor_amps = vesc_comm.get_motor_current();
+    data.battery_amps = vesc_comm.get_battery_current() * VESC_COUNT;
+    data.duty_cycle = vesc_comm.get_duty_cycle();
+    data.vesc_fault_code = vesc_comm.get_fault_code();
+    data.voltage = vesc_comm.get_voltage();
 
     // TODO: DRY
-    int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged(vesc_packet) -
-                                           vesc_comm.get_amphours_charged(vesc_packet));
+    int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
+                                           vesc_comm.get_amphours_charged());
     int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
     int32_t mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah_spent;
 
@@ -301,10 +297,10 @@ void loop() {
     // dim mAh if the counter is about to be reset
     data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
-    int32_t rpm = vesc_comm.get_rpm(vesc_packet);
+    int32_t rpm = vesc_comm.get_rpm();
     data.speed_kph = max(erpm_to_kph(rpm), 0);
 
-    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer(vesc_packet) / 6);
+    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
 
     uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
     if (button_1_down_elapsed > COUNTER_RESET_TIME) {

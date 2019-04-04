@@ -25,18 +25,18 @@
 class VescCommUnity: public VescComm {
 public:
     VescCommUnity();
-    float get_temp_mosfet(uint8_t *vesc_packet);
-    float get_temp_motor(uint8_t *vesc_packet);
-    float get_motor_current(uint8_t *vesc_packet);
-    float get_battery_current(uint8_t *vesc_packet);
-    float get_duty_cycle(uint8_t *vesc_packet);
-    int32_t get_rpm(uint8_t *vesc_packet);
-    float get_voltage(uint8_t *vesc_packet);
-    float get_amphours_discharged(uint8_t *vesc_packet);
-    float get_amphours_charged(uint8_t *vesc_packet);
-    int32_t get_tachometer(uint8_t *vesc_packet);
-    int32_t get_tachometer_abs(uint8_t *vesc_packet);
-    vesc_comm_fault_code get_fault_code(uint8_t *vesc_packet);
+    float get_temp_mosfet();
+    float get_temp_motor();
+    float get_motor_current();
+    float get_battery_current();
+    float get_duty_cycle();
+    int32_t get_rpm();
+    float get_voltage();
+    float get_amphours_discharged();
+    float get_amphours_charged();
+    int32_t get_tachometer();
+    int32_t get_tachometer_abs();
+    vesc_comm_fault_code get_fault_code();
 };
 
 #endif //VESC_COMM_UNITY_H

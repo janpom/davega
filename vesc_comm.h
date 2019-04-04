@@ -34,27 +34,31 @@ typedef enum {
 
 class VescComm {
 public:
+    ~VescComm();
     void init(uint32_t baud);
-    uint8_t fetch_packet(uint8_t *vesc_packet, uint16_t timeout = 100);
-    uint8_t receive_packet(uint8_t *vesc_packet, uint16_t timeout);
-    bool is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length);
-    virtual float get_temp_mosfet(uint8_t *vesc_packet) = 0;
-    virtual float get_temp_motor(uint8_t *vesc_packet) = 0;
-    virtual float get_motor_current(uint8_t *vesc_packet) = 0;
-    virtual float get_battery_current(uint8_t *vesc_packet) = 0;
-    virtual float get_duty_cycle(uint8_t *vesc_packet) = 0;
-    virtual int32_t get_rpm(uint8_t *vesc_packet) = 0;
-    virtual float get_voltage(uint8_t *vesc_packet) = 0;
-    virtual float get_amphours_discharged(uint8_t *vesc_packet) = 0;
-    virtual float get_amphours_charged(uint8_t *vesc_packet) = 0;
-    virtual int32_t get_tachometer(uint8_t *vesc_packet) = 0;
-    virtual int32_t get_tachometer_abs(uint8_t *vesc_packet) = 0;
-    virtual vesc_comm_fault_code get_fault_code(uint8_t *vesc_packet) = 0;
+    uint8_t fetch_packet(uint16_t timeout = 100);
+    uint8_t receive_packet(uint16_t timeout);
+    bool is_expected_packet();
+    virtual float get_temp_mosfet() = 0;
+    virtual float get_temp_motor() = 0;
+    virtual float get_motor_current() = 0;
+    virtual float get_battery_current() = 0;
+    virtual float get_duty_cycle() = 0;
+    virtual int32_t get_rpm() = 0;
+    virtual float get_voltage() = 0;
+    virtual float get_amphours_discharged() = 0;
+    virtual float get_amphours_charged() = 0;
+    virtual int32_t get_tachometer() = 0;
+    virtual int32_t get_tachometer_abs() = 0;
+    virtual vesc_comm_fault_code get_fault_code() = 0;
 
 protected:
-    uint16_t get_word(uint8_t *packet, uint8_t index);
-    uint32_t get_long(uint8_t *packet, uint8_t index);
+    uint16_t get_word(uint8_t index);
+    uint32_t get_long(uint8_t index);
+    uint8_t *_packet = NULL;
     uint8_t _max_packet_length;
+    uint8_t _bytes_read;
+
 };
 
 #endif //VESC_COMM_H
