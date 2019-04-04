@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -22,8 +22,6 @@
 #ifndef VESC_COMM_H
 #define VESC_COMM_H
 
-#define PACKET_MAX_LENGTH 70
-
 typedef enum {
     FAULT_CODE_NONE = 0,
     FAULT_CODE_OVER_VOLTAGE,
@@ -34,21 +32,33 @@ typedef enum {
     FAULT_CODE_OVER_TEMP_MOTOR
 } vesc_comm_fault_code;
 
-void vesc_comm_init(uint32_t baud);
-uint8_t vesc_comm_fetch_packet(uint8_t *vesc_packet, uint16_t timeout = 100);
-uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet, uint16_t timeout);
-bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length);
-float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet);
-float vesc_comm_get_temp_motor(uint8_t *vesc_packet);
-float vesc_comm_get_motor_current(uint8_t *vesc_packet);
-float vesc_comm_get_battery_current(uint8_t *vesc_packet);
-float vesc_comm_get_duty_cycle(uint8_t *vesc_packet);
-int32_t vesc_comm_get_rpm(uint8_t *vesc_packet);
-float vesc_comm_get_voltage(uint8_t *vesc_packet);
-float vesc_comm_get_amphours_discharged(uint8_t *vesc_packet);
-float vesc_comm_get_amphours_charged(uint8_t *vesc_packet);
-int32_t vesc_comm_get_tachometer(uint8_t *vesc_packet);
-int32_t vesc_comm_get_tachometer_abs(uint8_t *vesc_packet);
-vesc_comm_fault_code vesc_comm_get_fault_code(uint8_t *vesc_packet);
+class VescComm {
+public:
+    ~VescComm();
+    void init(uint32_t baud);
+    uint8_t fetch_packet(uint16_t timeout = 100);
+    uint8_t receive_packet(uint16_t timeout);
+    bool is_expected_packet();
+    virtual float get_temp_mosfet() = 0;
+    virtual float get_temp_motor() = 0;
+    virtual float get_motor_current() = 0;
+    virtual float get_battery_current() = 0;
+    virtual float get_duty_cycle() = 0;
+    virtual int32_t get_rpm() = 0;
+    virtual float get_voltage() = 0;
+    virtual float get_amphours_discharged() = 0;
+    virtual float get_amphours_charged() = 0;
+    virtual int32_t get_tachometer() = 0;
+    virtual int32_t get_tachometer_abs() = 0;
+    virtual vesc_comm_fault_code get_fault_code() = 0;
+
+protected:
+    uint16_t get_word(uint8_t index);
+    uint32_t get_long(uint8_t index);
+    uint8_t *_packet = NULL;
+    uint8_t _max_packet_length;
+    uint8_t _bytes_read;
+
+};
 
 #endif //VESC_COMM_H

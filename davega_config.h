@@ -20,7 +20,10 @@
 #ifndef DAVEGA_CONFIG_H
 #define DAVEGA_CONFIG_H
 
-#define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual
+// To compile for FOCBOX Unity, uncomment the following line.
+//#define FOCBOX_UNITY 1
+
+#define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
 #define MOTOR_POLE_PAIRS 7
 #define WHEEL_DIAMETER_MM 192
 #define MOTOR_PULLEY_TEETH 15
@@ -133,8 +136,8 @@
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 1
-#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
-#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
+//#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
+//#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
 #define TEXT_SCREEN_ENABLED 1
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
