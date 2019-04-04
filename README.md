@@ -1,6 +1,6 @@
-DAVEga (The VEsc GAuge/GAdget), or Dave for short, displays speed, battery capacity, traveled distance and other useful info retrieved from read from a [VESC](https://www.vesc-project.com/) based controller.
+DAVEga (The VEsc GAuge/GAdget), or Dave for short, displays speed, battery capacity, traveled distance and other useful info retrieved from a [VESC](https://www.vesc-project.com/) based controller.
 
-![DAVEga](img/davega.jpg)
+![DAVEga](img/davega.png)
 
 This repository contains the DAVEga firmware. The gerber files can be downloaded from the [gerbers](gerbers/) directory or from [EasyEDA](https://easyeda.com/honza.pomikalek/VESC-Gauge).
 
