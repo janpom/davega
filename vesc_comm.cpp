@@ -1,5 +1,5 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
     This file is part of the DAVEga firmware.
 
@@ -41,23 +41,23 @@ uint8_t expected_packet_length(uint8_t payload_length) {
     return (1 + 1 + payload_length + 2 + 1);
 }
 
-void vesc_comm_init(uint32_t baud) {
+void VescComm::init(uint32_t baud) {
     vesc_serial.begin(baud);
 }
 
-uint8_t vesc_comm_fetch_packet(uint8_t *vesc_packet, uint16_t timeout) {
+uint8_t VescComm::fetch_packet(uint8_t *vesc_packet, uint16_t timeout) {
     vesc_serial.write(GET_VALUES_PACKET, sizeof(GET_VALUES_PACKET));
-    return vesc_comm_receive_packet(vesc_packet, timeout);
+    return receive_packet(vesc_packet, timeout);
 }
 
-uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet, uint16_t timeout) {
+uint8_t VescComm::receive_packet(uint8_t *vesc_packet, uint16_t timeout) {
     int32_t start = millis();
     uint8_t bytes_read = 0;
     while (millis() - start < timeout) {
         if (vesc_serial.available())
             vesc_packet[bytes_read++] = vesc_serial.read();
 
-        if (bytes_read >= PACKET_MAX_LENGTH)
+        if (bytes_read >= _max_packet_length)
             break;
 
         if (bytes_read >= 2 && vesc_packet[0] != PACKET_LENGTH_IDENTIFICATION_BYTE_SHORT) {
@@ -74,18 +74,7 @@ uint8_t vesc_comm_receive_packet(uint8_t *vesc_packet, uint16_t timeout) {
     return bytes_read;
 }
 
-uint16_t get_word(uint8_t *packet, uint8_t index) {
-    return ((uint16_t) packet[index]) << 8 | ((uint16_t) packet[index + 1]);
-}
-
-uint32_t get_long(uint8_t *packet, uint8_t index) {
-    return ((uint32_t) packet[index]) << 24 |
-           ((uint32_t) packet[index + 1]) << 16 |
-           ((uint32_t) packet[index + 2]) << 8 |
-           ((uint32_t) packet[index + 3]);
-}
-
-bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
+bool VescComm::is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
     if (packet_length < 3) {
         D("packet too short (" + String(packet_length) + " bytes)");
         return false;
@@ -120,100 +109,13 @@ bool vesc_comm_is_expected_packet(uint8_t *vesc_packet, uint8_t packet_length) {
     return true;
 }
 
-#ifndef FOCBOX_UNITY
-float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet) {
-    return ((int16_t) get_word(vesc_packet, 3)) / 10.0;
+uint16_t VescComm::get_word(uint8_t *packet, uint8_t index) {
+    return ((uint16_t) packet[index]) << 8 | ((uint16_t) packet[index + 1]);
 }
 
-float vesc_comm_get_temp_motor(uint8_t *vesc_packet) {
-    return ((int16_t) get_word(vesc_packet, 5)) / 10.0;
+uint32_t VescComm::get_long(uint8_t *packet, uint8_t index) {
+    return ((uint32_t) packet[index]) << 24 |
+           ((uint32_t) packet[index + 1]) << 16 |
+           ((uint32_t) packet[index + 2]) << 8 |
+           ((uint32_t) packet[index + 3]);
 }
-
-float vesc_comm_get_motor_current(uint8_t *vesc_packet) {
-    return ((int32_t) get_long(vesc_packet, 7)) / 100.0;
-}
-
-float vesc_comm_get_battery_current(uint8_t *vesc_packet) {
-    return ((int32_t) get_long(vesc_packet, 11)) / 100.0;
-}
-
-float vesc_comm_get_duty_cycle(uint8_t *vesc_packet) {
-    return get_word(vesc_packet, 23) / 1000.0;
-}
-
-int32_t vesc_comm_get_rpm(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 25);
-}
-
-float vesc_comm_get_voltage(uint8_t *vesc_packet) {
-    return get_word(vesc_packet, 29) / 10.0;
-}
-
-float vesc_comm_get_amphours_discharged(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 31) / 10.0;
-}
-
-float vesc_comm_get_amphours_charged(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 35) / 10.0;
-}
-
-int32_t vesc_comm_get_tachometer(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 47);
-}
-
-int32_t vesc_comm_get_tachometer_abs(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 51);
-}
-
-vesc_comm_fault_code vesc_comm_get_fault_code(uint8_t *vesc_packet) {
-    return vesc_packet[55];
-}
-#else  // FOCBOX_UNITY
-float vesc_comm_get_temp_mosfet(uint8_t *vesc_packet) {
-    return (((int16_t) get_word(vesc_packet, 3)) + ((int16_t) get_word(vesc_packet, 5))) / 2.0 / 10.0;
-}
-
-float vesc_comm_get_temp_motor(uint8_t *vesc_packet) {
-    return (((int16_t) get_word(vesc_packet, 7)) + ((int16_t) get_word(vesc_packet, 9))) / 2.0 / 10.0;
-}
-
-float vesc_comm_get_motor_current(uint8_t *vesc_packet) {
-    return (((int32_t) get_long(vesc_packet, 11)) + ((int32_t) get_long(vesc_packet, 15))) / 2.0 / 100.0;
-}
-
-float vesc_comm_get_battery_current(uint8_t *vesc_packet) {
-    return ((int32_t) get_long(vesc_packet, 19)) / 100.0;
-}
-
-float vesc_comm_get_duty_cycle(uint8_t *vesc_packet) {
-    return (get_word(vesc_packet, 39) + get_word(vesc_packet, 41)) / 2.0 / 1000.0;
-}
-
-int32_t vesc_comm_get_rpm(uint8_t *vesc_packet) {
-    return (((int32_t) get_long(vesc_packet, 43)) + ((int32_t) get_long(vesc_packet, 47))) / 2;
-}
-
-float vesc_comm_get_voltage(uint8_t *vesc_packet) {
-    return get_word(vesc_packet, 51) / 10.0;
-}
-
-float vesc_comm_get_amphours_discharged(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 53) / 10.0;
-}
-
-float vesc_comm_get_amphours_charged(uint8_t *vesc_packet) {
-    return get_long(vesc_packet, 57) / 10.0;
-}
-
-int32_t vesc_comm_get_tachometer(uint8_t *vesc_packet) {
-    return ((int32_t) get_long(vesc_packet, 69)) + ((int32_t) get_long(vesc_packet, 73)) / 2;
-}
-
-int32_t vesc_comm_get_tachometer_abs(uint8_t *vesc_packet) {
-    return (((int32_t) get_long(vesc_packet, 77)) + ((int32_t) get_long(vesc_packet, 81))) / 2;
-}
-
-vesc_comm_fault_code vesc_comm_get_fault_code(uint8_t *vesc_packet) {
-    return vesc_packet[85];
-}
-#endif // FOCBOX_UNITY
