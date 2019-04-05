@@ -24,7 +24,7 @@
 
 #define KM_PER_MILE 0.621371
 
-char* make_fw_version(char* fw_version, char* revision_id);
+char* make_fw_version(const char* fw_version, const char* revision_id);
 float convert_distance(float distance_km, bool imperial_units);
 float convert_speed(float speed_kph, bool imperial_units);
 float convert_temperature(float temp_celsius, bool imperial_units);
