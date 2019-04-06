@@ -66,7 +66,7 @@ void format_total_distance(float total_distance, char* result) {
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     switch (fault_code) {
         case FAULT_CODE_NONE:
-            return "NONE";
+            return "FAULT CODE NONE";
         case FAULT_CODE_OVER_VOLTAGE:
             return "OVER VOLTAGE";
         case FAULT_CODE_UNDER_VOLTAGE:
