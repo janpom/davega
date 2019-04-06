@@ -207,6 +207,7 @@ void setup() {
     data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
     data.trip_km = session_data.trip_meters / 1000.0;
     data.total_km = eeprom_read_total_distance() / 1000.0;
+    data.session = &session_data;
 
     scr->reset();
     scr->update(&data);
@@ -244,8 +245,6 @@ void setup() {
     int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
     initial_trip_meters -= tachometer;
     initial_total_meters -= tachometer;
-
-    data.session = &session_data;
 }
 
 void loop() {
