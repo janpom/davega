@@ -58,10 +58,10 @@ void DavegaTextScreen::update(t_davega_data *data) {
                 _write_numeric_line(data->duty_cycle * 100, "%", "duty", i);
                 break;
             case SCR_TOTAL_VOLTAGE:
-                _write_numeric_line(data->voltage, "V", "total", i);
+                _write_numeric_line(data->voltage, "V", "pack", i);
                 break;
             case SCR_MIN_TOTAL_VOLTAGE:
-                _write_numeric_line(data->session->min_voltage, "V", "min total", i);
+                _write_numeric_line(data->session->min_voltage, "V", "min pack", i);
                 break;
             case SCR_AVG_CELL_VOLTAGE:
                 _write_numeric_line(data->voltage / _config->battery_cells, "V", "avg cell", i);
