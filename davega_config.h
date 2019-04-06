@@ -143,6 +143,7 @@
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:
 //    SCR_FW_VERSION
+//    SCR_FAULT_CODE
 //    SCR_MOSFET_TEMPERATURE
 //    SCR_MOTOR_TEMPERATURE
 //    SCR_MOTOR_CURRENT
@@ -160,8 +161,13 @@
 //    SCR_AVG_SPEED
 //    SCR_TIME_ELAPSED
 //    SCR_TIME_RIDING
-//    SCR_FAULT_CODE
 #define TEXT_SCREEN_ITEMS { \
+    SCR_FAULT_CODE, \
+    SCR_MOSFET_TEMPERATURE, \
+    SCR_MOTOR_TEMPERATURE, \
+    SCR_MOTOR_CURRENT, \
+    SCR_BATTERY_CURRENT, \
+    SCR_DUTY_CYCLE, \
     SCR_TOTAL_VOLTAGE, \
     SCR_MIN_TOTAL_VOLTAGE, \
     SCR_AVG_CELL_VOLTAGE, \
@@ -172,8 +178,8 @@
     SCR_SPEED, \
     SCR_MAX_SPEED, \
     SCR_AVG_SPEED, \
+    SCR_TIME_ELAPSED, \
     SCR_TIME_RIDING, \
-    SCR_FAULT_CODE, \
 }
 
 // Big font is only recommended for landscape orientation. 9 lines fit on the screen then.
