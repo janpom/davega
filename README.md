@@ -65,8 +65,9 @@ DAVEga firmware and hardware design is released under [GNU GPL v3](LICENSE).
 - [DAVEga video presentation](https://youtu.be/u4e83JhVZNA) (first prototype)
 - [DAVEga thread at esk8 builders forum](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509)
 - DAVEga cable tips:
-  [(1)](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/726?u=janpom)
-  [(2)](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/293?u=janpom)
+  - [Making a basic cable](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/1302?u=janpom)
+  - [Making an advanced cable](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/726?u=janpom)
+  - [Misc cable ideas](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/293?u=janpom)
 - [DAVEga on Arduino Nano](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/209?u=janpom)
 - [DAVEga coding crash course](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/1249?u=janpom)
 - [DAVEga kits for purchase](https://www.electric-skateboard.builders/t/davega-second-batch/82070)
