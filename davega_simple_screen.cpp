@@ -25,10 +25,12 @@ uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_da
     uint16_t color = COLOR_WHITE;
     if (screen_item == SCR_BATTERY_CURRENT || screen_item == SCR_MOTOR_CURRENT) {
         float value = screen_item == SCR_BATTERY_CURRENT ? data->battery_amps : data->motor_amps;
+        if (value < 0)
+            color = COLOR_RED;
         if (value >= 100)
             color = COLOR_YELLOW;
         if (value >= 200)
-            color = COLOR_RED;
+            color = COLOR_BLUEVIOLET;
     }
     else {
         // speed
@@ -52,5 +54,5 @@ uint8_t primary_item_value(t_screen_item screen_item, t_davega_data* data, t_dav
         default:
             value = convert_speed(data->speed_kph, config->imperial_units);
     }
-    return round(value) % 100;
+    return abs(round(value)) % 100;
 }
