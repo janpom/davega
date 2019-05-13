@@ -167,12 +167,13 @@ float voltage_to_percent(float voltage) {
     return 1.0;
 }
 
-bool was_battery_fully_charged(float last_volts, float current_volts) {
+bool was_battery_charged(float last_volts, float current_volts) {
+    return (current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE;
+}
+
+bool is_battery_full(float current_volts) {
     float max_volts = discharge_ticks[LEN(discharge_ticks) - 1];
-    return (
-            ((current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE) &&
-            (current_volts / max_volts > FULL_CHARGE_THRESHOLD)
-    );
+    return current_volts / max_volts > FULL_CHARGE_THRESHOLD;
 }
 
 void setup() {
@@ -220,9 +221,16 @@ void setup() {
 
     float last_volts = eeprom_read_volts();
     float current_volts = vesc_comm.get_voltage();
-    if (was_battery_fully_charged(last_volts, current_volts)) {
+    if (was_battery_charged(last_volts, current_volts)) {
         // reset mAh spent
-        eeprom_write_mah_spent(0);
+        if (is_battery_full(current_volts)) {
+            eeprom_write_mah_spent(0);
+        }
+        else {
+            float soc = voltage_to_percent(current_volts);
+            uint16_t mah_spent = (uint16_t) (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY * (1 - soc));
+            eeprom_write_mah_spent(mah_spent);
+        }
         eeprom_write_volts(current_volts);
     }
 
