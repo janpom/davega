@@ -1,3 +1,7 @@
+*This repository contains the firmware and gerber files for the open source DAVEga. **For DAVEGA X (not open source), please go to [davega.eu](https://davega.eu).***
+
+-----
+
 DAVEga (The VEsc GAuge/GAdget), or Dave for short, displays speed, battery capacity, traveled distance and other useful info retrieved from a [VESC](https://www.vesc-project.com/) based controller.
 
 ![DAVEga](img/davega.png)
@@ -77,3 +81,4 @@ DAVEga firmware and hardware design is released under [GNU GPL v3](LICENSE).
   - [AliExpress](https://www.aliexpress.com/item/ILI9225-2-0-Inch-UART-TFT-LCD-Display-Module-SPI-Interface-Colorful-Screen-Serial-Port-176x220/32792711665.html) (verified seller)
   - [Amazon](https://www.amazon.com/Display-176x220-ILI9225-Peripheral-Interface/dp/B07HF7WVST) (faster delivery but more expensive)
 - [VESC project](https://www.vesc-project.com/)
+- [DAVEGA X](https://davega.eu/) (more advanced commercial version of DAVEGA) 
