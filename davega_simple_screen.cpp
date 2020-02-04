@@ -43,16 +43,12 @@ uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_da
 }
 
 uint8_t primary_item_value(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config) {
-    float value;
     switch (screen_item) {
         case SCR_BATTERY_CURRENT:
-            value = data->battery_amps;
-            break;
+            return abs(round(data->battery_amps)) % 100;
         case SCR_MOTOR_CURRENT:
-            value = data->motor_amps;
-            break;
+            return abs(round(data->motor_amps)) % 100;
         default:
-            value = convert_speed(data->speed_kph, config->imperial_units);
+            return abs(round(convert_speed(data->speed_kph, config->imperial_units)));
     }
-    return abs(round(value)) % 100;
 }
