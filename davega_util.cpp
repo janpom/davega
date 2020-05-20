@@ -24,7 +24,7 @@ char fw_version_buffer[6];
 
 char* make_fw_version(const char* fw_version, const char* revision_id) {
     if (fw_version[0] == 'v') {
-        return fw_version;
+        return (char*)fw_version;
     }
     else {
         String r = String("r");

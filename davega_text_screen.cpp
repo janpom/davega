@@ -123,7 +123,7 @@ void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read
 }
 
 void DavegaTextScreen::_write_numeric_line(
-        float value, const char* units, const char* label, int lineno, uint16_t color = COLOR_WHITE) {
+        float value, const char* units, const char* label, int lineno, uint16_t color) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     dtostrf(value, 8, 2, _line_buffer);
@@ -137,7 +137,7 @@ void DavegaTextScreen::_write_numeric_line(
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = COLOR_WHITE) {
+void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     uint32_t hours = seconds / 3600;
@@ -163,7 +163,7 @@ void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color = COLOR_WHITE) {
+void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color) {
     for (int i=0; i<strlen(value); i++)
         _line_buffer[i] = value[i];
     _line_buffer[strlen(value)] = '\0';
@@ -171,7 +171,7 @@ void DavegaTextScreen::_write_text_line(char* value, int lineno, uint16_t color 
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color = COLOR_WHITE) {
+void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
     // space padding
     for (int i=strlen(_line_buffer); i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
