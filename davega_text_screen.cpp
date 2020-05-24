@@ -110,7 +110,7 @@ void DavegaTextScreen::update(t_davega_data *data) {
                 _write_text_line(vesc_fault_code_to_string(data->vesc_fault_code), i);
                 break;
             default:
-                _write_text_line("ERROR: unknown item", i);
+                _write_text_line((char*)"ERROR: unknown item", i);
         }
     }
 }

@@ -66,20 +66,20 @@ void format_total_distance(float total_distance, char* result) {
 char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     switch (fault_code) {
         case FAULT_CODE_NONE:
-            return "FAULT CODE NONE";
+            return (char*)"FAULT CODE NONE";
         case FAULT_CODE_OVER_VOLTAGE:
-            return "OVER VOLTAGE";
+            return (char*)"OVER VOLTAGE";
         case FAULT_CODE_UNDER_VOLTAGE:
-            return "UNDER VOLTAGE";
+            return (char*)"UNDER VOLTAGE";
         case FAULT_CODE_DRV:
-            return "DRV FAULT";
+            return (char*)"DRV FAULT";
         case FAULT_CODE_ABS_OVER_CURRENT:
-            return "OVER CURRENT";
+            return (char*)"OVER CURRENT";
         case FAULT_CODE_OVER_TEMP_FET:
-            return "OVER TEMP FET";
+            return (char*)"OVER TEMP FET";
         case FAULT_CODE_OVER_TEMP_MOTOR:
-            return "OVER TEMP MOTOR";
+            return (char*)"OVER TEMP MOTOR";
         default:
-            return "unexpected fault code";
+            return (char*)"unexpected fault code";
     }
 }
