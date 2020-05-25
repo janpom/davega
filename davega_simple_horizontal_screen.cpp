@@ -93,7 +93,7 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     _just_reset = false;
 }
 
-void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
+void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int width = 17;
     int space = 3;
     int cell_count = 11;

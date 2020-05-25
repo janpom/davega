@@ -95,7 +95,7 @@ const bool FONT_DIGITS_3x5[10][5][3] = {
 
 void tft_util_draw_digit(
         TFT_22_ILI9225* tft, uint8_t digit, uint8_t x, uint8_t y,
-        uint16_t fg_color, uint16_t bg_color, uint8_t magnify = 1) {
+        uint16_t fg_color, uint16_t bg_color, uint8_t magnify) {
     for (int xx = 0; xx < 3; xx++) {
         for (int yy = 0; yy < 5; yy++) {
             uint16_t color = FONT_DIGITS_3x5[digit][yy][xx] ? fg_color : bg_color;
@@ -108,7 +108,7 @@ void tft_util_draw_digit(
 
 void tft_util_draw_number(
         TFT_22_ILI9225* tft, char *number, uint8_t x, uint8_t y,
-        uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify = 1) {
+        uint16_t fg_color, uint16_t bg_color, uint8_t spacing, uint8_t magnify) {
     int cursor_x = x;
     int number_len = strlen(number);
     for (int i=0; i < number_len; i++) {

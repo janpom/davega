@@ -45,7 +45,7 @@ typedef enum {
 } t_screen_item;
 
 typedef struct {
-    char* fw_version;
+    const char* fw_version;
     bool imperial_units;
     bool use_fahrenheit;
     bool per_cell_voltage;

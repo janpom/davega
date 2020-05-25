@@ -34,7 +34,7 @@ public:
 protected:
     void _write_numeric_line(float value, const char* units, const char* label, int lineno, uint16_t color = COLOR_WHITE);
     void _write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color = COLOR_WHITE);
-    void _write_text_line(char* value, int lineno, uint16_t color = COLOR_WHITE);
+    void _write_text_line(const char* value, int lineno, uint16_t color = COLOR_WHITE);
     void _write_line_buffer(int lineno, uint16_t color = COLOR_WHITE);
 
     char _line_buffer[MAX_LINE_LENGTH+1];

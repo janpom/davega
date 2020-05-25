@@ -24,11 +24,11 @@
 
 #define KM_PER_MILE 0.621371
 
-char* make_fw_version(const char* fw_version, const char* revision_id);
+const char* make_fw_version(const char* fw_version, const char* revision_id);
 float convert_distance(float distance_km, bool imperial_units);
 float convert_speed(float speed_kph, bool imperial_units);
 float convert_temperature(float temp_celsius, bool imperial_units);
 void format_total_distance(float total_distance, char* result);
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
+const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
 
 #endif //DAVEGA_UTIL_H

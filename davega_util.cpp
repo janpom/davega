@@ -22,7 +22,7 @@
 
 char fw_version_buffer[6];
 
-char* make_fw_version(const char* fw_version, const char* revision_id) {
+const char* make_fw_version(const char* fw_version, const char* revision_id) {
     if (fw_version[0] == 'v') {
         return fw_version;
     }
@@ -63,7 +63,7 @@ void format_total_distance(float total_distance, char* result) {
         dtostrf(total_distance, 5, 1, result);
 }
 
-char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
+const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     switch (fault_code) {
         case FAULT_CODE_NONE:
             return "FAULT CODE NONE";

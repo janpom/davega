@@ -98,7 +98,7 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     _just_reset = false;
 }
 
-void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool redraw = false) {
+void DavegaSimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int height = 10;
     int space = 2;
     int cell_count = 10;

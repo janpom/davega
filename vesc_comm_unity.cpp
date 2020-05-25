@@ -21,7 +21,7 @@
 
 VescCommUnity::VescCommUnity() {
     _max_packet_length = 89;
-    _packet = malloc(_max_packet_length * sizeof(*_packet));
+    _packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
 }
 
 float VescCommUnity::get_temp_mosfet() {
@@ -69,5 +69,5 @@ int32_t VescCommUnity::get_tachometer_abs() {
 }
 
 vesc_comm_fault_code VescCommUnity::get_fault_code() {
-    return _packet[85];
+    return (vesc_comm_fault_code) _packet[85];
 }
