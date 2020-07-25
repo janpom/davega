@@ -1,18 +1,14 @@
 /*
     Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
-
     This file is part of the DAVEga firmware.
-
     DAVEga firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     DAVEga firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -20,19 +16,28 @@
 #ifndef DAVEGA_CONFIG_H
 #define DAVEGA_CONFIG_H
 
+// enable debug
+//#define DEBUG
+
+// enable simulated values
+#define SIM_VALUES
+
+// arduino nano every
+#define ARDUINO_NANO
+
 // To compile for FOCBOX Unity, uncomment the following line.
 //#define FOCBOX_UNITY 1
 
-#define VESC_COUNT 2  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
-#define MOTOR_POLE_PAIRS 7
-#define WHEEL_DIAMETER_MM 192
-#define MOTOR_PULLEY_TEETH 15
-#define WHEEL_PULLEY_TEETH 72
+#define VESC_COUNT 1  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
+#define MOTOR_POLE_PAIRS 18
+#define WHEEL_DIAMETER_MM 550
+#define MOTOR_PULLEY_TEETH 1
+#define WHEEL_PULLEY_TEETH 1
 
 // Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
 // The speed indicator will merely indicate the current speed as the max speed (all blue rectangles
 // filled). It will still show the correct number though.
-#define MAX_SPEED_KPH 50
+#define MAX_SPEED_KPH 30
 
 // Set to true to display the distance in miles and the speed in mph.
 #define IMPERIAL_UNITS false
@@ -40,13 +45,13 @@
 // Set to true to display the temperature in Fahrenheit instead of Celsius.
 #define USE_FAHRENHEIT false
 
-#define BATTERY_S 12  // number of battery cells
+#define BATTERY_S 10  // number of battery cells
 #define BATTERY_MAX_MAH 8000  // battery capacity in mAh
 #define BATTERY_USABLE_CAPACITY 0.8  // [0.0, 1.0]
 
 // If SHOW_AVG_CELL_VOLTAGE is true, average cell voltage is displayed instead of the total battery
 // pack voltage (total voltage is divided by the number of cells).
-#define SHOW_AVG_CELL_VOLTAGE true
+#define SHOW_AVG_CELL_VOLTAGE false
 
 // The two options below are for detecting that battery has been fully charged (in which case
 // we reset the available mAh to the max value). We think that the battery has been fully charged
@@ -92,7 +97,7 @@
 // Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
 // the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
 // traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 43  // [1, 255]
+#define EEPROM_MAGIC_VALUE 44  // [1, 255]
 
 #define EEPROM_INIT_VALUE_VOLTS 0
 #define EEPROM_INIT_VALUE_MAH_SPENT 0
@@ -101,7 +106,7 @@
 #define EEPROM_INIT_VALUE_MILLIS_RIDING 0
 #define EEPROM_INIT_VALUE_MIN_VOLTAGE 60
 #define EEPROM_INIT_VALUE_TRIP_DISTANCE 0  // meters
-#define EEPROM_INIT_VALUE_TOTAL_DISTANCE 0  // meters
+#define EEPROM_INIT_VALUE_TOTAL_DISTANCE 15300  // meters
 
 // After how many meters traveled should the distance (and other values) be stored to EEPROM.
 // The EEPROM lasts for 100,000 write cycles. With EEPROM_UPDATE_EACH_METERS=100, the EEPROM
@@ -109,7 +114,7 @@
 // Note that EEPROM is also updated whenever the board comes to a stop (see below), so regardless
 // of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless DAVEga is accidentally
 // reset before saving to EEPROM (which shouldn't happen under normal circumstances).
-#define EEPROM_UPDATE_EACH_METERS 100
+#define EEPROM_UPDATE_EACH_METERS 50000
 
 // If the board comes to stop, update EEPROM, unless it was already updated in less than
 // EEPROM_UPDATE_MIN_DELAY_ON_STOP millis when the board stopped. This shouldn't happen
