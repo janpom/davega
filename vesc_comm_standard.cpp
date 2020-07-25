@@ -18,10 +18,13 @@
 */
 
 #include "vesc_comm_standard.h"
+#include "davega_config.h"
 
 VescCommStandard::VescCommStandard() {
     _max_packet_length = 78;
-    _packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
+    #ifndef SIM_VALUES
+        _packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
+    #endif
 }
 
 float VescCommStandard::get_temp_mosfet() {

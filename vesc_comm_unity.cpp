@@ -21,7 +21,7 @@
 
 VescCommUnity::VescCommUnity() {
     _max_packet_length = 89;
-    _packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
+    //_packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
 }
 
 float VescCommUnity::get_temp_mosfet() {
