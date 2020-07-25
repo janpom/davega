@@ -19,9 +19,9 @@
 
 #include "davega_ili9225_screen.h"
 
-#define TFT_RST 12
+#define TFT_RST 1
 #define TFT_RS  9
-#define TFT_CS  10  // SS
+#define TFT_CS  8  // SS
 #define TFT_SDI 11  // MOSI
 #define TFT_CLK 13  // SCK
 #define TFT_LED 0

@@ -20,7 +20,7 @@
 #include "vesc_comm_standard.h"
 
 VescCommStandard::VescCommStandard() {
-    _max_packet_length = 70;
+    _max_packet_length = 78;
     _packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
 }
 
