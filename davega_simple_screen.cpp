@@ -42,7 +42,7 @@ uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_da
     return color;
 }
 
-uint8_t primary_item_value(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config) {
+float primary_item_value(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config) {
     float value;
     switch (screen_item) {
         case SCR_BATTERY_CURRENT:
@@ -54,5 +54,5 @@ uint8_t primary_item_value(t_screen_item screen_item, t_davega_data* data, t_dav
         default:
             value = convert_speed(data->speed_kph, config->imperial_units);
     }
-    return abs(round(value)) % 100;
+    return value;
 }

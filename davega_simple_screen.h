@@ -26,6 +26,6 @@
 #define SS_RED_SPEED_KPH 35
 
 uint16_t primary_item_color(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config);
-uint8_t primary_item_value(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config);
+float primary_item_value(t_screen_item screen_item, t_davega_data* data, t_davega_screen_config* config);
 
 #endif //DAVEGA_SIMPLE_SCREEN_H

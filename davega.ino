@@ -177,9 +177,9 @@ void setup() {
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
     pinMode(BUTTON_3_PIN, INPUT_PULLUP);
 
-/* #ifdef DEBUG
+#ifdef DEBUG
     Serial.begin(115200);
-#endif */
+#endif
     vesc_comm.init(115200);
 
     if (!eeprom_is_initialized(EEPROM_MAGIC_VALUE)) {

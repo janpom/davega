@@ -16,7 +16,7 @@
 #include "davega_ili9225_screen.h"
 #include "davega_config.h"
 
-#define TFT_RST 1  // MISO
+#define TFT_RST 10  // TODO: 12 does not work, check why
 #define TFT_RS  9   // REGISTER SELECT
 #ifdef ARDUINO_NANO
     #define TFT_CS  8  // CS
@@ -27,7 +27,7 @@
 #define TFT_CLK 13  // SCK
 #define TFT_LED 0
 
-TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 200); // hardware SPI
+TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 10); // hardware SPI
 // TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_SDI, TFT_CLK, TFT_LED, 200); // software SPI
 TFT_22_ILI9225* p_tft = nullptr;
 

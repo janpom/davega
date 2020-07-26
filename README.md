@@ -75,8 +75,6 @@ DAVEga firmware and hardware design is released under [GNU GPL v3](LICENSE).
   - [Misc cable ideas](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/293?u=janpom)
 - [DAVEga on Arduino Nano](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/209?u=janpom)
 - [DAVEga coding crash course](https://www.electric-skateboard.builders/t/davega-battery-monitor-odometer-speedometer/71509/1249?u=janpom)
-- [DAVEga kits for purchase](https://www.electric-skateboard.builders/t/davega-second-batch/82070)
-- [DAVEga SLA printed case for purchase](https://www.electric-skateboard.builders/t/davega-lrdesigns-sla-printed-case/82435)
 - DAVEga 2.0" display purchase links
   - [AliExpress](https://www.aliexpress.com/item/ILI9225-2-0-Inch-UART-TFT-LCD-Display-Module-SPI-Interface-Colorful-Screen-Serial-Port-176x220/32792711665.html) (verified seller)
   - [Amazon](https://www.amazon.com/Display-176x220-ILI9225-Peripheral-Interface/dp/B07HF7WVST) (faster delivery but more expensive)

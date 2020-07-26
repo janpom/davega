@@ -55,12 +55,10 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
         reset();
 
     // primary display item
-    uint8_t value = primary_item_value(_primary_item, data, _config);
+    float value = primary_item_value(_primary_item, data, _config);
     uint16_t color = primary_item_color(_primary_item, data, _config);
-    dtostrf(value, 2, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 21, color, COLOR_BLACK, 10, 16);
-    dtostrf(3, 1, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 140, 50, color, COLOR_BLACK, 10, 10);
+    dtostrf(value, 4, 1, fmt);
+    tft_util_draw_number(_tft, fmt, 0, 35, color, COLOR_BLACK, 10, 14);
 
     // trip distance
     dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
@@ -70,9 +68,9 @@ void DavegaSimpleVerticalScreen::update(t_davega_data *data) {
     format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
     tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
 
-    // battery %
-    dtostrf(min(100 * data->battery_percent, 99.9), 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 110, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    // watts
+    dtostrf(data->battery_amps * data->voltage, 4, 0, fmt);
+    tft_util_draw_number(_tft, fmt, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
 
     // battery voltage
     if (_config->per_cell_voltage)
