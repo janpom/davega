@@ -19,8 +19,8 @@
 #include "screen.h"
 #include "vesc_comm.h"
 
-#define REVISION_ID "v1.0"
-#define FW_VERSION "master"
+#define REVISION_ID ""
+#define FW_VERSION "v1.0"
 
 //#define DEBUG
 #ifdef DEBUG

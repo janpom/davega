@@ -1,4 +1,4 @@
-*This repository contains the firmware and gerber files for the open source Roxie (based on DAVEga OS). **For DAVEGA X (not open source), please go to [davega.eu](https://davega.eu).***
+*This repository contains the firmware and gerber files for the open source Roxie (based on [DAVEga OS](https://github.com/janpom/davega). **For DAVEGA X (not open source), please go to [davega.eu](https://davega.eu).***
 
 -----
 
@@ -6,7 +6,7 @@ Roxie displays speed, battery capacity, traveled distance and other useful info 
 
 ![Roxie](img/roxie.png)
 
-This repository contains the Roxie firmware. The gerber files can be downloaded from the [gerbers](gerbers/) directory.
+This repository contains the Roxie firmware. The gerber files can be downloaded from [roxie-hardware repository](https://github.com/charclo/roxie-hardware)
 
 ## Main features
 
