@@ -1,25 +1,25 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    
 
-    This file is part of the DAVEga firmware.
+    This file is part of the Roxie firmware.
 
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "davega_default_screen.h"
-#include "davega_screen.h"
-#include "davega_util.h"
+#include "default_screen.h"
+#include "screen.h"
+#include "util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
@@ -66,7 +66,7 @@ const Point PROGMEM SPEED_INDICATOR_CELLS[] = {
     {138, 151}, {122, 151}, {106, 151},
 };
 
-void DavegaDefaultScreen::reset() {
+void DefaultScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
     _draw_labels();
 
@@ -77,7 +77,7 @@ void DavegaDefaultScreen::reset() {
     _just_reset = true;
 }
 
-void DavegaDefaultScreen::update(t_davega_data* data) {
+void DefaultScreen::update(t_data* data) {
     char fmt[10];
 
     if (data->vesc_fault_code != _last_fault_code)
@@ -127,14 +127,14 @@ void DavegaDefaultScreen::update(t_davega_data* data) {
     _just_reset = false;
 }
 
-void DavegaDefaultScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+void DefaultScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
     _tft->fillRectangle(85, 155, 89, 159, color);
     delay(duration_ms);
     _tft->fillRectangle(85, 155, 89, 159, COLOR_BLACK);
 }
 
-void DavegaDefaultScreen::_draw_labels() {
+void DefaultScreen::_draw_labels() {
     _tft->setFont(Terminal6x8);
 
     _tft->drawText(36, 48, "VOLTS", COLOR_WHITE);
@@ -155,7 +155,7 @@ void DavegaDefaultScreen::_draw_labels() {
     }
 }
 
-bool DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw) {
+bool DefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw) {
     uint16_t p_word = pgm_read_word_near(BATTERY_INDICATOR_CELLS + index);
     Point *p = (Point *) &p_word;
     if (filled || redraw) {
@@ -178,7 +178,7 @@ bool DavegaDefaultScreen::_draw_battery_cell(int index, bool filled, bool redraw
     }
 }
 
-void DavegaDefaultScreen::_update_battery_indicator(float battery_percent, bool redraw) {
+void DefaultScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int cells_to_fill = round(battery_percent * LEN(BATTERY_INDICATOR_CELLS));
     if (redraw) {
         for (int i = 0; i < LEN(BATTERY_INDICATOR_CELLS); i++)
@@ -197,7 +197,7 @@ void DavegaDefaultScreen::_update_battery_indicator(float battery_percent, bool 
     _battery_cells_filled = cells_to_fill;
 }
 
-void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw) {
+void DefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw) {
     uint16_t p_word = pgm_read_word_near(SPEED_INDICATOR_CELLS + index);
     Point *p = (Point *) &p_word;
     if (filled || redraw) {
@@ -216,7 +216,7 @@ void DavegaDefaultScreen::_draw_speed_cell(int index, bool filled, bool redraw) 
     }
 }
 
-void DavegaDefaultScreen::_update_speed_indicator(float speed_percent, bool redraw) {
+void DefaultScreen::_update_speed_indicator(float speed_percent, bool redraw) {
     int cells_to_fill = round(speed_percent * LEN(SPEED_INDICATOR_CELLS));
     if (redraw) {
         for (int i = 0; i < LEN(SPEED_INDICATOR_CELLS); i++)

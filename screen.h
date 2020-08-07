@@ -1,24 +1,24 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
-    This file is part of the DAVEga firmware.
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    
+    This file is part of the Roxie firmware.
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_SCREEN_H
-#define DAVEGA_SCREEN_H
+#ifndef SCREEN_H
+#define SCREEN_H
 
 #define HEARTBEAT_SIZE 4
 
-#include "davega_data.h"
+#include "data.h"
 
 typedef enum {
     SCR_FW_VERSION = 0,
@@ -52,17 +52,17 @@ typedef struct {
     t_screen_item* text_screen_items;
     uint8_t text_screen_items_count;
     uint8_t orientation;
-} t_davega_screen_config;
+} t_screen_config;
 
-class DavegaScreen {
+class Screen {
 public:
-    virtual void init(t_davega_screen_config* config) { _config = config; };
+    virtual void init(t_screen_config* config) { _config = config; };
     virtual void reset() = 0;
-    virtual void update(t_davega_data* data) = 0;
+    virtual void update(t_data* data) = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
 
 protected:
-    t_davega_screen_config* _config;
+    t_screen_config* _config;
 };
 
-#endif //DAVEGA_SCREEN_H
+#endif //SCREEN_H

@@ -1,34 +1,34 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    
 
-    This file is part of the DAVEga firmware.
+    This file is part of the Roxie firmware.
 
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
-#define DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
+#ifndef SIMPLE_VERTICAL_SCREEN_H
+#define SIMPLE_VERTICAL_SCREEN_H
 
 #include <TFT_22_ILI9225.h>
-#include "davega_ili9225_screen.h"
-#include "davega_simple_screen.h"
+#include "ili9225_screen.h"
+#include "simple_screen.h"
 
-class DavegaSimpleHorizontalScreen: public DavegaILI9225Screen {
+class SimpleVerticalScreen: public ILI9225Screen {
 public:
-    DavegaSimpleHorizontalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
+    SimpleVerticalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
     void reset();
-    void update(t_davega_data* data);
+    void update(t_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
 
 protected:
@@ -45,4 +45,4 @@ protected:
     void _update_battery_indicator(float battery_percent, bool redraw = false);
 };
 
-#endif //DAVEGA_SIMPLE_HORIZONTAL_SCREEN_H
+#endif //SIMPLE_VERTICAL_SCREEN_H

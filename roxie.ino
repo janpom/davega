@@ -1,26 +1,25 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
-    This file is part of the DAVEga firmware.
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    This file is part of the Roxie firmware.
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "davega_config.h"
-#include "davega_eeprom.h"
-#include "davega_data.h"
-#include "davega_util.h"
-#include "davega_screen.h"
+#include "roxie_config.h"
+#include "eeprom.h"
+#include "data.h"
+#include "util.h"
+#include "screen.h"
 #include "vesc_comm.h"
 
-#define REVISION_ID "$Id$"
+#define REVISION_ID "v1.0"
 #define FW_VERSION "master"
 
 //#define DEBUG
@@ -45,68 +44,68 @@ VescCommStandard vesc_comm = VescCommStandard();
 #endif
 
 #ifdef DEFAULT_SCREEN_ENABLED
-#include "davega_default_screen.h"
-DavegaDefaultScreen davega_default_screen = DavegaDefaultScreen();
+#include "default_screen.h"
+DefaultScreen default_screen = DefaultScreen();
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
-#include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen = DavegaSimpleHorizontalScreen(SCR_SPEED);
+#include "simple_horizontal_screen.h"
+SimpleHorizontalScreen simple_horizontal_screen = SimpleHorizontalScreen(SCR_SPEED);
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-#include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen_with_battery_current = DavegaSimpleHorizontalScreen(SCR_BATTERY_CURRENT);
+#include "simple_horizontal_screen.h"
+SimpleHorizontalScreen simple_horizontal_screen_with_battery_current = SimpleHorizontalScreen(SCR_BATTERY_CURRENT);
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-#include "davega_simple_horizontal_screen.h"
-DavegaSimpleHorizontalScreen davega_simple_horizontal_screen_with_motor_current = DavegaSimpleHorizontalScreen(SCR_MOTOR_CURRENT);
+#include "simple_horizontal_screen.h"
+SimpleHorizontalScreen _simple_horizontal_screen_with_motor_current = SimpleHorizontalScreen(SCR_MOTOR_CURRENT);
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
-#include "davega_simple_vertical_screen.h"
-DavegaSimpleVerticalScreen davega_simple_vertical_screen = DavegaSimpleVerticalScreen(SCR_SPEED);
+#include "simple_vertical_screen.h"
+SimpleVerticalScreen simple_vertical_screen = SimpleVerticalScreen(SCR_SPEED);
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-#include "davega_simple_vertical_screen.h"
-DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_battery_current = DavegaSimpleVerticalScreen(SCR_BATTERY_CURRENT);
+#include "simple_vertical_screen.h"
+SimpleVerticalScreen simple_vertical_screen_with_battery_current = SimpleVerticalScreen(SCR_BATTERY_CURRENT);
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-#include "davega_simple_vertical_screen.h"
-DavegaSimpleVerticalScreen davega_simple_vertical_screen_with_motor_current = DavegaSimpleVerticalScreen(SCR_MOTOR_CURRENT);
+#include "simple_vertical_screen.h"
+SimpleVerticalScreen simple_vertical_screen_with_motor_current = SimpleVerticalScreen(SCR_MOTOR_CURRENT);
 #endif
 #ifdef TEXT_SCREEN_ENABLED
-#include "davega_text_screen.h"
-DavegaTextScreen davega_text_screen = DavegaTextScreen();
+#include "text_screen.h"
+TextScreen text_screen = TextScreen();
 #endif
 
-DavegaScreen* davega_screens[] = {
+Screen* screens[] = {
 #ifdef DEFAULT_SCREEN_ENABLED
-    &davega_default_screen,
+    &default_screen,
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
-    &davega_simple_horizontal_screen,
+    &simple_horizontal_screen,
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-    &davega_simple_horizontal_screen_with_battery_current,
+    &simple_horizontal_screen_with_battery_current,
 #endif
 #ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-    &davega_simple_horizontal_screen_with_motor_current,
+    &simple_horizontal_screen_with_motor_current,
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
-    &davega_simple_vertical_screen,
+    &simple_vertical_screen,
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-    &davega_simple_vertical_screen_with_battery_current,
+    &simple_vertical_screen_with_battery_current,
 #endif
 #ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-    &davega_simple_vertical_screen_with_motor_current,
+    &simple_vertical_screen_with_motor_current,
 #endif
 #ifdef TEXT_SCREEN_ENABLED
-    &davega_text_screen,
+    &text_screen,
 #endif
 };
 
 t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
-t_davega_screen_config screen_config = {
+t_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
     IMPERIAL_UNITS,
     USE_FAHRENHEIT,
@@ -119,12 +118,12 @@ t_davega_screen_config screen_config = {
 };
 
 int current_screen_index = 0;
-DavegaScreen* scr;
+Screen* scr;
 
 const float discharge_ticks[] = DISCHARGE_TICKS;
 
-t_davega_data data;
-t_davega_session_data session_data;
+t_data data;
+t_session_data session_data;
 int32_t initial_mah_spent;
 int32_t initial_trip_meters;
 int32_t initial_total_meters;
@@ -195,9 +194,9 @@ void setup() {
         eeprom_write_session_data(session_data);
     }
 
-    for (int i=0; i<LEN(davega_screens); i++)
-        davega_screens[i]->init(&screen_config);
-    scr = davega_screens[current_screen_index];
+    for (int i=0; i<LEN(screens); i++)
+        screens[i]->init(&screen_config);
+    scr = screens[current_screen_index];
 
     session_data = eeprom_read_session_data();
     data.voltage = eeprom_read_volts();
@@ -253,8 +252,8 @@ void setup() {
 
 void loop() {
     if (digitalRead(BUTTON_3_PIN) == LOW) {
-        current_screen_index = (current_screen_index + 1) % LEN(davega_screens);
-        scr = davega_screens[current_screen_index];
+        current_screen_index = (current_screen_index + 1) % LEN(screens);
+        scr = screens[current_screen_index];
         scr->reset();
         delay(UPDATE_DELAY);
     }

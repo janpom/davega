@@ -1,30 +1,30 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    
 
-    This file is part of the DAVEga firmware.
+    This file is part of the Roxie firmware.
 
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "davega_simple_horizontal_screen.h"
-#include "davega_screen.h"
-#include "davega_util.h"
+#include "simple_horizontal_screen.h"
+#include "screen.h"
+#include "util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-void DavegaSimpleHorizontalScreen::reset() {
+void SimpleHorizontalScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
 
     // labels
@@ -50,7 +50,7 @@ void DavegaSimpleHorizontalScreen::reset() {
     _just_reset = true;
 }
 
-void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
+void SimpleHorizontalScreen::update(t_data *data) {
     char fmt[10];
 
     if (data->vesc_fault_code != _last_fault_code)
@@ -93,7 +93,7 @@ void DavegaSimpleHorizontalScreen::update(t_davega_data *data) {
     _just_reset = false;
 }
 
-void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
+void SimpleHorizontalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int width = 17;
     int space = 3;
     int cell_count = 11;
@@ -115,7 +115,7 @@ void DavegaSimpleHorizontalScreen::_update_battery_indicator(float battery_perce
     _battery_cells_filled = cells_to_fill;
 }
 
-void DavegaSimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+void SimpleHorizontalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
     _tft->fillRectangle(67, 116, 71, 120, color);
     delay(duration_ms);

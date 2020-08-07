@@ -1,34 +1,34 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    
 
-    This file is part of the DAVEga firmware.
+    This file is part of the Roxie firmware.
 
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "davega_text_screen.h"
-#include "davega_screen.h"
-#include "davega_util.h"
+#include "text_screen.h"
+#include "screen.h"
+#include "util.h"
 #include "vesc_comm.h"
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-void DavegaTextScreen::reset() {
+void TextScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
 }
 
-void DavegaTextScreen::update(t_davega_data *data) {
+void TextScreen::update(t_data *data) {
     uint16_t session_data_color = progress_to_color(data->session_reset_progress, _tft);
     uint16_t capacity_data_color = progress_to_color(data->mah_reset_progress, _tft);
     float avg_speed_kph;
@@ -115,14 +115,14 @@ void DavegaTextScreen::update(t_davega_data *data) {
     }
 }
 
-void DavegaTextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+void TextScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
     _tft->fillRectangle(167, 5, 171, 9, color);
     delay(duration_ms);
     _tft->fillRectangle(167, 5, 171, 9, COLOR_BLACK);
 }
 
-void DavegaTextScreen::_write_numeric_line(
+void TextScreen::_write_numeric_line(
         float value, const char* units, const char* label, int lineno, uint16_t color) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
@@ -137,7 +137,7 @@ void DavegaTextScreen::_write_numeric_line(
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color) {
+void TextScreen::_write_time_line(uint32_t seconds, const char* label, int lineno, uint16_t color) {
     for (int i=0; i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';
     uint32_t hours = seconds / 3600;
@@ -163,7 +163,7 @@ void DavegaTextScreen::_write_time_line(uint32_t seconds, const char* label, int
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_text_line(const char* value, int lineno, uint16_t color) {
+void TextScreen::_write_text_line(const char* value, int lineno, uint16_t color) {
     for (int i=0; i<strlen(value); i++)
         _line_buffer[i] = value[i];
     _line_buffer[strlen(value)] = '\0';
@@ -171,7 +171,7 @@ void DavegaTextScreen::_write_text_line(const char* value, int lineno, uint16_t 
     _write_line_buffer(lineno, color);
 }
 
-void DavegaTextScreen::_write_line_buffer(int lineno, uint16_t color) {
+void TextScreen::_write_line_buffer(int lineno, uint16_t color) {
     // space padding
     for (int i=strlen(_line_buffer); i < MAX_LINE_LENGTH; i++)
         _line_buffer[i] = ' ';

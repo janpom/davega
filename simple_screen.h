@@ -1,5 +1,5 @@
 /*
-    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
+    
 
     This file is part of the Roxie firmware.
 
@@ -17,26 +17,15 @@
     along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "vesc_comm.h"
+#ifndef SIMPLE_SCREEN_H
+#define SIMPLE_SCREEN_H
 
-#ifndef VESC_COMM_UNITY_H
-#define VESC_COMM_UNITY_H
+#include "screen.h"
 
-class VescCommUnity: public VescComm {
-public:
-    VescCommUnity();
-    float get_temp_mosfet();
-    float get_temp_motor();
-    float get_motor_current();
-    float get_battery_current();
-    float get_duty_cycle();
-    int32_t get_rpm();
-    float get_voltage();
-    float get_amphours_discharged();
-    float get_amphours_charged();
-    int32_t get_tachometer();
-    int32_t get_tachometer_abs();
-    vesc_comm_fault_code get_fault_code();
-};
+#define SS_YELLOW_SPEED_KPH 25
+#define SS_RED_SPEED_KPH 35
 
-#endif //VESC_COMM_UNITY_H
+uint16_t primary_item_color(t_screen_item screen_item, t_data* data, t_screen_config* config);
+float primary_item_value(t_screen_item screen_item, t_data* data, t_screen_config* config);
+
+#endif //SIMPLE_SCREEN_H

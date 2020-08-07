@@ -1,33 +1,38 @@
 /*
     Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
 
-    This file is part of the DAVEga firmware.
+    This file is part of the Roxie firmware.
 
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "vesc_comm.h"
 #include "crc.h"
+#include "roxie_config.h"
 
 // TODO: Make vesc_serial a parameter of vesc_comm_init.
 #ifdef DEBUG
-#define D(x) Serial.println(x)
-#define DEB(x) Serial.print(x)
-HardwareSerial &vesc_serial = Serial1;
+    #define D(x) Serial.println(x)
+    #define DEB(x) Serial.print(x)
 #else
-#define D(x)
-HardwareSerial &vesc_serial = Serial1;
+    #define D(x)
+#endif
+
+#ifdef ARDUINO_NANO_EVERY
+    HardwareSerial &vesc_serial = Serial1;
+#else
+    HardwareSerial &vesc_serial = Serial;
 #endif
 
 #define PACKET_GET_VALUES_TYPE 4
@@ -51,8 +56,14 @@ void VescComm::init(uint32_t baud) {
 }
 
 uint8_t VescComm::fetch_packet(uint16_t timeout) {
-    vesc_serial.write(GET_VALUES_PACKET, sizeof(GET_VALUES_PACKET));
-    return receive_packet(timeout);
+    #ifndef SIM_VALUES
+        D("fetching packet");
+        vesc_serial.write(GET_VALUES_PACKET, sizeof(GET_VALUES_PACKET));
+        return receive_packet(timeout);
+    #endif
+        D("Using simulated values");
+        _bytes_read = 78;
+        return 0;
 }
 
 uint8_t VescComm::receive_packet(uint16_t timeout) {
@@ -80,10 +91,10 @@ uint8_t VescComm::receive_packet(uint16_t timeout) {
 }
 
 bool VescComm::is_expected_packet() {
-/*     for(int i = 0; i < _bytes_read; i++)
+    for(int i = 0; i < _bytes_read; i++)
     {
         DEB(String(_packet[i]) + " ");
-    } */
+    }
     D("bytes read : " + String(_bytes_read) + " bytes)");
     if (_bytes_read < 3) {
         D("packet too short (" + String(_bytes_read) + " bytes)");

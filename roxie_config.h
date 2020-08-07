@@ -1,29 +1,29 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
-    This file is part of the DAVEga firmware.
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    
+    This file is part of the Roxie firmware.
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef DAVEGA_CONFIG_H
-#define DAVEGA_CONFIG_H
+#ifndef ROXIE_CONFIG_H
+#define ROXIE_CONFIG_H
 
 // enable debug
-//#define DEBUG
+#define DEBUG
 
 // enable simulated values
-// #define SIM_VALUES
+#define SIM_VALUES
 
-// arduino nano every
-#define ARDUINO_NANO
+// uncomment if not using arduino nano every
+#define ARDUINO_NANO_EVERY
 
 // To compile for FOCBOX Unity, uncomment the following line.
 //#define FOCBOX_UNITY 1
@@ -112,7 +112,7 @@
 // The EEPROM lasts for 100,000 write cycles. With EEPROM_UPDATE_EACH_METERS=100, the EEPROM
 // should last for 10,000 km. If the value is set lower, the EEPROM will die earlier.
 // Note that EEPROM is also updated whenever the board comes to a stop (see below), so regardless
-// of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless DAVEga is accidentally
+// of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless Roxie is accidentally
 // reset before saving to EEPROM (which shouldn't happen under normal circumstances).
 #define EEPROM_UPDATE_EACH_METERS 50000
 
@@ -136,7 +136,7 @@
 #define SCREEN_ORIENTATION 0
 
 // Screens. Uncomment the ones you want enabled.
-//#define DEFAULT_SCREEN_ENABLED 1
+#define DEFAULT_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
@@ -188,7 +188,7 @@
 }
 
 // Big font is only recommended for landscape orientation. 9 lines fit on the screen then.
-// Some items overflow the right order. You may want to adjust the labels in davega_text_screen.cpp.
+// Some items overflow the right order. You may want to adjust the labels in text_screen.cpp.
 #define TEXT_SCREEN_BIG_FONT false
 
-#endif //DAVEGA_DAVEGA_CONFIG_H
+#endif //ROXIE_CONFIG_H

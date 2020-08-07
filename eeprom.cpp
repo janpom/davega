@@ -1,24 +1,24 @@
 /*
-    Copyright 2018 Jan Pomikalek <jan.pomikalek@gmail.com>
+    
 
-    This file is part of the DAVEga firmware.
+    This file is part of the Roxie firmware.
 
-    DAVEga firmware is free software: you can redistribute it and/or modify
+    Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    DAVEga firmware is distributed in the hope that it will be useful,
+    Roxie firmware is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with DAVEga firmware.  If not, see <https://www.gnu.org/licenses/>.
+    along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "davega_eeprom.h"
-#include "davega_data.h"
+#include "eeprom.h"
+#include "data.h"
 #include <EEPROM.h>
 
 #define EEPROM_ADDRESS_MAGIC_BYTE 0
@@ -65,12 +65,12 @@ void eeprom_write_total_distance(uint32_t meters) {
     EEPROM.put(EEPROM_ADDRESS_TOTAL_DISTANCE, meters);
 }
 
-t_davega_session_data eeprom_read_session_data() {
-    t_davega_session_data session_data;
+t_session_data eeprom_read_session_data() {
+    t_session_data session_data;
     EEPROM.get(EEPROM_ADDRESS_SESSION_DATA, session_data);
     return session_data;
 }
 
-void eeprom_write_session_data(t_davega_session_data session_data) {
+void eeprom_write_session_data(t_session_data session_data) {
     EEPROM.put(EEPROM_ADDRESS_SESSION_DATA, session_data);
 }
