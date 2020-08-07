@@ -27,6 +27,7 @@
     #define DEB(x) Serial.print(x)
 #else
     #define D(x)
+    #define DEB(x)
 #endif
 
 #ifdef ARDUINO_NANO_EVERY

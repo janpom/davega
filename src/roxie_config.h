@@ -17,13 +17,13 @@
 #define ROXIE_CONFIG_H
 
 // enable debug
-#define DEBUG
+// #define DEBUG
 
 // enable simulated values
-#define SIM_VALUES
+//#define SIM_VALUES
 
 // uncomment if not using arduino nano every
-#define ARDUINO_NANO_EVERY
+// #define ARDUINO_NANO_EVERY
 
 // To compile for FOCBOX Unity, uncomment the following line.
 //#define FOCBOX_UNITY 1
@@ -136,7 +136,7 @@
 #define SCREEN_ORIENTATION 0
 
 // Screens. Uncomment the ones you want enabled.
-#define DEFAULT_SCREEN_ENABLED 1
+// #define DEFAULT_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
