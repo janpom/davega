@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=$(grep FW_VERSION roxie.ino | cut -d' ' -f3 | tr -d '"')
+VERSION=$(grep FW_VERSION src/roxie.ino | cut -d' ' -f3 | tr -d '"')
 RELEASE_DIR="roxie-$VERSION"
 RELEASE_FILE="roxie-$VERSION.zip"
 

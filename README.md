@@ -1,4 +1,5 @@
-*This repository contains the firmware and gerber files for the open source Roxie (based on [DAVEga OS](https://github.com/janpom/davega). **For DAVEGA X (not open source), please go to [davega.eu](https://davega.eu).***
+*This repository contains the firmware and gerber files for the open source Roxie (based on [DAVEga OS](https://github.com/janpom/davega)).*
+**For DAVEGA X (not open source), please go to [davega.eu](https://davega.eu).**
 
 -----
 
@@ -20,7 +21,7 @@ This repository contains the Roxie firmware. The gerber files can be downloaded 
 - VESC fault codes
 - metric or imperial units
 - Arduino compatible FW
-- low HW cost (~$10)
+- low HW cost (~$20)
 - known to work well with the VESC FW v3.48 and v3.40
   - previous versions not tested but should work as well unless too old
 - FOCBOX Unity supported
