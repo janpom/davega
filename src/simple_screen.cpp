@@ -1,6 +1,4 @@
 /*
-    Copyright 2019 Jan Pomikalek <jan.pomikalek@gmail.com>
-
     This file is part of the Roxie firmware.
 
     Roxie firmware is free software: you can redistribute it and/or modify

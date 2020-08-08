@@ -1,6 +1,6 @@
 /*
-    
     This file is part of the Roxie firmware.
+
     Roxie firmware is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -17,13 +17,13 @@
 #define ROXIE_CONFIG_H
 
 // enable debug
-// #define DEBUG
+#define DEBUG
 
 // enable simulated values
-//#define SIM_VALUES
+// #define SIM_VALUES
 
 // uncomment if not using arduino nano every
-// #define ARDUINO_NANO_EVERY
+#define ARDUINO_NANO_EVERY
 
 // To compile for FOCBOX Unity, uncomment the following line.
 //#define FOCBOX_UNITY 1

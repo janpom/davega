@@ -1,6 +1,4 @@
 /*
-    
-
     This file is part of the Roxie firmware.
 
     Roxie firmware is free software: you can redistribute it and/or modify
