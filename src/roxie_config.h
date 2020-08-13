@@ -20,7 +20,7 @@
 #define DEBUG
 
 // enable simulated values
-#define SIM_VALUES
+// #define SIM_VALUES
 
 // uncomment if not using arduino nano every
 #define ARDUINO_NANO_EVERY

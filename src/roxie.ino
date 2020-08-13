@@ -255,6 +255,11 @@ void loop() {
     if (digitalRead(BUTTON_3_PIN) == LOW) {
         // current_screen_index = (current_screen_index + 1) % LEN(screens);
         scr = screens[current_screen_index];
+        // scr->nextScreen();
+        if (scr->value_screen == TEMP_SCREEN)
+            scr->value_screen = DEFAULT_SCREEN;
+        else
+            scr->value_screen = TEMP_SCREEN;
         scr->reset();
         delay(UPDATE_DELAY);
     }

@@ -22,106 +22,98 @@
 
 
 void SimpleVerticalScreen::reset() {
+    String label1;
+    String label2;
+    String label3;
+    String label4;
+
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
     
     _tft->setFont(Terminal6x8);
-    case (_config == false)
-    {
-        _tft->drawText(0, 130, _config->imperial_units ? "TRIP MI" : "TRIP KM", COLOR_WHITE);
-        _tft->drawText(0, 180, _config->imperial_units ? "TOTAL MI" : "TOTAL KM", COLOR_WHITE);
-        _tft->drawText(110, 130, "WATTS", COLOR_WHITE);
-        _tft->drawText(110, 180, "BATTERY V", COLOR_WHITE);
-
-        switch (_primary_item) {
-            case SCR_BATTERY_CURRENT:
-                _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
-                break;
-            case SCR_MOTOR_CURRENT:
-                _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
-                break;
-            default:
-                _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
-        }
+    switch (value_screen) {
+        case DEFAULT_SCREEN:
+            label1 = _config->imperial_units ? "TRIP MI" : "TRIP KM";
+            label2 = _config->imperial_units ? "TOTAL MI" : "TOTAL KM";
+            label3 = "WATTS";
+            label4 = "BATTERY V";
+            break;
+        case TEMP_SCREEN:
+            label1 = "MAH       ";
+            label2 = "MOSFET TEMP";
+            label3 = "AMPS   ";
+            label4 = "BATTERY V";
     }
-    else {
-        _tft->drawText(0, 130, "MAH       ", COLOR_WHITE);
-        _tft->drawText(0, 180, "MOSFET TEMP", COLOR_WHITE);
-        _tft->drawText(110, 130, "AMPS   ", COLOR_WHITE);
-        _tft->drawText(110, 180, "BATTERY V", COLOR_WHITE);
 
-        switch (_primary_item) {
-            case SCR_BATTERY_CURRENT:
-                _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
-                break;
-            case SCR_MOTOR_CURRENT:
-                _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
-                break;
-            default:
-                _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
-        }
+    _tft->drawText(0, 130, label1, COLOR_WHITE);
+    _tft->drawText(0, 180, label2, COLOR_WHITE);
+    _tft->drawText(110, 130, label3, COLOR_WHITE);
+    _tft->drawText(110, 180, label4, COLOR_WHITE);
+
+    switch (_primary_item) {
+        case SCR_BATTERY_CURRENT:   
+            _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
+            break;
+        case SCR_MOTOR_CURRENT:
+            _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
+            break;
+        default:
+            _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
     }
 
     _just_reset = true;
 }
 
 void SimpleVerticalScreen::update(t_data *data) {
-    char fmt[10];
+    char primary_value[10];
+    char value1[10];
+    char value2[10];
+    char value3[10];
+    char value4[10];
 
     if (data->vesc_fault_code != _last_fault_code)
         reset();
-    if (next_values == false){
-        // primary display item
-        float value = primary_item_value(_primary_item, data, _config);
-        uint16_t color = primary_item_color(_primary_item, data, _config);
-        dtostrf(value, 4, 1, fmt);
-        tft_util_draw_number(_tft, fmt, 0, 35, color, COLOR_BLACK, 10, 14);
 
-        // trip distance
-        dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-        tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    uint16_t color;
 
-        // total distance
-        format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
-        tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
-
-        // watts
-        dtostrf(data->battery_amps * data->voltage, 4, 0, fmt);
-        tft_util_draw_number(_tft, fmt, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
-
-        // battery voltage
-        if (_config->per_cell_voltage)
-            dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
-        else
-            dtostrf(data->voltage, 4, 1, fmt);
-        tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+    switch (value_screen) { 
+        case DEFAULT_SCREEN:
+            // primary display item
+            dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
+            color = primary_item_color(_primary_item, data, _config);
+            // trip distance
+            dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, value1);
+            // total distance
+            format_total_distance(convert_distance(data->total_km, _config->imperial_units), value2);
+            // watts
+            dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
+            // battery voltage
+            if (_config->per_cell_voltage)
+                dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
+            else
+                dtostrf(data->voltage, 4, 1, value4);
+            break;
+        case TEMP_SCREEN:
+            // primary display item
+            dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
+            color = primary_item_color(_primary_item, data, _config);
+            // mah
+            dtostrf(data->mah, 4, 0, value1);
+            // mosfet temperature
+            dtostrf(data->mosfet_celsius, 2, 2, value2);
+            // watts
+            dtostrf(data->battery_amps, 2, 2, value3);
+            // battery voltage
+            if (_config->per_cell_voltage)
+                dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
+            else
+                dtostrf(data->voltage, 4, 1, value4);
     }
-    else
-    {
-        // primary display item
-        float value = primary_item_value(_primary_item, data, _config);
-        uint16_t color = primary_item_color(_primary_item, data, _config);
-        dtostrf(value, 4, 1, fmt);
-        tft_util_draw_number(_tft, fmt, 0, 35, color, COLOR_BLACK, 10, 14);
 
-        // mah
-        dtostrf(data->mah, 4, 0, fmt);
-        tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
-
-        // mosfet temp
-        dtostrf(data->mosfet_celsius, 4, 2, fmt);
-        tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
-
-        // amps
-        dtostrf(data->battery_amps, 4, 0, fmt);
-        tft_util_draw_number(_tft, fmt, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
-
-        // battery voltage
-        if (_config->per_cell_voltage)
-            dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
-        else
-            dtostrf(data->voltage, 4, 1, fmt);
-        tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
-    }
+    tft_util_draw_number(_tft, primary_value, 0, 35, color, COLOR_BLACK, 10, 14);
+    tft_util_draw_number(_tft, value1, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, value2, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, value3, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, value4, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
     
 
     // warning
