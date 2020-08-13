@@ -61,6 +61,14 @@ float VescCommStandard::get_amphours_charged() {
     return get_long(35) / 10.0;
 }
 
+float VescCommStandard::get_watthours_discharged() {
+    return get_long(39) / 10.0;
+}
+
+float VescCommStandard::get_watthours_charged() {
+    return get_long(43) / 10.0;
+}
+
 int32_t VescCommStandard::get_tachometer() {
     return get_long(47);
 }

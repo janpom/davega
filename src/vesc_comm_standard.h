@@ -32,6 +32,8 @@ public:
     float get_voltage();
     float get_amphours_discharged();
     float get_amphours_charged();
+    float get_watthours_discharged();
+    float get_watthours_charged();
     int32_t get_tachometer();
     int32_t get_tachometer_abs();
     vesc_comm_fault_code get_fault_code();

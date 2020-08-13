@@ -279,6 +279,8 @@ void loop() {
     data.duty_cycle = vesc_comm.get_duty_cycle();
     data.vesc_fault_code = vesc_comm.get_fault_code();
     data.voltage = vesc_comm.get_voltage();
+    data.session->wh_spent = vesc_comm.get_watthours_discharged();
+    D("Current watthours: " + String(data.session->wh_spent));
 
     // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -

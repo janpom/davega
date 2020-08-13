@@ -104,6 +104,9 @@ void TextScreen::update(t_data *data) {
             case SCR_TIME_RIDING:
                 _write_time_line(data->session->millis_riding / 1000, "riding", i, session_data_color);
                 break;
+            case SCR_WATTHOURS:
+                _write_numeric_line(data->session->wh_spent , "Wh", "used", i, session_data_color);
+                break;
             case SCR_FAULT_CODE:
                 _write_text_line(vesc_fault_code_to_string(data->vesc_fault_code), i);
                 break;

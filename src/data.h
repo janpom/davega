@@ -26,13 +26,13 @@ typedef struct {
     float max_speed_kph;
     float min_voltage;
     int32_t trip_meters;
+    float wh_spent;
 
     // TODO:
     // max_motor_temp
     // max_fet_temp
     // max_current
     // min_current
-    // wh_spent
     // wh_per_km (derived)
     // range_km (derived)
 } t_session_data;
