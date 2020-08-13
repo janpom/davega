@@ -20,7 +20,7 @@
 #define DEBUG
 
 // enable simulated values
-// #define SIM_VALUES
+#define SIM_VALUES
 
 // uncomment if not using arduino nano every
 #define ARDUINO_NANO_EVERY
@@ -97,7 +97,7 @@
 // Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
 // the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
 // traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 45  // [1, 255]
+#define EEPROM_MAGIC_VALUE 49 // [1, 255]
 
 #define EEPROM_INIT_VALUE_VOLTS 0
 #define EEPROM_INIT_VALUE_MAH_SPENT 0
@@ -105,8 +105,8 @@
 #define EEPROM_INIT_VALUE_MILLIS_ELAPSED 0
 #define EEPROM_INIT_VALUE_MILLIS_RIDING 0
 #define EEPROM_INIT_VALUE_MIN_VOLTAGE 60
-#define EEPROM_INIT_VALUE_TRIP_DISTANCE 23900  // meters
-#define EEPROM_INIT_VALUE_TOTAL_DISTANCE 1530000  // meters
+#define EEPROM_INIT_VALUE_TRIP_DISTANCE 2390  // meters
+#define EEPROM_INIT_VALUE_TOTAL_DISTANCE 153000  // meters
 
 // After how many meters traveled should the distance (and other values) be stored to EEPROM.
 // The EEPROM lasts for 100,000 write cycles. With EEPROM_UPDATE_EACH_METERS=100, the EEPROM
@@ -136,7 +136,7 @@
 #define SCREEN_ORIENTATION 0
 
 // Screens. Uncomment the ones you want enabled.
-// #define DEFAULT_SCREEN_ENABLED 1
+//#define DEFAULT_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1

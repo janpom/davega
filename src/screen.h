@@ -43,6 +43,12 @@ typedef enum {
     SCR_FAULT_CODE
 } t_screen_item;
 
+typedef enum {
+    DEFAULT_SCREEN,
+    TEMP_SCREEN,
+    SPEED_SCREEN
+} t_value_screen;
+
 typedef struct {
     const char* fw_version;
     bool imperial_units;
@@ -51,6 +57,7 @@ typedef struct {
     uint8_t battery_cells;
     bool big_font;
     t_screen_item* text_screen_items;
+    t_value_screen value_screen;
     uint8_t text_screen_items_count;
     uint8_t orientation;
 } t_screen_config;
@@ -61,6 +68,7 @@ public:
     virtual void reset() = 0;
     virtual void update(t_data* data) = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
+    bool next_values = false;
 
 protected:
     t_screen_config* _config;

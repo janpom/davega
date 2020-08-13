@@ -115,8 +115,8 @@ void tft_util_draw_number(
             tft_util_draw_digit(tft, ch - '0', cursor_x, y, fg_color, bg_color, magnify);
             cursor_x += 3 * magnify + spacing;
         } else if (ch == '.') {
-            tft->fillRectangle(cursor_x, y, cursor_x + magnify - 1, y + 5 * magnify - 1, bg_color);
-            tft->fillRectangle(cursor_x, y + 4 * magnify, cursor_x + magnify - 1, y + 5 * magnify - 1, fg_color);
+            // tft->fillRectangle(cursor_x, y, cursor_x + magnify - 1, y + 5 * magnify - 1, bg_color); // why was this here, this causes flickering
+            tft->fillRectangle(cursor_x, y + 4 * magnify, cursor_x + magnify - 1, y + 5 * magnify - 1, fg_color); 
             cursor_x += magnify + spacing;
         } else if (ch == '-') {
             tft->fillRectangle(cursor_x, y, cursor_x + 3 * magnify - 1, y + 5 * magnify - 1, bg_color);

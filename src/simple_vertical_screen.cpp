@@ -23,27 +23,43 @@
 
 void SimpleVerticalScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
-
-        // labels
+    
     _tft->setFont(Terminal6x8);
-    _tft->drawText(0, 130, _config->imperial_units ? "TRIP MI" : "TRIP KM", COLOR_WHITE);
-    _tft->drawText(0, 180, _config->imperial_units ? "TOTAL MI" : "TOTAL KM", COLOR_WHITE);
-    _tft->drawText(110, 130, "WATTS", COLOR_WHITE);
-    _tft->drawText(110, 180, "BATTERY V", COLOR_WHITE);
+    case (_config == false)
+    {
+        _tft->drawText(0, 130, _config->imperial_units ? "TRIP MI" : "TRIP KM", COLOR_WHITE);
+        _tft->drawText(0, 180, _config->imperial_units ? "TOTAL MI" : "TOTAL KM", COLOR_WHITE);
+        _tft->drawText(110, 130, "WATTS", COLOR_WHITE);
+        _tft->drawText(110, 180, "BATTERY V", COLOR_WHITE);
 
-    switch (_primary_item) {
-        case SCR_BATTERY_CURRENT:
-            _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
-            break;
-        case SCR_MOTOR_CURRENT:
-            _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
-            break;
-        default:
-            _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+        switch (_primary_item) {
+            case SCR_BATTERY_CURRENT:
+                _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
+                break;
+            case SCR_MOTOR_CURRENT:
+                _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
+                break;
+            default:
+                _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+        }
     }
+    else {
+        _tft->drawText(0, 130, "MAH       ", COLOR_WHITE);
+        _tft->drawText(0, 180, "MOSFET TEMP", COLOR_WHITE);
+        _tft->drawText(110, 130, "AMPS   ", COLOR_WHITE);
+        _tft->drawText(110, 180, "BATTERY V", COLOR_WHITE);
 
-    // FW version
-    // _tft->drawText(0, 18, _config->fw_version, COLOR_WHITE);
+        switch (_primary_item) {
+            case SCR_BATTERY_CURRENT:
+                _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
+                break;
+            case SCR_MOTOR_CURRENT:
+                _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
+                break;
+            default:
+                _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+        }
+    }
 
     _just_reset = true;
 }
@@ -53,31 +69,60 @@ void SimpleVerticalScreen::update(t_data *data) {
 
     if (data->vesc_fault_code != _last_fault_code)
         reset();
+    if (next_values == false){
+        // primary display item
+        float value = primary_item_value(_primary_item, data, _config);
+        uint16_t color = primary_item_color(_primary_item, data, _config);
+        dtostrf(value, 4, 1, fmt);
+        tft_util_draw_number(_tft, fmt, 0, 35, color, COLOR_BLACK, 10, 14);
 
-    // primary display item
-    float value = primary_item_value(_primary_item, data, _config);
-    uint16_t color = primary_item_color(_primary_item, data, _config);
-    dtostrf(value, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 35, color, COLOR_BLACK, 10, 14);
+        // trip distance
+        dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
+        tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
 
-    // trip distance
-    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, fmt);
-    tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
+        // total distance
+        format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
+        tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
 
-    // total distance
-    format_total_distance(convert_distance(data->total_km, _config->imperial_units), fmt);
-    tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+        // watts
+        dtostrf(data->battery_amps * data->voltage, 4, 0, fmt);
+        tft_util_draw_number(_tft, fmt, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
 
-    // watts
-    dtostrf(data->battery_amps * data->voltage, 4, 0, fmt);
-    tft_util_draw_number(_tft, fmt, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
-
-    // battery voltage
-    if (_config->per_cell_voltage)
-        dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
+        // battery voltage
+        if (_config->per_cell_voltage)
+            dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
+        else
+            dtostrf(data->voltage, 4, 1, fmt);
+        tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+    }
     else
-        dtostrf(data->voltage, 4, 1, fmt);
-    tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+    {
+        // primary display item
+        float value = primary_item_value(_primary_item, data, _config);
+        uint16_t color = primary_item_color(_primary_item, data, _config);
+        dtostrf(value, 4, 1, fmt);
+        tft_util_draw_number(_tft, fmt, 0, 35, color, COLOR_BLACK, 10, 14);
+
+        // mah
+        dtostrf(data->mah, 4, 0, fmt);
+        tft_util_draw_number(_tft, fmt, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
+
+        // mosfet temp
+        dtostrf(data->mosfet_celsius, 4, 2, fmt);
+        tft_util_draw_number(_tft, fmt, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+
+        // amps
+        dtostrf(data->battery_amps, 4, 0, fmt);
+        tft_util_draw_number(_tft, fmt, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
+
+        // battery voltage
+        if (_config->per_cell_voltage)
+            dtostrf(data->voltage / _config->battery_cells, 4, 2, fmt);
+        else
+            dtostrf(data->voltage, 4, 1, fmt);
+        tft_util_draw_number(_tft, fmt, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+    }
+    
 
     // warning
     if (data->vesc_fault_code != FAULT_CODE_NONE) {

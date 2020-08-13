@@ -113,7 +113,7 @@ t_screen_config screen_config = {
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
     TEXT_SCREEN_BIG_FONT,
-    text_screen_items,
+    0, // 0 is default screen
     LEN(text_screen_items),
     SCREEN_ORIENTATION
 };
@@ -253,7 +253,7 @@ void setup() {
 
 void loop() {
     if (digitalRead(BUTTON_3_PIN) == LOW) {
-        current_screen_index = (current_screen_index + 1) % LEN(screens);
+        // current_screen_index = (current_screen_index + 1) % LEN(screens);
         scr = screens[current_screen_index];
         scr->reset();
         delay(UPDATE_DELAY);
