@@ -43,12 +43,6 @@ typedef enum {
     SCR_FAULT_CODE
 } t_screen_item;
 
-typedef enum {
-    DEFAULT_SCREEN,
-    TEMP_SCREEN,
-    SPEED_SCREEN
-} t_value_screen;
-
 typedef struct {
     const char* fw_version;
     bool imperial_units;
@@ -66,8 +60,8 @@ public:
     virtual void init(t_screen_config* config) { _config = config; };
     virtual void reset() = 0;
     virtual void update(t_data* data) = 0;
+    void nextScreen();
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
-    t_value_screen value_screen = DEFAULT_SCREEN;
 
 protected:
     t_screen_config* _config;
