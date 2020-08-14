@@ -30,7 +30,7 @@ void SimpleVerticalScreen::reset() {
     _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
     
     _tft->setFont(Terminal6x8);
-    switch (value_screen) {
+    switch (_value_screen) {
         case DEFAULT_SCREEN:
             label1 = _config->imperial_units ? "TRIP MI" : "TRIP KM";
             label2 = _config->imperial_units ? "TOTAL MI" : "TOTAL KM";
@@ -69,13 +69,12 @@ void SimpleVerticalScreen::update(t_data *data) {
     char value2[10];
     char value3[10];
     char value4[10];
+    uint16_t color;
 
     if (data->vesc_fault_code != _last_fault_code)
         reset();
 
-    uint16_t color;
-
-    switch (value_screen) { 
+    switch (_value_screen) { 
         case DEFAULT_SCREEN:
             // primary display item
             dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
@@ -130,6 +129,24 @@ void SimpleVerticalScreen::update(t_data *data) {
 
     _last_fault_code = data->vesc_fault_code;
     _just_reset = false;
+}
+
+void SimpleVerticalScreen::nextScreen(){
+    switch (_value_screen)
+    {
+    case DEFAULT_SCREEN:
+        _value_screen = TEMP_SCREEN;
+        break;
+    case TEMP_SCREEN:
+        _value_screen = SPEED_SCREEN;
+        break;
+    case SPEED_SCREEN:
+        _value_screen =DEFAULT_SCREEN;
+        break;
+    default:
+        _value_screen =DEFAULT_SCREEN;
+        break;
+    }
 }
 
 void SimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool redraw) {

@@ -22,16 +22,25 @@
 #include "ili9225_screen.h"
 #include "simple_screen.h"
 
+typedef enum {
+    DEFAULT_SCREEN,
+    TEMP_SCREEN,
+    SPEED_SCREEN
+} t_value_screen;
+
 class SimpleVerticalScreen: public ILI9225Screen {
 public:
     SimpleVerticalScreen(t_screen_item primary_item) { _primary_item = primary_item; }
     void reset();
     void update(t_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+    void nextScreen();
 
 protected:
     // Have we just reset the screen? Unset by the first update() call.
     bool _just_reset = false;
+
+    t_value_screen _value_screen = DEFAULT_SCREEN;
 
     // Remember how many cells are currently filled so that we can update the indicators more efficiently.
     uint8_t _battery_cells_filled = 0;
