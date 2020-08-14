@@ -26,7 +26,6 @@ typedef struct {
     float max_speed_kph;
     float min_voltage;
     int32_t trip_meters;
-    float wh_spent;
 
     // TODO:
     // max_motor_temp
@@ -54,6 +53,8 @@ typedef struct {
     float trip_km;
     float session_reset_progress;
     float total_km;
+    float wh_spent;
+    float mah_spent;
     vesc_comm_fault_code vesc_fault_code = FAULT_CODE_NONE;
     t_session_data* session;
 } t_data;

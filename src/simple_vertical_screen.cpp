@@ -38,9 +38,9 @@ void SimpleVerticalScreen::reset() {
             label4 = "BATTERY V";
             break;
         case TEMP_SCREEN:
-            label1 = "MAH       ";
+            label1 = "Wh USED";
             label2 = "MOSFET TEMP";
-            label3 = "AMPS   ";
+            label3 = "mAh LEFT";
             label4 = "BATTERY V";
     }
 
@@ -96,12 +96,12 @@ void SimpleVerticalScreen::update(t_data *data) {
             // primary display item
             dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
             color = primary_item_color(_primary_item, data, _config);
-            // mah
-            dtostrf(data->mah, 4, 0, value1);
+            // wh used
+            dtostrf(data->wh_spent, 2, 3, value1);
             // mosfet temperature
             dtostrf(data->mosfet_celsius, 2, 2, value2);
-            // watts
-            dtostrf(data->battery_amps, 2, 2, value3);
+            // mah used
+            dtostrf(data->mah_spent, 2, 3, value3);
             // battery voltage
             if (_config->per_cell_voltage)
                 dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);

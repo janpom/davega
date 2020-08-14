@@ -284,8 +284,8 @@ void loop() {
     data.duty_cycle = vesc_comm.get_duty_cycle();
     data.vesc_fault_code = vesc_comm.get_fault_code();
     data.voltage = vesc_comm.get_voltage();
-    data.session->wh_spent = vesc_comm.get_watthours_discharged();
-    D("Current watthours: " + String(data.session->wh_spent));
+    data.wh_spent = vesc_comm.get_watthours_discharged();
+    D("Current watthours: " + String(data.wh_spent));
 
     // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
@@ -303,6 +303,7 @@ void loop() {
     }
 
     data.mah = mah;
+    data.mah_spent = vesc_comm.get_amphours_discharged();
 
     // dim mAh if the counter is about to be reset
     data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
