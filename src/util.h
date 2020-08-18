@@ -28,5 +28,11 @@ float convert_speed(float speed_kph, bool imperial_units);
 float convert_temperature(float temp_celsius, bool imperial_units);
 void format_total_distance(float total_distance, char* result);
 const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
+int32_t rotations_to_meters(int32_t rotations);
+float erpm_to_kph(uint32_t erpm);
+float voltage_to_percent(float voltage);
+bool was_battery_charged(float last_volts, float current_volts);
+bool is_battery_full(float current_volts);
+
 
 #endif //UTIL_H

@@ -60,7 +60,7 @@ public:
     virtual void init(t_screen_config* config) { _config = config; };
     virtual void reset() = 0;
     virtual void update(t_data* data) = 0;
-    void nextScreen();
+    virtual void nextScreen() = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
 
 protected:

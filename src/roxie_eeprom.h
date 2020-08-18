@@ -22,7 +22,7 @@
 #include <Arduino.h>
 
 bool eeprom_is_initialized(uint8_t magic_value);
-void eeprom_initialize(uint8_t magic_value);
+void eeprom_initialize(uint8_t magic_value, t_session_data session_data);
 
 float eeprom_read_volts();
 void eeprom_write_volts(float volts);

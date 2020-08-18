@@ -28,6 +28,7 @@ public:
     void reset();
     void update(t_data* data);
     void heartbeat(uint32_t duration_ms, bool successful_vesc_read);
+    void nextScreen();
 
 protected:
     void _write_numeric_line(float value, const char* units, const char* label, int lineno, uint16_t color = COLOR_WHITE);

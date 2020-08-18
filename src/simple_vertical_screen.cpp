@@ -27,20 +27,26 @@ void SimpleVerticalScreen::reset() {
     String label3;
     String label4;
 
-    _tft->fillRectangle(0, 0, _tft->maxX() - 1, _tft->maxY() - 1, COLOR_BLACK);
+    //_tft->fillRectangle(0, 130, 176 - 1, 220 - 1, COLOR_BLACK);
     
     _tft->setFont(Terminal6x8);
     switch (_value_screen) {
         case DEFAULT_SCREEN:
-            label1 = _config->imperial_units ? "TRIP MI" : "TRIP KM";
-            label2 = _config->imperial_units ? "TOTAL MI" : "TOTAL KM";
-            label3 = "WATTS";
-            label4 = "BATTERY V";
+            label1 = _config->imperial_units ? "TRIP MI   " : "TRIP KM   ";
+            label2 = _config->imperial_units ? "TOTAL MI  " : "TOTAL KM  ";
+            label3 = "WATTS      ";
+            label4 = "BATTERY V  ";
             break;
         case TEMP_SCREEN:
-            label1 = "Wh USED";
+            label1 = "Wh USED    ";
             label2 = "MOSFET TEMP";
-            label3 = "mAh LEFT";
+            label3 = "mAh LEFT   ";
+            label4 = "BATTERY V  ";
+            break;
+        case SPEED_SCREEN:
+            label1 = "MAX SPEED";
+            label2 = "MOTOR AMPS";
+            label3 = "SPEED PERC";
             label4 = "BATTERY V";
     }
 
@@ -74,38 +80,30 @@ void SimpleVerticalScreen::update(t_data *data) {
     if (data->vesc_fault_code != _last_fault_code)
         reset();
 
+    // primary display item
+    dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
+    color = primary_item_color(_primary_item, data, _config);
+    if (_config->per_cell_voltage)
+        dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
+    else
+        dtostrf(data->voltage, 4, 1, value4);
+
     switch (_value_screen) { 
-        case DEFAULT_SCREEN:
-            // primary display item
-            dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
-            color = primary_item_color(_primary_item, data, _config);
-            // trip distance
-            dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, value1);
-            // total distance
-            format_total_distance(convert_distance(data->total_km, _config->imperial_units), value2);
-            // watts
-            dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
-            // battery voltage
-            if (_config->per_cell_voltage)
-                dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
-            else
-                dtostrf(data->voltage, 4, 1, value4);
-            break;
-        case TEMP_SCREEN:
-            // primary display item
-            dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
-            color = primary_item_color(_primary_item, data, _config);
-            // wh used
-            dtostrf(data->wh_spent, 2, 3, value1);
-            // mosfet temperature
-            dtostrf(data->mosfet_celsius, 2, 2, value2);
-            // mah used
-            dtostrf(data->mah_spent, 2, 3, value3);
-            // battery voltage
-            if (_config->per_cell_voltage)
-                dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
-            else
-                dtostrf(data->voltage, 4, 1, value4);
+    case DEFAULT_SCREEN:
+        dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, value1);
+        format_total_distance(convert_distance(data->total_km, _config->imperial_units), value2);
+        dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
+        break;
+    case TEMP_SCREEN:
+        dtostrf(data->wh_spent*1000, 2, 2, value1);
+        dtostrf(data->mosfet_celsius, 2, 2, value2);
+        dtostrf(data->mah_spent, 4, 2, value3);
+        break;
+    case SPEED_SCREEN:
+        dtostrf(data->session->max_speed_kph, 3, 1, value1);
+        dtostrf(data->motor_amps, 2, 2, value2);
+        dtostrf(data->speed_percent, 2, 2, value3);
+        break;
     }
 
     tft_util_draw_number(_tft, primary_value, 0, 35, color, COLOR_BLACK, 10, 14);

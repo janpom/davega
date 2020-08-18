@@ -18,6 +18,8 @@
 #ifndef DATA_H
 #define DATA_H
 
+#define LEN(X) (sizeof(X) / sizeof(X[0]))
+
 #include "vesc_comm.h"
 
 typedef struct {
@@ -32,6 +34,7 @@ typedef struct {
     // max_fet_temp
     // max_current
     // min_current
+    // wh_spent
     // wh_per_km (derived)
     // range_km (derived)
 } t_session_data;

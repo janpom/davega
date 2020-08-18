@@ -15,6 +15,7 @@
     along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "data.h"
 #include "vesc_comm_standard.h"
 #include "roxie_config.h"
 
@@ -23,6 +24,18 @@ VescCommStandard::VescCommStandard() {
     #ifndef SIM_VALUES
         _packet = (uint8_t*) malloc(_max_packet_length * sizeof(*_packet));
     #endif
+}
+
+void VescCommStandard::process_packet(t_data* data_packet){
+    data_packet->mosfet_celsius = get_temp_mosfet();
+    data_packet->motor_celsius = get_temp_motor();
+    data_packet->motor_amps = get_motor_current();
+    data_packet->battery_amps = get_battery_current() * VESC_COUNT;
+    data_packet->duty_cycle = get_duty_cycle();
+    data_packet->vesc_fault_code = get_fault_code();
+    data_packet->voltage = get_voltage();
+    data_packet->wh_spent = get_watthours_discharged();
+  //  D("Current watthours: " + String(data_packet.wh_spent));
 }
 
 float VescCommStandard::get_temp_mosfet() {

@@ -20,9 +20,6 @@
 
 #include "screen.h"
 
-#define SS_YELLOW_SPEED_KPH 25
-#define SS_RED_SPEED_KPH 35
-
 uint16_t primary_item_color(t_screen_item screen_item, t_data* data, t_screen_config* config);
 float primary_item_value(t_screen_item screen_item, t_data* data, t_screen_config* config);
 

@@ -182,3 +182,7 @@ void TextScreen::_write_line_buffer(int lineno, uint16_t color) {
     _tft->setFont(_config->big_font ? Terminal11x16 : Terminal6x8, true);
     _tft->drawText(5, y, _line_buffer, color);
 }
+
+void TextScreen::nextScreen(){
+    Serial.println("Next screen");
+}

@@ -18,6 +18,9 @@
 #include "util.h"
 #include "vesc_comm.h"
 
+#define LEN(X) (sizeof(X) / sizeof(X[0]))
+const float discharge_ticks[] = DISCHARGE_TICKS;
+
 char fw_version_buffer[6];
 
 const char* make_fw_version(const char* fw_version, const char* revision_id) {
@@ -80,4 +83,39 @@ const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
         default:
             return "unexpected fault code";
     }
+}
+
+int32_t rotations_to_meters(int32_t rotations) {
+    float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
+    return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
+}
+
+float erpm_to_kph(uint32_t erpm) {
+    float km_per_minute = rotations_to_meters(erpm) / 1000.0;
+    return km_per_minute * 60.0;
+}
+
+float voltage_to_percent(float voltage) {
+    if (voltage < discharge_ticks[0])
+        return 0.0;
+    for (int i = 1; i < LEN(discharge_ticks); i++) {
+        float cur_voltage = discharge_ticks[i];
+        if (voltage < cur_voltage) {
+            float prev_voltage = discharge_ticks[i - 1];
+            float interval_perc = (voltage - prev_voltage) / (cur_voltage - prev_voltage);
+            float low = 1.0 * (i - 1) / (LEN(discharge_ticks) - 1);
+            float high = 1.0 * i / (LEN(discharge_ticks) - 1);
+            return low + (high - low) * interval_perc;
+        }
+    }
+    return 1.0;
+}
+
+bool was_battery_charged(float last_volts, float current_volts) {
+    return (current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE;
+}
+
+bool is_battery_full(float current_volts) {
+    float max_volts = discharge_ticks[LEN(discharge_ticks) - 1];
+    return current_volts / max_volts > FULL_CHARGE_THRESHOLD;
 }

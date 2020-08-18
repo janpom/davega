@@ -15,6 +15,7 @@
     along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "data.h"
 #include "vesc_comm.h"
 
 #ifndef VESC_COMM_STANDARD_H
@@ -23,6 +24,7 @@
 class VescCommStandard: public VescComm {
 public:
     VescCommStandard();
+    void process_packet(t_data* data_packet);
     float get_temp_mosfet();
     float get_temp_motor();
     float get_motor_current();

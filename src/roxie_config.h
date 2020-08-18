@@ -39,6 +39,9 @@
 // filled). It will still show the correct number though.
 #define MAX_SPEED_KPH 30
 
+#define SS_YELLOW_SPEED_KPH 25
+#define SS_RED_SPEED_KPH 35
+
 // Set to true to display the distance in miles and the speed in mph.
 #define IMPERIAL_UNITS false
 

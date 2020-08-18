@@ -14,8 +14,8 @@
 */
 
 #include "roxie_config.h"
-#include "eeprom.h"
 #include "data.h"
+#include "roxie_eeprom.h"
 #include "util.h"
 #include "screen.h"
 #include "vesc_comm.h"
@@ -23,7 +23,6 @@
 #define REVISION_ID ""
 #define FW_VERSION "v1.0"
 
-//#define DEBUG
 #ifdef DEBUG
 #define D(x) Serial.println(x)
 #else
@@ -113,15 +112,13 @@ t_screen_config screen_config = {
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
     TEXT_SCREEN_BIG_FONT,
-    0, // 0 is default screen
+    text_screen_items,
     LEN(text_screen_items),
     SCREEN_ORIENTATION
 };
 
 int current_screen_index = 0;
 Screen* scr;
-
-const float discharge_ticks[] = DISCHARGE_TICKS;
 
 t_data data;
 t_session_data session_data;
@@ -137,41 +134,6 @@ int32_t last_rpm;
 uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
 
-int32_t rotations_to_meters(int32_t rotations) {
-    float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
-    return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
-}
-
-float erpm_to_kph(uint32_t erpm) {
-    float km_per_minute = rotations_to_meters(erpm) / 1000.0;
-    return km_per_minute * 60.0;
-}
-
-float voltage_to_percent(float voltage) {
-    if (voltage < discharge_ticks[0])
-        return 0.0;
-    for (int i = 1; i < LEN(discharge_ticks); i++) {
-        float cur_voltage = discharge_ticks[i];
-        if (voltage < cur_voltage) {
-            float prev_voltage = discharge_ticks[i - 1];
-            float interval_perc = (voltage - prev_voltage) / (cur_voltage - prev_voltage);
-            float low = 1.0 * (i - 1) / (LEN(discharge_ticks) - 1);
-            float high = 1.0 * i / (LEN(discharge_ticks) - 1);
-            return low + (high - low) * interval_perc;
-        }
-    }
-    return 1.0;
-}
-
-bool was_battery_charged(float last_volts, float current_volts) {
-    return (current_volts - last_volts) / current_volts > FULL_CHARGE_MIN_INCREASE;
-}
-
-bool is_battery_full(float current_volts) {
-    float max_volts = discharge_ticks[LEN(discharge_ticks) - 1];
-    return current_volts / max_volts > FULL_CHARGE_THRESHOLD;
-}
-
 void setup() {
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
@@ -182,18 +144,7 @@ void setup() {
 #endif
     vesc_comm.init(115200);
 
-    if (!eeprom_is_initialized(EEPROM_MAGIC_VALUE)) {
-        eeprom_initialize(EEPROM_MAGIC_VALUE);
-        eeprom_write_volts(EEPROM_INIT_VALUE_VOLTS);
-        eeprom_write_mah_spent(EEPROM_INIT_VALUE_MAH_SPENT);
-        eeprom_write_total_distance(EEPROM_INIT_VALUE_TOTAL_DISTANCE);
-        session_data.max_speed_kph = EEPROM_INIT_VALUE_MAX_SPEED;
-        session_data.millis_elapsed = EEPROM_INIT_VALUE_MILLIS_ELAPSED;
-        session_data.millis_riding = EEPROM_INIT_VALUE_MILLIS_RIDING;
-        session_data.min_voltage = EEPROM_INIT_VALUE_MIN_VOLTAGE;
-        session_data.trip_meters = EEPROM_INIT_VALUE_TRIP_DISTANCE;
-        eeprom_write_session_data(session_data);
-    }
+    eeprom_initialize(EEPROM_MAGIC_VALUE, session_data);
 
     for (int i=0; i<LEN(screens); i++)
         screens[i]->init(&screen_config);
@@ -252,19 +203,7 @@ void setup() {
 }
 
 void loop() {
-    if (digitalRead(BUTTON_3_PIN) == LOW) {
-        // current_screen_index = (current_screen_index + 1) % LEN(screens);
-        //scr = screens[current_screen_index];
-        simple_vertical_screen.nextScreen();
-        simple_vertical_screen.reset();
-        delay(UPDATE_DELAY);
-    }
-
-    if (digitalRead(BUTTON_1_PIN) == HIGH)
-        button_1_last_up_time = millis();
-
-    if (digitalRead(BUTTON_2_PIN) == HIGH)
-        button_2_last_up_time = millis();
+    read_buttons();
 
     vesc_comm.fetch_packet();
 
@@ -273,15 +212,7 @@ void loop() {
         return;
     }
 
-    data.mosfet_celsius = vesc_comm.get_temp_mosfet();
-    data.motor_celsius = vesc_comm.get_temp_motor();
-    data.motor_amps = vesc_comm.get_motor_current();
-    data.battery_amps = vesc_comm.get_battery_current() * VESC_COUNT;
-    data.duty_cycle = vesc_comm.get_duty_cycle();
-    data.vesc_fault_code = vesc_comm.get_fault_code();
-    data.voltage = vesc_comm.get_voltage();
-    data.wh_spent = vesc_comm.get_watthours_discharged();
-    D("Current watthours: " + String(data.wh_spent));
+    vesc_comm.process_packet(&data);
 
     // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
@@ -368,4 +299,22 @@ void loop() {
 
     scr->update(&data);
     scr->heartbeat(UPDATE_DELAY, true);
+}
+
+void read_buttons(){
+    if (digitalRead(BUTTON_3_PIN) == LOW) {
+        //current_screen_index = (current_screen_index + 1) % LEN(screens);
+        scr = screens[current_screen_index];
+        // simple_vertical_screen.nextScreen();
+        scr->nextScreen();
+        scr->reset();
+        delay(UPDATE_DELAY);
+    }
+
+    if (digitalRead(BUTTON_1_PIN) == HIGH)
+        button_1_last_up_time = millis();
+
+    if (digitalRead(BUTTON_2_PIN) == HIGH)
+        button_2_last_up_time = millis();
+
 }
