@@ -38,6 +38,10 @@ void VescCommStandard::process_packet(t_data* data_packet){
   //  D("Current watthours: " + String(data_packet.wh_spent));
 }
 
+float VescCommStandard::test() {
+    return 5;
+}
+
 float VescCommStandard::get_temp_mosfet() {
     return ((int16_t) get_word(3)) / 10.0;
 }

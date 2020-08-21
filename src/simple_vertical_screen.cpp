@@ -19,35 +19,34 @@
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
-
-
 void SimpleVerticalScreen::reset() {
     String label1;
     String label2;
     String label3;
     String label4;
 
-    //_tft->fillRectangle(0, 130, 176 - 1, 220 - 1, COLOR_BLACK);
+    _tft->fillRectangle(0, 130, 176 - 1, 220 - 1, COLOR_BLACK);
     
     _tft->setFont(Terminal6x8);
     switch (_value_screen) {
         case DEFAULT_SCREEN:
-            label1 = _config->imperial_units ? "TRIP MI   " : "TRIP KM   ";
-            label2 = _config->imperial_units ? "TOTAL MI  " : "TOTAL KM  ";
-            label3 = "WATTS      ";
-            label4 = "BATTERY V  ";
+            label1 = _config->imperial_units ? "TRIP MI" : "TRIP KM";
+            label2 = _config->imperial_units ? "TOTAL MI" : "TOTAL KM";
+            label3 = "WATTS";
+            label4 = "BATTERY V";
             break;
         case TEMP_SCREEN:
-            label1 = "Wh USED    ";
+            label1 = "Wh USED";
             label2 = "MOSFET TEMP";
-            label3 = "mAh LEFT   ";
-            label4 = "BATTERY V  ";
+            label3 = "mAh LEFT";
+            label4 = "BATTERY V";
             break;
         case SPEED_SCREEN:
             label1 = "MAX SPEED";
             label2 = "MOTOR AMPS";
-            label3 = "SPEED PERC";
+            label3 = "AVG SPEED";
             label4 = "BATTERY V";
+            break;
     }
 
     _tft->drawText(0, 130, label1, COLOR_WHITE);
@@ -64,6 +63,7 @@ void SimpleVerticalScreen::reset() {
             break;
         default:
             _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
+            break;
     }
 
     _just_reset = true;
@@ -95,21 +95,26 @@ void SimpleVerticalScreen::update(t_data *data) {
         dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
         break;
     case TEMP_SCREEN:
-        dtostrf(data->wh_spent*1000, 2, 2, value1);
-        dtostrf(data->mosfet_celsius, 2, 2, value2);
-        dtostrf(data->mah_spent, 4, 2, value3);
+        dtostrf(data->wh_spent, 2, 2, value1);
+        dtostrf(data->mosfet_celsius, 2, 1, value2);
+        dtostrf(data->mah_spent, 4, 1, value3);
         break;
     case SPEED_SCREEN:
-        dtostrf(data->session->max_speed_kph, 3, 1, value1);
-        dtostrf(data->motor_amps, 2, 2, value2);
-        dtostrf(data->speed_percent, 2, 2, value3);
+        dtostrf(data->session->max_speed_kph, 4, 1, value1);
+        dtostrf(data->motor_amps, 4, 1, value2);
+        float avg_speed_kph = data->session->millis_riding > 10
+            ? 3600.0 * data->session->trip_meters / data->session->millis_riding : 0;
+        avg_speed_kph = avg_speed_kph < 100
+            ?  avg_speed_kph : 99.9;
+        convert_distance(avg_speed_kph, _config->imperial_units);
+        dtostrf(avg_speed_kph, 4, 1, value3);
         break;
     }
 
-    tft_util_draw_number(_tft, primary_value, 0, 35, color, COLOR_BLACK, 10, 14);
-    tft_util_draw_number(_tft, value1, 0, 140, progress_to_color(data->session_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, primary_value, 0, 35, COLOR_WHITE, COLOR_BLACK, 10, 14);
+    tft_util_draw_number(_tft, value1, 0, 140, color, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value2, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
-    tft_util_draw_number(_tft, value3, 95, 140, progress_to_color(data->mah_reset_progress, _tft), COLOR_BLACK, 2, 6);
+    tft_util_draw_number(_tft, value3, 95, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value4, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
     
 

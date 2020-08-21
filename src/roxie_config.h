@@ -136,7 +136,7 @@
 #define UPDATE_DELAY 50  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define SCREEN_ORIENTATION 0
+#define SCREEN_ORIENTATION 2
 
 // Screens. Uncomment the ones you want enabled.
 //#define DEFAULT_SCREEN_ENABLED 1
@@ -146,7 +146,7 @@
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
-#define TEXT_SCREEN_ENABLED 1
+// #define TEXT_SCREEN_ENABLED 1
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:
