@@ -85,8 +85,8 @@ uint8_t VescComm::receive_packet(uint16_t timeout) {
 /*     while (vesc_serial.available()) {
         // TODO: warning
         vesc_serial.read();
-    }
-    return _bytes_read; */
+    } */
+    return _bytes_read;
 }
 
 bool VescComm::is_expected_packet() {

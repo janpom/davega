@@ -31,7 +31,7 @@ bool eeprom_is_initialized(uint8_t magic_value) {
     return EEPROM.read(EEPROM_ADDRESS_MAGIC_BYTE) == magic_value;
 }
 
-void eeprom_initialize(uint8_t magic_value, t_session_data session_data) {
+void eeprom_initialize(uint8_t magic_value, t_session_data session_data, t_data data) {
     EEPROM.write(EEPROM_ADDRESS_MAGIC_BYTE, magic_value);
     eeprom_write_volts(EEPROM_INIT_VALUE_VOLTS);
     eeprom_write_mah_spent(EEPROM_INIT_VALUE_MAH_SPENT);
@@ -43,13 +43,21 @@ void eeprom_initialize(uint8_t magic_value, t_session_data session_data) {
     session_data.trip_meters = EEPROM_INIT_VALUE_TRIP_DISTANCE;
     eeprom_write_session_data(session_data);
 
-    session_data = eeprom_read_session_data();
+    //session_data = eeprom_read_session_data();
 /*     data.voltage = eeprom_read_volts();
     data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
     data.trip_km = session_data.trip_meters / 1000.0;
     data.total_km = eeprom_read_total_distance() / 1000.0;
     data.session = &session_data; */
 
+}
+
+void eeprom_read_data(t_data data, t_session_data session_data){
+    data.voltage = eeprom_read_volts();
+    data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
+    data.trip_km = session_data.trip_meters / 1000.0;
+    data.total_km = eeprom_read_total_distance() / 1000.0;
+    data.session = &session_data;
 }
 
 float eeprom_read_volts() {

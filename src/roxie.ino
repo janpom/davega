@@ -141,15 +141,6 @@ uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
 
 void setup() {
-
-/*     bounce1.attach (BUTTON_1_PIN, INPUT_PULLUP );
-    bounce1.interval(BOUNCE_TIMEOUT);
-    //bounce2.attach (BUTTON_2_PIN, INPUT_PULLUP );
-    //bounce2.interval(BOUNCE_TIMEOUT);
-    bounce3.attach (BUTTON_3_PIN, INPUT_PULLUP );
-    bounce3.interval(BOUNCE_TIMEOUT); */
-    //pinMode(BUTTON_3_PIN, INPUT_PULLUP);
-    //pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_pressed, FALLING);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
@@ -162,18 +153,17 @@ void setup() {
 #endif
     vesc_comm.init(115200);
 
-    eeprom_initialize(EEPROM_MAGIC_VALUE, session_data);
-
     for (int i=0; i<LEN(screens); i++)
         screens[i]->init(&screen_config);
     scr = screens[current_screen_index];
 
-    session_data = eeprom_read_session_data();
-    data.voltage = eeprom_read_volts();
-    data.mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - eeprom_read_mah_spent();
-    data.trip_km = session_data.trip_meters / 1000.0;
-    data.total_km = eeprom_read_total_distance() / 1000.0;
-    data.session = &session_data;
+    if(eeprom_is_initialized(EEPROM_MAGIC_VALUE)){
+        session_data = eeprom_read_session_data();
+    }
+    else {
+        eeprom_initialize(EEPROM_MAGIC_VALUE, session_data, data);
+    }
+    eeprom_read_data(data, session_data);
 
     scr->reset();
     scr->update(&data);
@@ -184,6 +174,69 @@ void setup() {
         vesc_comm.fetch_packet();
     }
 
+    check_if_battery_charged();
+    get_initial_values();
+}
+
+void loop() {
+    read_buttons();
+
+    vesc_comm.fetch_packet();
+    if (!vesc_comm.is_expected_packet()) {
+        scr->heartbeat(UPDATE_DELAY, false);
+        return;
+    }
+    vesc_comm.process_packet(&data);
+
+    calculate_mah();
+    read_other_values();
+
+    scr->update(&data);
+    scr->heartbeat(UPDATE_DELAY, true);
+}
+
+void read_buttons(){
+
+    // uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
+    if (button1_down) {
+        D("button 1 pressed");
+        button1_down = LOW;
+        // reset session
+        session_data.trip_meters = 0;
+        session_data.max_speed_kph = 0;
+        session_data.millis_elapsed = 0;
+        session_data.millis_riding = 0;
+        session_data.min_voltage = data.voltage;
+        eeprom_write_session_data(session_data);
+        // initial_trip_meters = -tachometer;
+        initial_millis_elapsed = -millis();
+    }
+
+    if(button3_down){
+        button3_down = LOW;
+        D("Button 3 pressed " + String(millis()-starting_time) + " milliseconds");
+        scr = screens[current_screen_index];
+        scr->nextScreen();
+        scr->reset();
+    }
+
+}
+
+
+// ISR routines for button presses
+void button1_pressed(){
+    button1_down = HIGH;
+}
+
+void button2_pressed(){
+    button2_down = HIGH;
+}
+
+void button3_pressed(){
+    button3_down = HIGH;
+}
+
+void check_if_battery_charged(){
     float last_volts = eeprom_read_volts();
     float current_volts = vesc_comm.get_voltage();
     if (was_battery_charged(last_volts, current_volts)) {
@@ -198,7 +251,9 @@ void setup() {
         }
         eeprom_write_volts(current_volts);
     }
+}
 
+void get_initial_values(){
     initial_mah_spent = eeprom_read_mah_spent();
     initial_trip_meters = session_data.trip_meters;
     initial_total_meters = eeprom_read_total_distance();
@@ -220,19 +275,8 @@ void setup() {
     initial_total_meters -= tachometer;
 }
 
-void loop() {
-    read_buttons();
-
-    vesc_comm.fetch_packet();
-
-    if (!vesc_comm.is_expected_packet()) {
-        scr->heartbeat(UPDATE_DELAY, false);
-        return;
-    }
-
-    vesc_comm.process_packet(&data);
-
-    // TODO: DRY
+void calculate_mah(){
+        // TODO: DRY
     int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
                                            vesc_comm.get_amphours_charged());
     int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
@@ -240,7 +284,6 @@ void loop() {
 
     // uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
     if (button2_down) {
-        D("button 2 pressed");
         button2_down = LOW;
         // reset coulomb counter
         mah = voltage_to_percent(data.voltage) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
@@ -251,29 +294,16 @@ void loop() {
 
     data.mah = mah;
     data.mah_spent = vesc_comm.get_amphours_discharged();
+}
 
-    // dim mAh if the counter is about to be reset
+void read_other_values(){
+        // dim mAh if the counter is about to be reset
     // data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
     int32_t rpm = vesc_comm.get_rpm();
     data.speed_kph = max(erpm_to_kph(rpm), 0);
 
     int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
-
-    // uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
-    if (button1_down) {
-        D("button 1 pressed");
-        button1_down = LOW;
-        // reset session
-        session_data.trip_meters = 0;
-        session_data.max_speed_kph = 0;
-        session_data.millis_elapsed = 0;
-        session_data.millis_riding = 0;
-        session_data.min_voltage = data.voltage;
-        eeprom_write_session_data(session_data);
-        initial_trip_meters = -tachometer;
-        initial_millis_elapsed = -millis();
-    }
 
     session_data.trip_meters = initial_trip_meters + tachometer;
     int32_t total_meters = initial_total_meters + tachometer;
@@ -286,7 +316,7 @@ void loop() {
 
     data.speed_percent = 1.0 * data.speed_kph / MAX_SPEED_KPH;
 
-    data.mah_percent = 1.0 * mah / (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY);
+    data.mah_percent = 1.0 * data.mah / (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY);
     data.voltage_percent = voltage_to_percent(data.voltage);
     data.battery_percent = VOLTAGE_WEIGHT * data.voltage_percent + (1.0 - VOLTAGE_WEIGHT) * data.mah_percent;
 
@@ -312,41 +342,10 @@ void loop() {
             last_eeprom_update_on_stop = millis();
         last_eeprom_written_total_meters = total_meters;
         eeprom_write_volts(data.voltage);
-        eeprom_write_mah_spent(mah_spent);
+        eeprom_write_mah_spent(data.mah_spent);
         eeprom_write_total_distance(total_meters);
         eeprom_write_session_data(session_data);
     }
 
     last_rpm = rpm;
-
-    starting_time = millis();
-    scr->update(&data);
-    scr->heartbeat(UPDATE_DELAY, true);
-    //Serial.println("Redrawing screen took " + String(millis()-starting_time) + " milliseconds)");
-}
-
-void read_buttons(){
-
-    if(button3_down){
-        button3_down = LOW;
-        D("Button 3 pressed " + String(millis()-starting_time) + " milliseconds");
-        scr = screens[current_screen_index];
-        scr->nextScreen();
-        scr->reset();
-    }
-
-}
-
-
-// ISR routines for button presses
-void button1_pressed(){
-    button1_down = HIGH;
-}
-
-void button2_pressed(){
-    button2_down = HIGH;
-}
-
-void button3_pressed(){
-    button3_down = HIGH;
 }
