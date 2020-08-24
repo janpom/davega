@@ -25,27 +25,28 @@ void SimpleVerticalScreen::reset() {
     String label3;
     String label4;
 
-    _tft->fillRectangle(0, 130, 176 - 1, 220 - 1, COLOR_BLACK);
+    _tft->fillRectangle(0, 140, 176 - 1, 170, COLOR_BLACK);
+    _tft->fillRectangle(0, 190, 176 - 1, 220, COLOR_BLACK);
     
     _tft->setFont(Terminal6x8);
     switch (_value_screen) {
         case DEFAULT_SCREEN:
-            label1 = _config->imperial_units ? "TRIP MI" : "TRIP KM";
-            label2 = _config->imperial_units ? "TOTAL MI" : "TOTAL KM";
-            label3 = "WATTS";
-            label4 = "BATTERY V";
+            label1 = _config->imperial_units ? "TRIP MI     " : "TRIP KM     ";
+            label2 = _config->imperial_units ? "TOTAL MI    " : "TOTAL KM    ";
+            label3 = "WATTS       ";
+            label4 = "BATTERY V   ";
             break;
         case TEMP_SCREEN:
-            label1 = "Wh USED";
-            label2 = "MOSFET TEMP";
-            label3 = "mAh LEFT";
-            label4 = "BATTERY V";
+            label1 = "Wh USED     ";
+            label2 = "MOSFET TEMP ";
+            label3 = "mAh LEFT    ";
+            label4 = "BATTERY V   ";
             break;
         case SPEED_SCREEN:
-            label1 = "MAX SPEED";
-            label2 = "MOTOR AMPS";
-            label3 = "AVG SPEED";
-            label4 = "BATTERY V";
+            label1 = "MAX SPEED   ";
+            label2 = "MOTOR AMPS  ";
+            label3 = "AVG SPEED   ";
+            label4 = "BATTERY V   ";
             break;
     }
 
@@ -111,8 +112,9 @@ void SimpleVerticalScreen::update(t_data *data) {
         break;
     }
 
-    tft_util_draw_number(_tft, primary_value, 0, 35, COLOR_WHITE, COLOR_BLACK, 10, 14);
-    tft_util_draw_number(_tft, value1, 0, 140, color, COLOR_BLACK, 2, 6);
+    
+    tft_util_draw_number(_tft, primary_value, 2, 35, COLOR_WHITE, COLOR_BLACK, 10, 14);
+    tft_util_draw_number(_tft, value1, 0, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value2, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value3, 95, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value4, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);

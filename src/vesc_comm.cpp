@@ -56,7 +56,7 @@ void VescComm::init(uint32_t baud) {
 
 uint8_t VescComm::fetch_packet(uint16_t timeout) {
     #ifndef SIM_VALUES
-        D("fetching packet");
+        //D("fetching packet");
         vesc_serial.write(GET_VALUES_PACKET, sizeof(GET_VALUES_PACKET));
         return receive_packet(timeout);
     #endif
@@ -82,19 +82,19 @@ uint8_t VescComm::receive_packet(uint16_t timeout) {
         }
     }
     // read any left-over bytes without storing
-    while (vesc_serial.available()) {
+/*     while (vesc_serial.available()) {
         // TODO: warning
         vesc_serial.read();
     }
-    return _bytes_read;
+    return _bytes_read; */
 }
 
 bool VescComm::is_expected_packet() {
-    for(int i = 0; i < _bytes_read; i++)
+/*     for(int i = 0; i < _bytes_read; i++)
     {
         DEB(String(_packet[i]) + " ");
     }
-    D("bytes read : " + String(_bytes_read) + " bytes)");
+    D("bytes read : " + String(_bytes_read) + " bytes)"); */
     if (_bytes_read < 3) {
         D("packet too short (" + String(_bytes_read) + " bytes)");
         return false;

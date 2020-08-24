@@ -33,6 +33,12 @@
 #define BUTTON_2_PIN A1
 #define BUTTON_3_PIN A2
 
+
+unsigned long starting_time;
+volatile byte button1_down = LOW;
+volatile byte button2_down = LOW;
+volatile byte button3_down = LOW;
+
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 #ifdef FOCBOX_UNITY
@@ -135,9 +141,21 @@ uint32_t button_1_last_up_time = 0;
 uint32_t button_2_last_up_time = 0;
 
 void setup() {
+
+/*     bounce1.attach (BUTTON_1_PIN, INPUT_PULLUP );
+    bounce1.interval(BOUNCE_TIMEOUT);
+    //bounce2.attach (BUTTON_2_PIN, INPUT_PULLUP );
+    //bounce2.interval(BOUNCE_TIMEOUT);
+    bounce3.attach (BUTTON_3_PIN, INPUT_PULLUP );
+    bounce3.interval(BOUNCE_TIMEOUT); */
+    //pinMode(BUTTON_3_PIN, INPUT_PULLUP);
+    //pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_pressed, FALLING);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_2_PIN), button2_pressed, FALLING);
     pinMode(BUTTON_3_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_3_PIN), button3_pressed, FALLING);
 
 #ifdef DEBUG
     Serial.begin(115200);
@@ -220,8 +238,10 @@ void loop() {
     int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
     int32_t mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah_spent;
 
-    uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
-    if (button_2_down_elapsed > COUNTER_RESET_TIME) {
+    // uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
+    if (button2_down) {
+        D("button 2 pressed");
+        button2_down = LOW;
         // reset coulomb counter
         mah = voltage_to_percent(data.voltage) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
         mah_spent = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah;
@@ -233,15 +253,17 @@ void loop() {
     data.mah_spent = vesc_comm.get_amphours_discharged();
 
     // dim mAh if the counter is about to be reset
-    data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
+    // data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
     int32_t rpm = vesc_comm.get_rpm();
     data.speed_kph = max(erpm_to_kph(rpm), 0);
 
     int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
 
-    uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
-    if (button_1_down_elapsed > COUNTER_RESET_TIME) {
+    // uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
+    if (button1_down) {
+        D("button 1 pressed");
+        button1_down = LOW;
         // reset session
         session_data.trip_meters = 0;
         session_data.max_speed_kph = 0;
@@ -257,7 +279,7 @@ void loop() {
     int32_t total_meters = initial_total_meters + tachometer;
 
     // dim trip distance if it's about to be reset
-    data.session_reset_progress = min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0);
+    // data.session_reset_progress = min(1.0 * button_1_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
     data.trip_km = session_data.trip_meters / 1000.0;
     data.total_km = total_meters / 1000.0;
@@ -297,24 +319,34 @@ void loop() {
 
     last_rpm = rpm;
 
+    starting_time = millis();
     scr->update(&data);
     scr->heartbeat(UPDATE_DELAY, true);
+    //Serial.println("Redrawing screen took " + String(millis()-starting_time) + " milliseconds)");
 }
 
 void read_buttons(){
-    if (digitalRead(BUTTON_3_PIN) == LOW) {
-        //current_screen_index = (current_screen_index + 1) % LEN(screens);
+
+    if(button3_down){
+        button3_down = LOW;
+        D("Button 3 pressed " + String(millis()-starting_time) + " milliseconds");
         scr = screens[current_screen_index];
-        // simple_vertical_screen.nextScreen();
         scr->nextScreen();
         scr->reset();
-        delay(UPDATE_DELAY);
     }
 
-    if (digitalRead(BUTTON_1_PIN) == HIGH)
-        button_1_last_up_time = millis();
+}
 
-    if (digitalRead(BUTTON_2_PIN) == HIGH)
-        button_2_last_up_time = millis();
 
+// ISR routines for button presses
+void button1_pressed(){
+    button1_down = HIGH;
+}
+
+void button2_pressed(){
+    button2_down = HIGH;
+}
+
+void button3_pressed(){
+    button3_down = HIGH;
 }

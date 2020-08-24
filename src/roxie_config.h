@@ -32,7 +32,7 @@
 #define MOTOR_POLE_PAIRS 18
 #define WHEEL_DIAMETER_MM 550
 #define MOTOR_PULLEY_TEETH 1
-#define WHEEL_PULLEY_TEETH 1
+#define WHEEL_PULLEY_TEETH 3
 
 // Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
 // The speed indicator will merely indicate the current speed as the max speed (all blue rectangles
