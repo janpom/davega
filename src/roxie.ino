@@ -19,6 +19,7 @@
 #include "util.h"
 #include "screen.h"
 #include "vesc_comm.h"
+#include "buttons.h"
 
 #define REVISION_ID ""
 #define FW_VERSION "v1.0"
@@ -33,11 +34,7 @@
 #define BUTTON_2_PIN A1
 #define BUTTON_3_PIN A2
 
-
 unsigned long starting_time;
-volatile byte button1_down = LOW;
-volatile byte button2_down = LOW;
-volatile byte button3_down = LOW;
 
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 
@@ -142,7 +139,8 @@ uint32_t button_2_last_up_time = 0;
 
 void setup() {
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_pressed, FALLING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_falling, FALLING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_rising, RISING);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(BUTTON_2_PIN), button2_pressed, FALLING);
     pinMode(BUTTON_3_PIN, INPUT_PULLUP);
@@ -179,7 +177,7 @@ void setup() {
 }
 
 void loop() {
-    read_buttons();
+    read_buttons(session_data);
 
     vesc_comm.fetch_packet();
     if (!vesc_comm.is_expected_packet()) {
@@ -195,46 +193,6 @@ void loop() {
     scr->heartbeat(UPDATE_DELAY, true);
 }
 
-void read_buttons(){
-
-    // uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
-    if (button1_down) {
-        D("button 1 pressed");
-        button1_down = LOW;
-        // reset session
-        session_data.trip_meters = 0;
-        session_data.max_speed_kph = 0;
-        session_data.millis_elapsed = 0;
-        session_data.millis_riding = 0;
-        session_data.min_voltage = data.voltage;
-        eeprom_write_session_data(session_data);
-        // initial_trip_meters = -tachometer;
-        initial_millis_elapsed = -millis();
-    }
-
-    if(button3_down){
-        button3_down = LOW;
-        D("Button 3 pressed " + String(millis()-starting_time) + " milliseconds");
-        scr = screens[current_screen_index];
-        scr->nextScreen();
-        scr->reset();
-    }
-
-}
-
-
-// ISR routines for button presses
-void button1_pressed(){
-    button1_down = HIGH;
-}
-
-void button2_pressed(){
-    button2_down = HIGH;
-}
-
-void button3_pressed(){
-    button3_down = HIGH;
-}
 
 void check_if_battery_charged(){
     float last_volts = eeprom_read_volts();
