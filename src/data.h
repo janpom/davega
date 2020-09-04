@@ -60,6 +60,10 @@ typedef struct {
     float mah_spent;
     vesc_comm_fault_code vesc_fault_code = FAULT_CODE_NONE;
     t_session_data* session;
+    float mah_discharged;
+    float mah_charged;
+    float tachometer;
+    float rpm;
 } t_data;
 
 #endif //DATA_H

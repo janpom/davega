@@ -23,7 +23,7 @@
 // #define SIM_VALUES
 
 // uncomment if not using arduino nano every
-#define ARDUINO_NANO_EVERY
+// #define ARDUINO_NANO_EVERY
 
 // To compile for FOCBOX Unity, uncomment the following line.
 //#define FOCBOX_UNITY 1
@@ -100,7 +100,7 @@
 // Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
 // the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
 // traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 49 // [1, 255]
+#define EEPROM_MAGIC_VALUE 46 // [1, 255]
 
 #define EEPROM_INIT_VALUE_VOLTS 0
 #define EEPROM_INIT_VALUE_MAH_SPENT 0
@@ -136,7 +136,7 @@
 #define UPDATE_DELAY 50  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define SCREEN_ORIENTATION 2
+#define SCREEN_ORIENTATION 0
 
 // Screens. Uncomment the ones you want enabled.
 //#define DEFAULT_SCREEN_ENABLED 1
@@ -146,7 +146,7 @@
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
 //#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
-// #define TEXT_SCREEN_ENABLED 1
+#define TEXT_SCREEN_ENABLED 1
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:

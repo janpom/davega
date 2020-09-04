@@ -129,9 +129,9 @@ void TextScreen::_write_numeric_line(
         _line_buffer[i] = ' ';
     dtostrf(value, 8, 2, _line_buffer);
     _line_buffer[8] = ' ';
-    for (int i=0; i<strlen(units); i++)
+    for (uint32_t i=0; i<strlen(units); i++)
         _line_buffer[i+9] = units[i];
-    for (int i=0; i<strlen(label); i++)
+    for (uint32_t i=0; i<strlen(label); i++)
         _line_buffer[i+13] = label[i];
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
@@ -157,7 +157,7 @@ void TextScreen::_write_time_line(uint32_t seconds, const char* label, int linen
     }
 
     _line_buffer[9] = 'h';
-    for (int i=0; i<strlen(label); i++)
+    for (uint32_t i=0; i<strlen(label); i++)
         _line_buffer[i+13] = label[i];
     _line_buffer[MAX_LINE_LENGTH] = '\0';
 
@@ -165,7 +165,7 @@ void TextScreen::_write_time_line(uint32_t seconds, const char* label, int linen
 }
 
 void TextScreen::_write_text_line(const char* value, int lineno, uint16_t color) {
-    for (int i=0; i<strlen(value); i++)
+    for (uint32_t i=0; i<strlen(value); i++)
         _line_buffer[i] = value[i];
     _line_buffer[strlen(value)] = '\0';
 

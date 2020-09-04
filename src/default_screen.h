@@ -39,7 +39,7 @@ protected:
     vesc_comm_fault_code _last_fault_code = FAULT_CODE_NONE;
 
     void _draw_labels();
-    bool _draw_battery_cell(int index, bool filled, bool redraw = false);
+    void _draw_battery_cell(int index, bool filled, bool redraw = false);
     void _draw_speed_cell(int index, bool filled, bool redraw = false);
     void _update_battery_indicator(float battery_percent, bool redraw = false);
     void _update_speed_indicator(float speed_percent, bool redraw = false);

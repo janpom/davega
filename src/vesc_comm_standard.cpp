@@ -35,6 +35,10 @@ void VescCommStandard::process_packet(t_data* data_packet){
     data_packet->vesc_fault_code = get_fault_code();
     data_packet->voltage = get_voltage();
     data_packet->wh_spent = get_watthours_discharged();
+    data_packet->mah_charged = get_amphours_charged();
+    data_packet->mah_discharged = get_amphours_discharged();
+    data_packet->tachometer = get_tachometer();
+    data_packet->rpm = get_rpm();
   //  D("Current watthours: " + String(data_packet.wh_spent));
 }
 

@@ -19,6 +19,7 @@
 #define UTIL_H
 
 #include "vesc_comm.h"
+#include "data.h"
 
 #define KM_PER_MILE 0.621371
 
@@ -31,6 +32,7 @@ const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);
 int32_t rotations_to_meters(int32_t rotations);
 float erpm_to_kph(uint32_t erpm);
 float voltage_to_percent(float voltage);
+void check_if_battery_charged(t_data* data);
 bool was_battery_charged(float last_volts, float current_volts);
 bool is_battery_full(float current_volts);
 

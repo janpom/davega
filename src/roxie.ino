@@ -25,14 +25,20 @@
 #define FW_VERSION "v1.0"
 
 #ifdef DEBUG
-#define D(x) Serial.println(x)
+    #define DEB(x) Serial.println(x)
 #else
-#define D(x)
+    #define DEB(x)
 #endif
 
-#define BUTTON_1_PIN A0
-#define BUTTON_2_PIN A1
-#define BUTTON_3_PIN A2
+#ifdef ARDUINO_NANO_EVERY
+	#define BUTTON_1_PIN A0
+	#define BUTTON_2_PIN A1
+	#define BUTTON_3_PIN A2
+#else
+	#define BUTTON_1_PIN PB3
+	#define BUTTON_2_PIN PB4
+	#define BUTTON_3_PIN PB5
+#endif
 
 unsigned long starting_time;
 
@@ -139,19 +145,18 @@ uint32_t button_2_last_up_time = 0;
 
 void setup() {
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_falling, FALLING);
-    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_rising, RISING);
+    attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_changed, CHANGE);
     pinMode(BUTTON_2_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(BUTTON_2_PIN), button2_pressed, FALLING);
     pinMode(BUTTON_3_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(BUTTON_3_PIN), button3_pressed, FALLING);
 
 #ifdef DEBUG
-    Serial.begin(115200);
+    //Serial3.begin(115200);
 #endif
     vesc_comm.init(115200);
 
-    for (int i=0; i<LEN(screens); i++)
+    for (uint8_t i=0; i<LEN(screens); i++)
         screens[i]->init(&screen_config);
     scr = screens[current_screen_index];
 
@@ -172,12 +177,15 @@ void setup() {
         vesc_comm.fetch_packet();
     }
 
-    check_if_battery_charged();
+    check_if_battery_charged(&data);
     get_initial_values();
 }
-
+unsigned long start;
+unsigned long loop_time;
 void loop() {
-    read_buttons(session_data);
+    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
+    read_buttons(session_data, &initial_trip_meters, &tachometer, scr);
+    //Serial.println("trip meters is " + String(session_data.trip_meters));
 
     vesc_comm.fetch_packet();
     if (!vesc_comm.is_expected_packet()) {
@@ -189,27 +197,15 @@ void loop() {
     calculate_mah();
     read_other_values();
 
+    start = millis();
+
     scr->update(&data);
     scr->heartbeat(UPDATE_DELAY, true);
+
+    loop_time = millis() - start;
+
 }
 
-
-void check_if_battery_charged(){
-    float last_volts = eeprom_read_volts();
-    float current_volts = vesc_comm.get_voltage();
-    if (was_battery_charged(last_volts, current_volts)) {
-        // reset mAh spent
-        if (is_battery_full(current_volts)) {
-            eeprom_write_mah_spent(0);
-        }
-        else {
-            float soc = voltage_to_percent(current_volts);
-            uint16_t mah_spent = (uint16_t) (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY * (1 - soc));
-            eeprom_write_mah_spent(mah_spent);
-        }
-        eeprom_write_volts(current_volts);
-    }
-}
 
 void get_initial_values(){
     initial_mah_spent = eeprom_read_mah_spent();
@@ -225,43 +221,41 @@ void get_initial_values(){
     //   current value = initial value + VESC value
     // and that works correctly with the default initial values in case the VESC values
     // start from 0. If that's not the case though we need to lower the initial values.
-    int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
-                                           vesc_comm.get_amphours_charged());
+    int32_t vesc_mah_spent = VESC_COUNT * (data.mah_discharged - data.mah_charged);
     initial_mah_spent -= vesc_mah_spent;
-    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
+    int32_t tachometer = rotations_to_meters(data.tachometer / 6);
     initial_trip_meters -= tachometer;
     initial_total_meters -= tachometer;
 }
 
 void calculate_mah(){
         // TODO: DRY
-    int32_t vesc_mah_spent = VESC_COUNT * (vesc_comm.get_amphours_discharged() -
-                                           vesc_comm.get_amphours_charged());
+    int32_t vesc_mah_spent = VESC_COUNT * (data.mah_discharged - data.mah_charged);
     int32_t mah_spent = initial_mah_spent + vesc_mah_spent;
     int32_t mah = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah_spent;
 
     // uint32_t button_2_down_elapsed = millis() - button_2_last_up_time;
-    if (button2_down) {
-        button2_down = LOW;
+/*     if (button2_down) {
+        button2_down = LOW; */
         // reset coulomb counter
         mah = voltage_to_percent(data.voltage) * BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY;
         mah_spent = BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY - mah;
         eeprom_write_mah_spent(mah_spent);
         initial_mah_spent = mah_spent - vesc_mah_spent;
-    }
+    //}
 
     data.mah = mah;
-    data.mah_spent = vesc_comm.get_amphours_discharged();
+    data.mah_spent = data.mah_discharged;
 }
 
 void read_other_values(){
         // dim mAh if the counter is about to be reset
     // data.mah_reset_progress = min(1.0 * button_2_down_elapsed / COUNTER_RESET_TIME, 1.0);
 
-    int32_t rpm = vesc_comm.get_rpm();
-    data.speed_kph = max(erpm_to_kph(rpm), 0);
+    int32_t rpm = data.rpm;
+    data.speed_kph = max(erpm_to_kph(rpm), float(0));
 
-    int32_t tachometer = rotations_to_meters(vesc_comm.get_tachometer() / 6);
+    int32_t tachometer = rotations_to_meters(data.tachometer / 6);
 
     session_data.trip_meters = initial_trip_meters + tachometer;
     int32_t total_meters = initial_total_meters + tachometer;

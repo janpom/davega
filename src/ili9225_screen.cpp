@@ -16,17 +16,27 @@
 #include "ili9225_screen.h"
 #include "roxie_config.h"
 
-#define TFT_RS  9   // REGISTER SELECT
-#ifdef ARDUINO_NANO_EVERY
-    #define TFT_CS  8  // CS
-    #define TFT_RST 10  // TODO: 12 does not work, check why
-#else 
-    #define TFT_CS  10  // CS
-    #define TFT_RST 12
+#ifndef ARDUINO_NANO_EVERY
+    #define TFT_RS  PA2   // REGISTER SELECT
+    #define TFT_CS  PA4  // CS
+    #define TFT_RST PA0
+    #define TFT_SDI PA7  // MOSI
+    #define TFT_CLK PA5  // SCK
+    #define TFT_LED 0
+#else
+
+    #define TFT_RS  9   // REGISTER SELECT
+    #ifdef ARDUINO_NANO_EVERY
+        #define TFT_CS  8  // CS
+        #define TFT_RST 10  // TODO: 12 does not work, check why
+    #else 
+        #define TFT_CS  10  // CS
+        #define TFT_RST 12
+    #endif
+    #define TFT_SDI 11  // MOSI
+    #define TFT_CLK 13  // SCK
+    #define TFT_LED 0
 #endif
-#define TFT_SDI 11  // MOSI
-#define TFT_CLK 13  // SCK
-#define TFT_LED 0
 
 TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_LED, 10); // hardware SPI
 // TFT_22_ILI9225 tft = TFT_22_ILI9225(TFT_RST, TFT_RS, TFT_CS, TFT_SDI, TFT_CLK, TFT_LED, 200); // software SPI

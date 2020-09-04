@@ -17,6 +17,8 @@
 
 #include "util.h"
 #include "vesc_comm.h"
+#include "data.h"
+#include "roxie_eeprom.h"
 
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 const float discharge_ticks[] = DISCHARGE_TICKS;
@@ -98,7 +100,7 @@ float erpm_to_kph(uint32_t erpm) {
 float voltage_to_percent(float voltage) {
     if (voltage < discharge_ticks[0])
         return 0.0;
-    for (int i = 1; i < LEN(discharge_ticks); i++) {
+    for (uint8_t i = 1; i < LEN(discharge_ticks); i++) {
         float cur_voltage = discharge_ticks[i];
         if (voltage < cur_voltage) {
             float prev_voltage = discharge_ticks[i - 1];
@@ -109,6 +111,22 @@ float voltage_to_percent(float voltage) {
         }
     }
     return 1.0;
+}
+
+void check_if_battery_charged(t_data* data){
+    float last_volts = eeprom_read_volts();
+    if (was_battery_charged(last_volts, data->voltage)) {
+        // reset mAh spent
+        if (is_battery_full(data->voltage)) {
+            eeprom_write_mah_spent(0);
+        }
+        else {
+            float soc = voltage_to_percent(data->voltage);
+            uint16_t mah_spent = (uint16_t) (BATTERY_MAX_MAH * BATTERY_USABLE_CAPACITY * (1 - soc));
+            eeprom_write_mah_spent(mah_spent);
+        }
+        eeprom_write_volts(data->voltage);
+    }
 }
 
 bool was_battery_charged(float last_volts, float current_volts) {

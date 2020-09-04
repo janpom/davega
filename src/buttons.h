@@ -17,15 +17,10 @@
 #define BUTTONS_H
 
 #include "data.h"
+#include "screen.h"
 
-
-volatile bool button1_clicked = false;
-volatile bool button2_down = LOW;
-volatile bool button3_down = LOW;
-
-void read_buttons(t_session_data session_data);
-void button1_falling();
-void button1_rising();
+void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, int32_t* tachometer, Screen* scr);
+void button1_changed();
 void button2_pressed();
 void button3_pressed();
 

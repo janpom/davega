@@ -19,6 +19,7 @@
 #include "tft_util.h"
 #include <TFT_22_ILI9225.h>
 
+
 void SimpleVerticalScreen::reset() {
     String label1;
     String label2;
@@ -27,6 +28,7 @@ void SimpleVerticalScreen::reset() {
 
     _tft->fillRectangle(0, 140, 176 - 1, 170, COLOR_BLACK);
     _tft->fillRectangle(0, 190, 176 - 1, 220, COLOR_BLACK);
+
     
     _tft->setFont(Terminal6x8);
     switch (_value_screen) {
@@ -113,7 +115,7 @@ void SimpleVerticalScreen::update(t_data *data) {
     }
 
     
-    tft_util_draw_number(_tft, primary_value, 2, 35, COLOR_WHITE, COLOR_BLACK, 10, 14);
+    tft_util_draw_number(_tft, primary_value, 2, 35, color, COLOR_BLACK, 10, 14);
     tft_util_draw_number(_tft, value1, 0, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value2, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value3, 95, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
