@@ -27,7 +27,7 @@
 #endif
 
 #ifdef ARDUINO_NANO_EVERY
-    HardwareSerial &vesc_serial = Serial;
+    HardwareSerial &vesc_serial = Serial1;
 #else
     HardwareSerial &vesc_serial = Serial;
 #endif

@@ -20,6 +20,7 @@
 #include "screen.h"
 #include "vesc_comm.h"
 #include "buttons.h"
+#include "simple_vertical_screen.h"
 
 #define REVISION_ID ""
 #define FW_VERSION "v1.0"
@@ -52,64 +53,10 @@ VescCommUnity vesc_comm = VescCommUnity();
 VescCommStandard vesc_comm = VescCommStandard();
 #endif
 
-#ifdef DEFAULT_SCREEN_ENABLED
-#include "default_screen.h"
-DefaultScreen default_screen = DefaultScreen();
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
-#include "simple_horizontal_screen.h"
-SimpleHorizontalScreen simple_horizontal_screen = SimpleHorizontalScreen(SCR_SPEED);
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-#include "simple_horizontal_screen.h"
-SimpleHorizontalScreen simple_horizontal_screen_with_battery_current = SimpleHorizontalScreen(SCR_BATTERY_CURRENT);
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-#include "simple_horizontal_screen.h"
-SimpleHorizontalScreen _simple_horizontal_screen_with_motor_current = SimpleHorizontalScreen(SCR_MOTOR_CURRENT);
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
-#include "simple_vertical_screen.h"
 SimpleVerticalScreen simple_vertical_screen = SimpleVerticalScreen(SCR_SPEED);
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-#include "simple_vertical_screen.h"
-SimpleVerticalScreen simple_vertical_screen_with_battery_current = SimpleVerticalScreen(SCR_BATTERY_CURRENT);
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-#include "simple_vertical_screen.h"
-SimpleVerticalScreen simple_vertical_screen_with_motor_current = SimpleVerticalScreen(SCR_MOTOR_CURRENT);
-#endif
-#ifdef TEXT_SCREEN_ENABLED
-#include "text_screen.h"
-TextScreen text_screen = TextScreen();
-#endif
 
 Screen* screens[] = {
-#ifdef DEFAULT_SCREEN_ENABLED
-    &default_screen,
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_ENABLED
-    &simple_horizontal_screen,
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-    &simple_horizontal_screen_with_battery_current,
-#endif
-#ifdef SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-    &simple_horizontal_screen_with_motor_current,
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_ENABLED
     &simple_vertical_screen,
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED
-    &simple_vertical_screen_with_battery_current,
-#endif
-#ifdef SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED
-    &simple_vertical_screen_with_motor_current,
-#endif
-#ifdef TEXT_SCREEN_ENABLED
-    &text_screen,
-#endif
 };
 
 t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
@@ -152,7 +99,7 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(BUTTON_3_PIN), button3_pressed, FALLING);
 
 #ifdef DEBUG
-    //Serial3.begin(115200);
+    Serial.begin(115200);
 #endif
     vesc_comm.init(115200);
 
@@ -180,6 +127,7 @@ void setup() {
     check_if_battery_charged(&data);
     get_initial_values();
 }
+
 unsigned long start;
 unsigned long loop_time;
 void loop() {

@@ -23,7 +23,7 @@
 // #define SIM_VALUES
 
 // uncomment if not using arduino nano every
-// #define ARDUINO_NANO_EVERY
+#define ARDUINO_NANO_EVERY
 
 // To compile for FOCBOX Unity, uncomment the following line.
 //#define FOCBOX_UNITY 1
@@ -32,7 +32,7 @@
 #define MOTOR_POLE_PAIRS 18
 #define WHEEL_DIAMETER_MM 550
 #define MOTOR_PULLEY_TEETH 1
-#define WHEEL_PULLEY_TEETH 3
+#define WHEEL_PULLEY_TEETH 5
 
 // Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
 // The speed indicator will merely indicate the current speed as the max speed (all blue rectangles
@@ -136,17 +136,11 @@
 #define UPDATE_DELAY 50  // ms
 
 // 0=portrait, 1=right rotated landscape, 2=reverse portrait, 3=left rotated landscape
-#define SCREEN_ORIENTATION 0
+#define SCREEN_ORIENTATION 2
 
 // Screens. Uncomment the ones you want enabled.
-//#define DEFAULT_SCREEN_ENABLED 1
-//#define SIMPLE_HORIZONTAL_SCREEN_ENABLED 1
-//#define SIMPLE_HORIZONTAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
-//#define SIMPLE_HORIZONTAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 1
-//#define SIMPLE_VERTICAL_SCREEN_WITH_BATTERY_CURRENT_ENABLED 1
-//#define SIMPLE_VERTICAL_SCREEN_WITH_MOTOR_CURRENT_ENABLED 1
-#define TEXT_SCREEN_ENABLED 1
+
 
 // Information to be displayed on the text screen. Only relevant if TEXT_SCREEN_ENABLED is set.
 // Available options:
