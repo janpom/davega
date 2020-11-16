@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "test",
+			"path": "../../Documents/PlatformIO/Projects/test"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.tcc": "cpp",
+			"random": "cpp",
+			"array": "cpp",
+			"atomic": "cpp",
+			"vector": "cpp",
+			"functional": "cpp",
+			"memory_resource": "cpp",
+			"optional": "cpp",
+			"string_view": "cpp",
+			"type_traits": "cpp",
+			"fstream": "cpp",
+			"memory": "cpp",
+			"new": "cpp",
+			"stdexcept": "cpp",
+			"system_error": "cpp",
+			"tuple": "cpp",
+			"typeinfo": "cpp",
+			"utility": "cpp",
+			"cstddef": "cpp",
+			"cstdio": "cpp",
+			"cwchar": "cpp",
+			"initializer_list": "cpp",
+			"string": "cpp"
+		}
+	}
+}

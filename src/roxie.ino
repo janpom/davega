@@ -19,7 +19,7 @@
 #include "screen.h"
 #include "vesc_comm.h"
 #include "buttons.h"
-#include "simple_vertical_screen.h"
+#include "vertical_screen.h"
 
 unsigned long starting_time;
 

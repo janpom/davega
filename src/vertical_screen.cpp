@@ -13,7 +13,7 @@
     along with Roxie firmware.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "simple_vertical_screen.h"
+#include "vertical_screen.h"
 #include "screen.h"
 #include "util.h"
 #include "tft_util.h"

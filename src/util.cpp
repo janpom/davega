@@ -19,11 +19,48 @@
 #include "vesc_comm.h"
 #include "data.h"
 #include "roxie_eeprom.h"
+#include "TFT_22_ILI9225.h"
 
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
 const float discharge_ticks[] = DISCHARGE_TICKS;
 
 char fw_version_buffer[6];
+
+uint16_t primary_item_color(t_screen_item screen_item, t_data* data, t_screen_config* config) {
+    uint16_t color = COLOR_WHITE;
+    if (screen_item == SCR_BATTERY_CURRENT || screen_item == SCR_MOTOR_CURRENT) {
+        float value = screen_item == SCR_BATTERY_CURRENT ? data->battery_amps : data->motor_amps;
+        if (value < 0)
+            color = COLOR_RED;
+        if (value >= 100)
+            color = COLOR_YELLOW;
+        if (value >= 200)
+            color = COLOR_BLUEVIOLET;
+    }
+    else {
+        // speed
+        if (data->speed_kph > SS_RED_SPEED_KPH)
+            color = COLOR_RED;
+        else if (data->speed_kph > SS_YELLOW_SPEED_KPH)
+            color = COLOR_YELLOW;
+    }
+    return color;
+}
+
+float primary_item_value(t_screen_item screen_item, t_data* data, t_screen_config* config) {
+    float value;
+    switch (screen_item) {
+        case SCR_BATTERY_CURRENT:
+            value = data->battery_amps;
+            break;
+        case SCR_MOTOR_CURRENT:
+            value = data->motor_amps;
+            break;
+        default:
+            value = convert_speed(data->speed_kph, config->imperial_units);
+    }
+    return value;
+}
 
 const char* make_fw_version(const char* fw_version, const char* revision_id) {
     if (fw_version[0] == 'v') {
