@@ -59,7 +59,7 @@ Screen* screens[] = {
     &simple_vertical_screen,
 };
 
-t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
+// t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
 t_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
@@ -67,9 +67,6 @@ t_screen_config screen_config = {
     USE_FAHRENHEIT,
     SHOW_AVG_CELL_VOLTAGE,
     BATTERY_S,
-    TEXT_SCREEN_BIG_FONT,
-    text_screen_items,
-    LEN(text_screen_items),
     SCREEN_ORIENTATION
 };
 
