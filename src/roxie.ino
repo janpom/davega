@@ -14,7 +14,6 @@
 */
 
 #include "roxie_config.h"
-#include "data.h"
 #include "roxie_eeprom.h"
 #include "util.h"
 #include "screen.h"
@@ -22,28 +21,7 @@
 #include "buttons.h"
 #include "simple_vertical_screen.h"
 
-#define REVISION_ID ""
-#define FW_VERSION "v1.0"
-
-#ifdef DEBUG
-    #define DEB(x) Serial.println(x)
-#else
-    #define DEB(x)
-#endif
-
-#ifdef ARDUINO_NANO_EVERY
-	#define BUTTON_1_PIN A0
-	#define BUTTON_2_PIN A1
-	#define BUTTON_3_PIN A2
-#else
-	#define BUTTON_1_PIN PB3
-	#define BUTTON_2_PIN PB4
-	#define BUTTON_3_PIN PB5
-#endif
-
 unsigned long starting_time;
-
-#define LEN(X) (sizeof(X) / sizeof(X[0]))
 
 #ifdef FOCBOX_UNITY
 #include "vesc_comm_unity.h"
@@ -58,8 +36,6 @@ SimpleVerticalScreen simple_vertical_screen = SimpleVerticalScreen(SCR_SPEED);
 Screen* screens[] = {
     &simple_vertical_screen,
 };
-
-// t_screen_item text_screen_items[] = TEXT_SCREEN_ITEMS;
 
 t_screen_config screen_config = {
     make_fw_version(FW_VERSION, REVISION_ID),
@@ -95,9 +71,7 @@ void setup() {
     pinMode(BUTTON_3_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(BUTTON_3_PIN), button3_pressed, FALLING);
 
-#ifdef DEBUG
     Serial.begin(115200);
-#endif
     vesc_comm.init(115200);
 
     for (uint8_t i=0; i<LEN(screens); i++)
@@ -148,6 +122,7 @@ void loop() {
     scr->heartbeat(UPDATE_DELAY, true);
 
     loop_time = millis() - start;
+    Serial.println("Loop time is " + String(loop_time));
 
 }
 

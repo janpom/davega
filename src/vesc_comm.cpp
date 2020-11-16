@@ -19,13 +19,6 @@
 #include "crc.h"
 #include "roxie_config.h"
 
-// TODO: Make vesc_serial a parameter of vesc_comm_init.
-#ifdef DEBUG
-    #define DEB(x) Serial.println(x)
-#else
-    #define DEB(x)
-#endif
-
 #ifdef ARDUINO_NANO_EVERY
     HardwareSerial &vesc_serial = Serial1;
 #else
