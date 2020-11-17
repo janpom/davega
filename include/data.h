@@ -66,4 +66,13 @@ typedef struct {
     float rpm;
 } t_data;
 
+typedef struct {
+    const char* fw_version;
+    bool imperial_units;
+    bool use_fahrenheit;
+    bool per_cell_voltage;
+    uint8_t battery_cells;
+    uint8_t orientation;
+} t_screen_config;
+
 #endif //DATA_H

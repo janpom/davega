@@ -19,7 +19,7 @@
 #include "data.h"
 #include "screen.h"
 
-void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, int32_t* tachometer, Screen* scr);
+void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, int32_t* tachometer, Screen* screen);
 void button1_changed();
 void button2_pressed();
 void button3_pressed();

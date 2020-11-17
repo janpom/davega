@@ -27,7 +27,7 @@ unsigned long last_button_rising_time;
 volatile bool button2_down = LOW;
 volatile bool button3_down = LOW;
 
-void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, int32_t* tachometer, Screen* scr){
+void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, int32_t* tachometer, Screen* screen){
 
     // uint32_t button_1_down_elapsed = millis() - button_1_last_up_time;
     if(change_flag){
@@ -57,8 +57,8 @@ void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, in
     if(button3_down){
         button3_down = LOW;
         // scr = screens[current_screen_index];
-        scr->nextScreen();
-        scr->reset();
+        //screen->nextScreen();
+        screen->draw_basic();
     }
 
 }

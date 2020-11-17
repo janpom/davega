@@ -18,6 +18,7 @@
 #include "data.h"
 #include "vesc_comm_standard.h"
 #include "roxie_config.h"
+#include "util.h"
 
 VescCommStandard::VescCommStandard() {
     _max_packet_length = 78;
@@ -26,24 +27,22 @@ VescCommStandard::VescCommStandard() {
     #endif
 }
 
-void VescCommStandard::process_packet(t_data* data_packet){
-    data_packet->mosfet_celsius = get_temp_mosfet();
-    data_packet->motor_celsius = get_temp_motor();
-    data_packet->motor_amps = get_motor_current();
-    data_packet->battery_amps = get_battery_current() * VESC_COUNT;
-    data_packet->duty_cycle = get_duty_cycle();
-    data_packet->vesc_fault_code = get_fault_code();
-    data_packet->voltage = get_voltage();
-    data_packet->wh_spent = get_watthours_discharged();
-    data_packet->mah_charged = get_amphours_charged();
-    data_packet->mah_discharged = get_amphours_discharged();
-    data_packet->tachometer = get_tachometer();
-    data_packet->rpm = get_rpm();
-  //  D("Current watthours: " + String(data_packet.wh_spent));
-}
-
-float VescCommStandard::test() {
-    return 5;
+void VescCommStandard::process_packet(t_data* data){
+    data->mosfet_celsius = get_temp_mosfet();
+    data->motor_celsius = get_temp_motor();
+    data->motor_amps = get_motor_current();
+    data->battery_amps = get_battery_current() * VESC_COUNT;
+    data->duty_cycle = get_duty_cycle();
+    data->vesc_fault_code = get_fault_code();
+    data->voltage = get_voltage();
+    data->wh_spent = get_watthours_discharged();
+    data->mah_charged = get_amphours_charged();
+    data->mah_discharged = get_amphours_discharged();
+    data->tachometer = get_tachometer();
+    data->rpm = get_rpm();
+    data->speed_kph = max(erpm_to_kph(data->rpm), float(0));
+    data->voltage_percent = voltage_to_percent(data->voltage);
+    data->battery_percent = VOLTAGE_WEIGHT * data->voltage_percent;
 }
 
 float VescCommStandard::get_temp_mosfet() {

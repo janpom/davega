@@ -24,7 +24,6 @@
 class VescCommStandard: public VescComm {
 public:
     VescCommStandard();
-    float test();
     void process_packet(t_data* data_packet);
     float get_temp_mosfet();
     float get_temp_motor();

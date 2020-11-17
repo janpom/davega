@@ -20,44 +20,11 @@
 
 #include "data.h"
 
-typedef enum {
-    SCR_FW_VERSION = 0,
-    SCR_MOSFET_TEMPERATURE,
-    SCR_MOTOR_TEMPERATURE,
-    SCR_MOTOR_CURRENT,
-    SCR_BATTERY_CURRENT,
-    SCR_DUTY_CYCLE,
-    SCR_TOTAL_VOLTAGE,
-    SCR_MIN_TOTAL_VOLTAGE,
-    SCR_AVG_CELL_VOLTAGE,
-    SCR_BATTERY_CAPACITY_MAH,
-    SCR_BATTERY_CAPACITY_PERCENT,
-    SCR_WATTHOURS,
-    SCR_TRIP_DISTANCE,
-    SCR_TOTAL_DISTANCE,
-    SCR_SPEED,
-    SCR_MAX_SPEED,
-    SCR_AVG_SPEED,
-    SCR_TIME_ELAPSED,
-    SCR_TIME_RIDING,
-    SCR_FAULT_CODE
-} t_screen_item;
-
-typedef struct {
-    const char* fw_version;
-    bool imperial_units;
-    bool use_fahrenheit;
-    bool per_cell_voltage;
-    uint8_t battery_cells;
-    uint8_t orientation;
-} t_screen_config;
-
 class Screen {
 public:
     virtual void init(t_screen_config* config) { _config = config; };
-    virtual void reset() = 0;
+    virtual void draw_basic() = 0;
     virtual void update(t_data* data) = 0;
-    virtual void nextScreen() = 0;
     virtual void heartbeat(uint32_t duration_ms, bool successful_vesc_read) = 0;
 
 protected:

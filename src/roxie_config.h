@@ -128,7 +128,7 @@
 // In particular,
 // 1.0 = only use battery voltage for estimating remaining capacity.
 // 0.0 = only use coulomb counter for estimating remaining capacity.
-#define VOLTAGE_WEIGHT 0.4
+#define VOLTAGE_WEIGHT 1.0
 
 #define SS_YELLOW_SPEED_KPH (MAX_SPEED_KPH*3/5)
 #define SS_RED_SPEED_KPH (MAX_SPEED_KPH*4/5)

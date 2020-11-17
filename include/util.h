@@ -25,8 +25,7 @@
 #define KM_PER_MILE 0.621371
 
 
-uint16_t primary_item_color(t_screen_item screen_item, t_data* data, t_screen_config* config);
-float primary_item_value(t_screen_item screen_item, t_data* data, t_screen_config* config);
+uint16_t item_color(t_data* data);
 const char* make_fw_version(const char* fw_version, const char* revision_id);
 float convert_distance(float distance_km, bool imperial_units);
 float convert_speed(float speed_kph, bool imperial_units);

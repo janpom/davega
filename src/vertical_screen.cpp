@@ -20,102 +20,43 @@
 #include <TFT_22_ILI9225.h>
 
 
-void SimpleVerticalScreen::reset() {
-    String label1;
-    String label2;
-    String label3;
-    String label4;
-
+void VerticalScreen::draw_basic() {
     _tft->fillRectangle(0, 140, 176 - 1, 170, COLOR_BLACK);
     _tft->fillRectangle(0, 190, 176 - 1, 220, COLOR_BLACK);
 
-    
     _tft->setFont(Terminal6x8);
-    switch (_value_screen) {
-        case DEFAULT_SCREEN:
-            label1 = _config->imperial_units ? "TRIP MI     " : "TRIP KM     ";
-            label2 = _config->imperial_units ? "TOTAL MI    " : "TOTAL KM    ";
-            label3 = "WATTS       ";
-            label4 = "BATTERY V   ";
-            break;
-        case TEMP_SCREEN:
-            label1 = "Wh USED     ";
-            label2 = "MOSFET TEMP ";
-            label3 = "mAh LEFT    ";
-            label4 = "BATTERY V   ";
-            break;
-        case SPEED_SCREEN:
-            label1 = "MAX SPEED   ";
-            label2 = "MOTOR AMPS  ";
-            label3 = "AVG SPEED   ";
-            label4 = "BATTERY V   ";
-            break;
-    }
-
-    _tft->drawText(0, 130, label1, COLOR_WHITE);
-    _tft->drawText(0, 180, label2, COLOR_WHITE);
-    _tft->drawText(110, 130, label3, COLOR_WHITE);
-    _tft->drawText(110, 180, label4, COLOR_WHITE);
-
-    switch (_primary_item) {
-        case SCR_BATTERY_CURRENT:   
-            _tft->drawText(82, 0, "BATTERY A", COLOR_WHITE);
-            break;
-        case SCR_MOTOR_CURRENT:
-            _tft->drawText(96, 0, "MOTOR A", COLOR_WHITE);
-            break;
-        default:
-            _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
-            break;
-    }
+    _tft->drawText(0, 130, _config->imperial_units ? "TRIP MI     " : "TRIP KM     ", COLOR_WHITE);
+    _tft->drawText(0, 180, _config->imperial_units ? "TOTAL MI    " : "TOTAL KM    ", COLOR_WHITE);
+    _tft->drawText(110, 130, "WATTS       ", COLOR_WHITE);
+    _tft->drawText(110, 180, "BATTERY V   ", COLOR_WHITE);
+    _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
 
     _just_reset = true;
 }
 
-void SimpleVerticalScreen::update(t_data *data) {
+void VerticalScreen::update(t_data *data) {
     char primary_value[10];
     char value1[10];
     char value2[10];
     char value3[10];
     char value4[10];
-    uint16_t color;
 
     if (data->vesc_fault_code != _last_fault_code)
-        reset();
+        draw_basic();
 
-    // primary display item
-    dtostrf(primary_item_value(_primary_item, data, _config), 4, 1, primary_value);
-    color = primary_item_color(_primary_item, data, _config);
+    dtostrf(convert_speed(data->speed_kph, _config), 4, 1, primary_value);
     if (_config->per_cell_voltage)
         dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
     else
         dtostrf(data->voltage, 4, 1, value4);
 
-    switch (_value_screen) { 
-    case DEFAULT_SCREEN:
-        dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, value1);
-        format_total_distance(convert_distance(data->total_km, _config->imperial_units), value2);
-        dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
-        break;
-    case TEMP_SCREEN:
-        dtostrf(data->wh_spent, 2, 2, value1);
-        dtostrf(data->mosfet_celsius, 2, 1, value2);
-        dtostrf(data->mah_spent, 4, 1, value3);
-        break;
-    case SPEED_SCREEN:
-        dtostrf(data->session->max_speed_kph, 4, 1, value1);
-        dtostrf(data->motor_amps, 4, 1, value2);
-        float avg_speed_kph = data->session->millis_riding > 10
-            ? 3600.0 * data->session->trip_meters / data->session->millis_riding : 0;
-        avg_speed_kph = avg_speed_kph < 100
-            ?  avg_speed_kph : 99.9;
-        convert_distance(avg_speed_kph, _config->imperial_units);
-        dtostrf(avg_speed_kph, 4, 1, value3);
-        break;
-    }
+
+    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, value1);
+    format_total_distance(convert_distance(data->total_km, _config->imperial_units), value2);
+    dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
 
     
-    tft_util_draw_number(_tft, primary_value, 2, 35, color, COLOR_BLACK, 10, 14);
+    tft_util_draw_number(_tft, primary_value, 2, 35, item_color(data), COLOR_BLACK, 10, 14);
     tft_util_draw_number(_tft, value1, 0, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value2, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value3, 95, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
@@ -132,31 +73,14 @@ void SimpleVerticalScreen::update(t_data *data) {
         _tft->setBackgroundColor(COLOR_BLACK);
     }
 
-    _update_battery_indicator(data->battery_percent, _just_reset);
+    Serial.println("Current battery percent: " + String(data->battery_percent));
+    _update_battery_indicator(data->voltage_percent, _just_reset);
 
     _last_fault_code = data->vesc_fault_code;
     _just_reset = false;
 }
 
-void SimpleVerticalScreen::nextScreen(){
-    switch (_value_screen)
-    {
-    case DEFAULT_SCREEN:
-        _value_screen = TEMP_SCREEN;
-        break;
-    case TEMP_SCREEN:
-        _value_screen = SPEED_SCREEN;
-        break;
-    case SPEED_SCREEN:
-        _value_screen =DEFAULT_SCREEN;
-        break;
-    default:
-        _value_screen =DEFAULT_SCREEN;
-        break;
-    }
-}
-
-void SimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
+void VerticalScreen::_update_battery_indicator(float battery_percent, bool redraw) {
     int width = 15;
     int space = 2;
     int cell_count = 10;
@@ -181,7 +105,7 @@ void SimpleVerticalScreen::_update_battery_indicator(float battery_percent, bool
 #define HEARTBEAT_X ((176 - HEARTBEAT_SIZE)/2 + 9)
 #define HEARBEAT_Y 220-HEARTBEAT_SIZE-1
 
-void SimpleVerticalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
+void VerticalScreen::heartbeat(uint32_t duration_ms, bool successful_vesc_read) {
     uint16_t color = successful_vesc_read ? _tft->setColor(0, 150, 0) : _tft->setColor(150, 0, 0);
     _tft->fillRectangle(HEARTBEAT_X, HEARBEAT_Y, HEARTBEAT_X + HEARTBEAT_SIZE, HEARBEAT_Y + HEARTBEAT_SIZE, color);
     delay(duration_ms);
