@@ -97,13 +97,16 @@ const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
     }
 }
 
-int32_t rotations_to_meters(int32_t rotations) {
+int32_t rotations_to_meters(int32_t erpm) {
+    Serial.println(String(erpm ) + " is the erpm");
     float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
-    return (rotations / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
+    Serial.println(String(gear_ratio) + " is the gear ratio");
+    return (erpm / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
 }
 
 float erpm_to_kph(uint32_t erpm) {
     float km_per_minute = rotations_to_meters(erpm) / 1000.0;
+    Serial.println(String(km_per_minute) + " km per minute");
     return km_per_minute * 60.0;
 }
 
