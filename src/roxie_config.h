@@ -20,7 +20,7 @@
 // #define ARDUINO_NANO_EVERY
 
 #define VESC_COUNT 1  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
-#define MOTOR_POLE_PAIRS 4
+#define MOTOR_POLE_PAIRS 2
 #define WHEEL_DIAMETER_MM 550
 #define MOTOR_PULLEY_TEETH 1
 #define WHEEL_PULLEY_TEETH 5
@@ -31,7 +31,7 @@
 // Affects the speed indicator. If MAX_SPEED_KPH is exceeded, no major disaster will happen.
 // The speed indicator will merely indicate the current speed as the max speed (all blue rectangles
 // filled). It will still show the correct number though.
-#define MAX_SPEED_KPH 30
+#define MAX_SPEED_KPH 35
 
 // Set to true to display the distance in miles and the speed in mph.
 #define IMPERIAL_UNITS false
@@ -46,7 +46,7 @@
 // Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
 // the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
 // traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 46 // [1, 255]
+#define EEPROM_MAGIC_VALUE 51 // [1, 255]
 
 #define EEPROM_INIT_VALUE_VOLTS 0
 #define EEPROM_INIT_VALUE_MAH_SPENT 0
@@ -63,7 +63,7 @@
 // Note that EEPROM is also updated whenever the board comes to a stop (see below), so regardless
 // of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless Roxie is accidentally
 // reset before saving to EEPROM (which shouldn't happen under normal circumstances).
-#define EEPROM_UPDATE_EACH_METERS 50000
+#define EEPROM_UPDATE_EACH_METERS 1000
 
 // If the board comes to stop, update EEPROM, unless it was already updated in less than
 // EEPROM_UPDATE_MIN_DELAY_ON_STOP millis when the board stopped. This shouldn't happen
@@ -79,7 +79,7 @@
 #define COUNTER_RESET_TIME 3000  // ms
 
 // This corresponds (more or less) to how often data is read from VESC.
-#define UPDATE_DELAY 50  // ms
+#define UPDATE_DELAY 50 // ms
 
 // Screens. Uncomment the ones you want enabled.
 #define SIMPLE_VERTICAL_SCREEN_ENABLED 1
@@ -158,5 +158,27 @@
 	#define BUTTON_2_PIN PB4
 	#define BUTTON_3_PIN PB5
 #endif
+
+/* #ifndef ARDUINO_NANO_EVERY
+    #define TFT_RS  PA2   // REGISTER SELECT
+    #define TFT_CS  PA4  // CS
+    #define TFT_RST PA0
+    #define TFT_SDI PA7  // MOSI
+    #define TFT_CLK PA5  // SCK
+    #define TFT_LED 0
+#else */
+
+    #define TFT_RS  9   // REGISTER SELECT
+    #ifdef ARDUINO_NANO_EVERY
+        #define TFT_CS  8  // CS
+        #define TFT_RST 10  // TODO: 12 does not work, check why
+    #else 
+        #define TFT_CS  10  // CS
+        #define TFT_RST 12
+    #endif
+    #define TFT_SDI 11  // MOSI
+    #define TFT_CLK 13  // SCK
+    #define TFT_LED 0
+// #endif
 
 #endif //ROXIE_CONFIG_H

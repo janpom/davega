@@ -25,10 +25,19 @@
 #define KM_PER_MILE 0.621371
 
 
-uint16_t item_color(t_data* data);
+uint16_t item_color(float speed_kph);
+
 const char* make_fw_version(const char* fw_version, const char* revision_id);
-float convert_distance(float distance_km, bool imperial_units);
-float convert_speed(float speed_kph, bool imperial_units);
+
+/**
+ * @brief Convert kilometers to miles if this is set in the configuration
+ * 
+ * @param kilometer
+ * @param imperial_units 
+ * @return float 
+ */
+float convert_km_to_miles(float kilometer, bool imperial_units);
+
 float convert_temperature(float temp_celsius, bool imperial_units);
 void format_total_distance(float total_distance, char* result);
 const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code);

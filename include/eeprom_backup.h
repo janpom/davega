@@ -21,7 +21,22 @@
 #include "data.h"
 #include <Arduino.h>
 
+/**
+ * @brief Check if the magic value in the EEPROM is the same as the value from the config file.
+ * 
+ * @param magic_value 
+ * @return true
+ * @return false 
+ */
 bool eeprom_is_initialized(uint8_t magic_value);
+
+/**
+ * @brief Initialize the EEPROM with values from the config file
+ * 
+ * @param magic_value 
+ * @param session_data 
+ * @param data 
+ */
 void eeprom_initialize(uint8_t magic_value, t_session_data session_data, t_data data);
 void eeprom_read_data(t_data data, t_session_data session_data);
 

@@ -31,6 +31,10 @@ void VerticalScreen::draw_basic() {
     _tft->drawText(110, 180, "BATTERY V   ", COLOR_WHITE);
     _tft->drawText(150, 21, _config->imperial_units ? "MPH" : "KPH", COLOR_WHITE);
 
+    // Draw degrees symbol
+    _tft->drawCircle(37, 22, 1, COLOR_WHITE);
+    _tft->drawText(40, 24, _config->imperial_units ?  "F" : "C", COLOR_WHITE);
+
     _just_reset = true;
 }
 
@@ -40,27 +44,31 @@ void VerticalScreen::update(t_data *data) {
     char value2[10];
     char value3[10];
     char value4[10];
+    char temp_value[10];
 
     if (data->vesc_fault_code != _last_fault_code)
         draw_basic();
 
-    dtostrf(convert_speed(data->speed_kph, _config), 4, 1, primary_value);
+    dtostrf(convert_km_to_miles(data->speed_kph, _config), 4, 1, primary_value);
     if (_config->per_cell_voltage)
         dtostrf(data->voltage / _config->battery_cells, 4, 2, value4);
     else
         dtostrf(data->voltage, 4, 1, value4);
 
 
-    dtostrf(convert_distance(data->trip_km, _config->imperial_units), 5, 2, value1);
-    format_total_distance(convert_distance(data->total_km, _config->imperial_units), value2);
+    dtostrf(convert_km_to_miles(data->trip_km, _config->imperial_units), 5, 2, value1);
+    format_total_distance(convert_km_to_miles(data->total_km, _config->imperial_units), value2);
     dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
+    dtostrf(data->mosfet_celsius, 2, 1, temp_value);
 
     
-    tft_util_draw_number(_tft, primary_value, 2, 35, item_color(data), COLOR_BLACK, 10, 14);
+    tft_util_draw_number(_tft, primary_value, 2, 35, item_color(convert_km_to_miles(data->speed_kph, _config)), COLOR_BLACK, 10, 14);
     tft_util_draw_number(_tft, value1, 0, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value2, 0, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value3, 95, 140, COLOR_WHITE, COLOR_BLACK, 2, 6);
     tft_util_draw_number(_tft, value4, 110, 190, COLOR_WHITE, COLOR_BLACK, 2, 6);
+
+    tft_util_draw_number(_tft, temp_value, 5, 21, COLOR_WHITE, COLOR_BLACK, 2, 2);
     
 
     // warning
@@ -73,7 +81,6 @@ void VerticalScreen::update(t_data *data) {
         _tft->setBackgroundColor(COLOR_BLACK);
     }
 
-    Serial.println("Current battery percent: " + String(data->battery_percent));
     _update_battery_indicator(data->voltage_percent, _just_reset);
 
     _last_fault_code = data->vesc_fault_code;

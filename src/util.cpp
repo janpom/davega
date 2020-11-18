@@ -16,9 +16,8 @@
 */
 
 #include "util.h"
-#include "vesc_comm.h"
 #include "data.h"
-#include "roxie_eeprom.h"
+#include "eeprom_backup.h"
 #include "TFT_22_ILI9225.h"
 
 #define LEN(X) (sizeof(X) / sizeof(X[0]))
@@ -26,11 +25,11 @@ const float discharge_ticks[] = DISCHARGE_TICKS;
 
 char fw_version_buffer[6];
 
-uint16_t item_color(t_data* data) {
+uint16_t item_color(float speed_kph) {
     uint16_t color = COLOR_WHITE;
-    if (data->speed_kph > SS_RED_SPEED_KPH)
+    if (speed_kph > SS_RED_SPEED_KPH)
         color = COLOR_RED;
-    else if (data->speed_kph > SS_YELLOW_SPEED_KPH)
+    else if (speed_kph > SS_YELLOW_SPEED_KPH)
         color = COLOR_YELLOW;
     return color;
 }
@@ -49,17 +48,12 @@ const char* make_fw_version(const char* fw_version, const char* revision_id) {
     }
 }
 
-float convert_distance(float distance_km, bool imperial_units)
+float convert_km_to_miles(float kilometer, bool imperial_units)
 {
     if (imperial_units)
-        return distance_km * KM_PER_MILE;
+        return kilometer * KM_PER_MILE;
     else
-        return distance_km;
-}
-
-float convert_speed(float speed_kph, bool imperial_units)
-{
-    return convert_distance(speed_kph, imperial_units);
+        return kilometer;
 }
 
 float convert_temperature(float temp_celsius, bool imperial_units) {
@@ -98,15 +92,12 @@ const char* vesc_fault_code_to_string(vesc_comm_fault_code fault_code) {
 }
 
 int32_t rotations_to_meters(int32_t erpm) {
-    Serial.println(String(erpm ) + " is the erpm");
     float gear_ratio = float(WHEEL_PULLEY_TEETH) / float(MOTOR_PULLEY_TEETH);
-    Serial.println(String(gear_ratio) + " is the gear ratio");
     return (erpm / MOTOR_POLE_PAIRS / gear_ratio) * WHEEL_DIAMETER_MM * PI / 1000;
 }
 
 float erpm_to_kph(uint32_t erpm) {
     float km_per_minute = rotations_to_meters(erpm) / 1000.0;
-    Serial.println(String(km_per_minute) + " km per minute");
     return km_per_minute * 60.0;
 }
 
