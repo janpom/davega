@@ -59,7 +59,7 @@ void VerticalScreen::update(t_data *data) {
     dtostrf(convert_km_to_miles(data->trip_km, _config->imperial_units), 5, 2, value1);
     format_total_distance(convert_km_to_miles(data->total_km, _config->imperial_units), value2);
     dtostrf(data->battery_amps * data->voltage, 4, 0, value3);
-    dtostrf(data->mosfet_celsius, 2, 1, temp_value);
+    dtostrf(data->mosfet_celsius, 3, 1, temp_value);
 
     
     tft_util_draw_number(_tft, primary_value, 2, 35, item_color(convert_km_to_miles(data->speed_kph, _config)), COLOR_BLACK, 10, 14);

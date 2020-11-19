@@ -17,7 +17,7 @@
 #define ROXIE_CONFIG_H
 
 // uncomment if not using arduino nano every
-// #define ARDUINO_NANO_EVERY
+#define ARDUINO_NANO_EVERY
 
 #define VESC_COUNT 1  // number of controllers: 1 = single, 2 = dual (set to 1 for FOCBOX Unity unless you have more than 1)
 #define MOTOR_POLE_PAIRS 2
@@ -46,7 +46,7 @@
 // Changing the EEPROM_MAGIC_VALUE (to any value different from the current, e.g. 42 -> 43) will reset
 // the EEPROM to the values defined below. This is especially handy for pre-setting the total distance
 // traveled (EEPROM_INIT_VALUE_TOTAL_DISTANCE).
-#define EEPROM_MAGIC_VALUE 51 // [1, 255]
+#define EEPROM_MAGIC_VALUE 1 // [1, 255]
 
 #define EEPROM_INIT_VALUE_VOLTS 0
 #define EEPROM_INIT_VALUE_MAH_SPENT 0
@@ -63,7 +63,7 @@
 // Note that EEPROM is also updated whenever the board comes to a stop (see below), so regardless
 // of how EEPROM_UPDATE_EACH_METERS is set, there won't be missed meters unless Roxie is accidentally
 // reset before saving to EEPROM (which shouldn't happen under normal circumstances).
-#define EEPROM_UPDATE_EACH_METERS 1000
+#define EEPROM_UPDATE_EACH_METERS 100
 
 // If the board comes to stop, update EEPROM, unless it was already updated in less than
 // EEPROM_UPDATE_MIN_DELAY_ON_STOP millis when the board stopped. This shouldn't happen

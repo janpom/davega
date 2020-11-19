@@ -19,7 +19,13 @@
 #include "data.h"
 #include "screen.h"
 
-void read_buttons(t_session_data &session_data, int32_t* initial_trip_meters, int32_t* tachometer, Screen* screen);
+/**
+ * @brief Check to see if button 1 was pressed. In case it was pressed, reset the session.
+ * 
+ * @param _data 
+ * @return true if button was pressed
+ */
+bool check_button1(t_data* _data);
 void button1_changed();
 void button2_pressed();
 void button3_pressed();

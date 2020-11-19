@@ -38,7 +38,7 @@ bool eeprom_is_initialized(uint8_t magic_value);
  * @param data 
  */
 void eeprom_initialize(uint8_t magic_value, t_session_data session_data, t_data data);
-void eeprom_read_data(t_data data, t_session_data session_data);
+void eeprom_read_data(t_data* data, t_session_data session_data);
 
 float eeprom_read_volts();
 void eeprom_write_volts(float volts);

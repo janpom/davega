@@ -72,11 +72,11 @@ uint8_t VescComm::receive_packet(uint16_t timeout) {
                 break;
         }
     }
-    // read any left-over bytes without storing
-/*     while (vesc_serial.available()) {
+    //read any left-over bytes without storing
+    while (vesc_serial.available()) {
         // TODO: warning
         vesc_serial.read();
-    } */
+    }
     return _bytes_read;
 }
 

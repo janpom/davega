@@ -33,14 +33,14 @@ VerticalScreen vertical_screen;
 t_screen_config screen_config;
 t_data data; // struct containing data received from vesc
 t_session_data session_data; // data from this session
-int32_t initial_trip_meters; // trip meters that were stored in the EEPROM on startup
-int32_t initial_total_meters; // total meters that were stored in the EEPROM on startup
+int32_t startup_trip_meters; // trip meters that were stored in the EEPROM on startup
+int32_t startup_total_meters; // total meters that were stored in the EEPROM on startup
 int32_t last_total_meters_stored;
 int32_t last_stopped;
 int32_t last_rpm;
 
 void setup() {
-    delay(1000);
+    // delay(1000); // Only for testing the EEPROM
     // Initialize the buttons with interrupts. Drawing the screen takes a long time and else buttons feel sluggish.
     pinMode(BUTTON_1_PIN, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(BUTTON_1_PIN), button1_changed, CHANGE);
@@ -61,27 +61,26 @@ void setup() {
     if(!eeprom_is_initialized(EEPROM_MAGIC_VALUE)){
         eeprom_initialize(EEPROM_MAGIC_VALUE, session_data, data);
     }
-    eeprom_read_data(data, session_data);
-
-    vesc_comm.fetch_packet();
-    if (!vesc_comm.is_expected_packet()) {
-        vertical_screen.heartbeat(UPDATE_DELAY, false);
-        return;
-    }
-    vesc_comm.process_packet(&data);
-
-    get_initial_values();
+    eeprom_read_data(&data, session_data);
 
     // Initialize the screen and draw te basic interface
     vertical_screen.init(&screen_config);
     vertical_screen.draw_basic();
 
-    // Draw the rest of the interface so there is something to see if the vesc isn't connected yet
+    Serial.println("Getting startup value for the tachometer from vesc");
+    vesc_comm.fetch_packet();
+    while(!vesc_comm.is_expected_packet()) {
+        vertical_screen.heartbeat(UPDATE_DELAY, false);
+        vesc_comm.fetch_packet();
+    }
+    vesc_comm.process_packet(&data);
+
+    load_startup_values();
     vertical_screen.update(&data);
 }
 
 void loop() {
-    //read_buttons(session_data, &initial_trip_meters, &tachometer, screen);
+    check_buttons();
 
     vesc_comm.fetch_packet();
     if (!vesc_comm.is_expected_packet()) {
@@ -90,17 +89,26 @@ void loop() {
     }
     vesc_comm.process_packet(&data);
 
-    read_other_values();
+    process_other_values();
 
     vertical_screen.update(&data);
     vertical_screen.heartbeat(UPDATE_DELAY, true);
 
 }
 
-void get_initial_values(){
+void check_buttons(){
+    if(check_button1(&data)){
+        startup_trip_meters = 0 - rotations_to_meters(data.tachometer / 6);
+    }
+}
+
+void load_startup_values(){
     // Store the trip and total meter values on startup
-    initial_trip_meters = session_data.trip_meters;
-    initial_total_meters = eeprom_read_total_distance(); // TODO: read from data instead of EEPROM
+    Serial.println("Getting startup values");
+    t_session_data startup = eeprom_read_session_data();
+    startup_trip_meters = startup.trip_meters;
+    startup_total_meters = eeprom_read_total_distance(); // TODO: read from data instead of EEPROM
+    last_total_meters_stored = startup_total_meters; // set the startup values as the last values stored in EEPROM 
 
     // Subtract current VESC values, which could be non-zero in case the display
     // got reset without resetting the VESC as well. The invariant is:
@@ -108,15 +116,15 @@ void get_initial_values(){
     // and that works correctly with the default initial values in case the VESC values
     // start from 0. If that's not the case though we need to lower the initial values.
     int32_t tachometer = rotations_to_meters(data.tachometer / 6);
-    initial_trip_meters -= tachometer;
-    initial_total_meters -= tachometer;
+    startup_trip_meters -= tachometer;
+    startup_total_meters -= tachometer;
 }
 
-void read_other_values(){
+void process_other_values(){
     int32_t tachometer_meters = rotations_to_meters(data.tachometer / 6);
 
-    session_data.trip_meters = initial_trip_meters + tachometer_meters;
-    int32_t total_meters = initial_total_meters + tachometer_meters;
+    session_data.trip_meters = startup_trip_meters + tachometer_meters;
+    int32_t total_meters = startup_total_meters + tachometer_meters;
 
     data.trip_km = session_data.trip_meters / 1000.0;
     data.total_km = total_meters / 1000.0;
@@ -125,7 +133,6 @@ void read_other_values(){
     bool came_to_stop = (last_rpm != 0 && data.rpm == 0);
     bool traveled_enough_distance = (total_meters - last_total_meters_stored >= EEPROM_UPDATE_EACH_METERS);
     if (traveled_enough_distance || (came_to_stop && millis() - last_stopped > EEPROM_UPDATE_MIN_DELAY_ON_STOP)) {
-        Serial.println("Storing data in eeprom");
         if (came_to_stop)
             last_stopped = millis();
         last_total_meters_stored = total_meters;
